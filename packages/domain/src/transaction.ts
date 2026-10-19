@@ -42,3 +42,14 @@ export interface VoiceParseResult {
   unresolvedFields: string[];
   latencyMs: number;
 }
+
+export interface ResolvedVoiceEntry {
+  type: TransactionType;
+  amountMinor: number;
+  categoryId: string;
+  subcategoryId: string | null;
+  occurredAt: string;
+  note: string;
+  categoryName: string;
+  subcategoryName: string | null;
+}

@@ -1,7 +1,8 @@
 import { randomUUID } from 'expo-crypto';
 import { and, desc, eq, gte, isNull, lt } from 'drizzle-orm';
+import type { ResolvedVoiceEntry } from '@shengzhang/domain';
 
-import { backupState, transactions } from './schema';
+import { backupState, transactions, voiceBatches } from './schema';
 import type { AppDatabase } from './schema-types';
 import { findCategory } from './categoryRepository';
 
@@ -14,6 +15,12 @@ export interface TransactionInput {
   subcategoryId: string | null;
   occurredAt: string;
   note: string;
+}
+
+export interface VoiceBatchInput {
+  requestId: string;
+  transcript: string;
+  entries: ResolvedVoiceEntry[];
 }
 
 function validateCategorySelection(db: AppDatabase, input: TransactionInput) {
@@ -106,6 +113,82 @@ export function restoreTransaction(db: AppDatabase, id: string) {
     tx.update(transactions)
       .set({ deletedAt: null, updatedAt: new Date().toISOString() })
       .where(eq(transactions.id, id))
+      .run();
+    tx.update(backupState)
+      .set({ status: 'pending' })
+      .where(eq(backupState.id, 1))
+      .run();
+  });
+}
+
+export function createVoiceBatch(db: AppDatabase, input: VoiceBatchInput): string[] {
+  if (input.entries.length === 0 || input.entries.length > 5) {
+    throw new Error('一次语音需要生成 1–5 笔账单');
+  }
+  input.entries.forEach((entry) =>
+    validateCategorySelection(db, {
+      type: entry.type,
+      amountMinor: entry.amountMinor,
+      categoryId: entry.categoryId,
+      subcategoryId: entry.subcategoryId,
+      occurredAt: entry.occurredAt,
+      note: entry.note,
+    }),
+  );
+
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const ids: string[] = [];
+
+  db.transaction((tx) => {
+    tx.insert(voiceBatches)
+      .values({
+        requestId: input.requestId,
+        transcript: input.transcript,
+        entryCount: input.entries.length,
+        unresolvedFields: '[]',
+        undoExpiresAt: new Date(now.getTime() + 8000).toISOString(),
+        createdAt: nowIso,
+      })
+      .run();
+
+    input.entries.forEach((entry, index) => {
+      const id = randomUUID();
+      ids.push(id);
+      tx.insert(transactions)
+        .values({
+          id,
+          type: entry.type,
+          amountMinor: entry.amountMinor,
+          currency: 'CNY',
+          categoryId: entry.categoryId,
+          subcategoryId: entry.subcategoryId,
+          occurredAt: entry.occurredAt,
+          note: entry.note.trim(),
+          source: 'voice',
+          voiceBatchId: input.requestId,
+          voiceEntryIndex: index,
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        })
+        .run();
+    });
+
+    tx.update(backupState)
+      .set({ status: 'pending' })
+      .where(eq(backupState.id, 1))
+      .run();
+  });
+
+  return ids;
+}
+
+export function softDeleteVoiceBatch(db: AppDatabase, requestId: string) {
+  const now = new Date().toISOString();
+  db.transaction((tx) => {
+    tx.update(transactions)
+      .set({ deletedAt: now, updatedAt: now })
+      .where(and(eq(transactions.voiceBatchId, requestId), isNull(transactions.deletedAt)))
       .run();
     tx.update(backupState)
       .set({ status: 'pending' })

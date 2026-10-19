@@ -258,6 +258,7 @@ export default function StatsScreen() {
         visible={voiceVisible}
         onClose={() => setVoiceVisible(false)}
         onManualEntry={() => router.push('/entry')}
+        onSaved={() => router.replace('/')}
       />
     </SafeAreaView>
   );

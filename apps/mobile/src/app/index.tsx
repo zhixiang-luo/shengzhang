@@ -17,6 +17,7 @@ import { BrandMark } from '../components/BrandMark';
 import { Icon } from '../components/Icon';
 import { UndoDeleteBanner } from '../components/UndoDeleteBanner';
 import { VoiceActionSheet } from '../components/VoiceActionSheet';
+import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatDayHeading, formatMonth, formatTime } from '../utils/date';
@@ -171,7 +172,9 @@ export default function LedgerScreen() {
         visible={voiceVisible}
         onClose={() => setVoiceVisible(false)}
         onManualEntry={openManualEntry}
+        onSaved={refresh}
       />
+      <VoiceResultSheet onUndone={refresh} />
     </SafeAreaView>
   );
 }
