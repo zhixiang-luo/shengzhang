@@ -6,14 +6,16 @@
 
 ## 当前阶段
 
-项目处于 **产品原型阶段**。
+项目处于 **技术基线与高保真 UI 阶段**。
 
 - [x] 产品定位与 MVP 范围
 - [x] 核心业务流程
 - [x] 微信一键登录与云备份策略
-- [ ] 可点击产品原型评审
-- [ ] 高保真 UI 与设计规范
-- [ ] 技术方案与双端应用开发
+- [x] 可点击产品原型评审
+- [x] 技术方案与仓库结构
+- [x] UI 交付规范与设计令牌
+- [ ] 高保真页面导出
+- [ ] 双端应用开发
 
 ## 产品原则
 
@@ -31,8 +33,33 @@
 ├── prototype/    可点击的中保真产品原型
 ├── design/       高保真 UI、设计令牌、图标与导出图
 ├── preview/      面向 GitHub 浏览的预览入口
-└── apps/         后续移动端与 Web 代码（尚未创建）
+├── apps/mobile/  Expo + React Native 双端应用
+├── services/api/ 语音、微信登录与云备份网关
+└── packages/     跨端领域模型与接口契约
 ```
+
+## 技术栈
+
+- React Native 0.88 + Expo 58 + TypeScript 6
+- Expo Router、SQLite、Drizzle ORM、Zustand
+- Node.js 22 + Fastify + Zod + PostgreSQL
+- pnpm workspace；EAS Build；GitHub Actions
+
+详细架构、目录边界、数据模型和接口契约见 `docs/09-technical-architecture.md`。所有 AI 协作先读根目录 `AGENTS.md` 和 `docs/HANDOFF.md`，完整索引见 `docs/README.md`。
+
+## 常用命令
+
+```bash
+pnpm install
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm run doctor
+pnpm dev:mobile
+pnpm dev:api
+```
+
+移动端第一阶段可直接使用 Expo Go 真机预览。真实微信 SDK 和商店构建将在外部账号就绪后使用 EAS Build。
 
 ## 查看原型
 

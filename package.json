@@ -1,0 +1,22 @@
+{
+  "name": "shengzhang",
+  "version": "0.1.0",
+  "private": true,
+  "description": "声账 · 一句话语音记账",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev:mobile": "pnpm --filter @shengzhang/mobile start",
+    "dev:api": "pnpm --filter @shengzhang/api dev",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "pnpm -r --if-present lint",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build",
+    "doctor": "expo-doctor apps/mobile"
+  },
+  "devDependencies": {
+    "expo-doctor": "^1.21.5"
+  }
+}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">声账小猪标记</title>
+  <circle cx="64" cy="64" r="60" fill="#F7DDD8"/>
+  <path d="M29 66c0-25 14-40 35-40s35 15 35 40c0 23-14 36-35 36S29 89 29 66Z" fill="#FFFDF8" stroke="#292624" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M36 37c-7-9-6-18 1-21 7-2 12 3 15 12" fill="#E89A96" stroke="#292624" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M92 37c7-9 6-18-1-21-7-2-12 3-15 12" fill="#E89A96" stroke="#292624" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="49" cy="61" r="3.3" fill="#292624"/>
+  <circle cx="79" cy="61" r="3.3" fill="#292624"/>
+  <rect x="46" y="73" width="36" height="22" rx="11" fill="#E89A96" stroke="#292624" stroke-width="3"/>
+  <circle cx="56" cy="84" r="2.4" fill="#292624"/>
+  <circle cx="72" cy="84" r="2.4" fill="#292624"/>
+  <path d="M104 54c5 0 8 4 8 9" fill="none" stroke="#9D5657" stroke-width="3" stroke-linecap="round"/>
+  <path d="M106 43c9 0 14 7 14 16" fill="none" stroke="#9D5657" stroke-width="3" stroke-linecap="round" opacity=".65"/>
+</svg>

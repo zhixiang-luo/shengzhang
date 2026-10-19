@@ -18,6 +18,7 @@
 
 | 文件 | 用途 |
 | --- | --- |
+| `ASSETS.md` | 设计资产状态、命名、导出规格与代码映射 |
 | `tokens/design-tokens.json` | 跨平台设计令牌源文件 |
 | `tokens/tokens.css` | 原型与网页预览使用 |
 | `assets/piggy-mark.svg` | 小猪品牌标记 |

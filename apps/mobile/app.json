@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "声账",
+    "slug": "shengzhang",
+    "scheme": "shengzhang",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shengzhang.ledger",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "声账需要使用麦克风听取你的账单内容。录音仅用于本次识别，完成后立即丢弃。"
+      }
+    },
+    "android": {
+      "package": "com.shengzhang.ledger",
+      "permissions": [
+        "RECORD_AUDIO"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-audio",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#FAF7F0"
+        }
+      ],
+      "expo-sqlite",
+      "expo-sharing",
+      "expo-localization",
+      "expo-asset"
+    ]
+  }
+}
