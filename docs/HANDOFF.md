@@ -42,13 +42,13 @@
 
 ## 下一步最小任务
 
-先在 Expo Go 真机验收本地账本闭环：
+进入 M3 语音垂直切片：
 
-1. 启动 `pnpm dev:mobile`，iPhone/Android 扫码。
-2. 新建支出、收入，切换分类和日期，重启 App 检查持久化。
-3. 编辑并删除账单，检查账本与统计同步。
-4. 修复真机上的键盘、安全区和滚动问题。
-5. 完成后再进入分类管理、删除撤销和语音模块。
+1. 用 `expo-audio` 实现按住录音、松手停止和权限处理。
+2. 把录音上传到现有 `/v1/voice/parse` mock 网关。
+3. 将返回的多笔结果写入 SQLite，并复用结果卡与 8 秒撤销。
+4. 补缺金额修正、网络失败和额度耗尽状态。
+5. 在真机验证后再接真实 ASR/LLM。
 
 ## 已知风险
 
@@ -66,6 +66,6 @@ pnpm typecheck: passed
 pnpm lint: passed
 pnpm test: passed
 expo export --platform ios: passed
-domain tests: 9 passed
+domain tests: 13 passed
 SQLite schema: sqlite3 语法与 foreign_key_check 通过
 ```
