@@ -1,4 +1,8 @@
-import { summarizeAmounts, summarizeExpenseCategories } from '@shengzhang/domain';
+import {
+  summarizeAmounts,
+  summarizeExpenseCategories,
+  type AmountSummary,
+} from '@shengzhang/domain';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -25,13 +29,22 @@ export function useLedgerMonth() {
   const [month, setMonthState] = useState(() => startOfMonth(new Date()));
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [categories, setCategories] = useState<CategoryRow[]>([]);
+  const [previousSummary, setPreviousSummary] = useState<AmountSummary>({
+    expenseMinor: 0,
+    incomeMinor: 0,
+    balanceMinor: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
     try {
       const range = monthRange(month);
+      const previousRange = monthRange(shiftMonth(month, -1));
       setTransactions(listTransactionsBetween(db, range.startIso, range.endIso));
+      setPreviousSummary(
+        summarizeAmounts(listTransactionsBetween(db, previousRange.startIso, previousRange.endIso)),
+      );
       setCategories(listCategories(db));
       setError(null);
     } catch (caught) {
@@ -97,6 +110,7 @@ export function useLedgerMonth() {
     entries,
     groups,
     summary,
+    previousSummary,
     expenseCategories,
     loading,
     error,

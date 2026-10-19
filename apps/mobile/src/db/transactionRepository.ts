@@ -101,6 +101,19 @@ export function softDeleteTransaction(db: AppDatabase, id: string) {
   });
 }
 
+export function restoreTransaction(db: AppDatabase, id: string) {
+  db.transaction((tx) => {
+    tx.update(transactions)
+      .set({ deletedAt: null, updatedAt: new Date().toISOString() })
+      .where(eq(transactions.id, id))
+      .run();
+    tx.update(backupState)
+      .set({ status: 'pending' })
+      .where(eq(backupState.id, 1))
+      .run();
+  });
+}
+
 export function findTransaction(db: AppDatabase, id: string): TransactionRow | null {
   return db
     .select()

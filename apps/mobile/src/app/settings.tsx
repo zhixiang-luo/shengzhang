@@ -39,6 +39,16 @@ export default function SettingsScreen() {
         </View>
         <Text style={styles.note}>账本保存在本机，可离线记收入和支出。</Text>
 
+        <Text style={styles.sectionLabel}>分类</Text>
+        <View style={styles.group}>
+          <SettingRow
+            label="分类管理"
+            value="新增、改名、隐藏"
+            last
+            onPress={() => router.push('/categories')}
+          />
+        </View>
+
         <Text style={styles.sectionLabel}>即将接入</Text>
         <View style={styles.group}>
           <SettingRow label="语音记账" value="下一阶段" />
@@ -62,17 +72,33 @@ function SettingRow({
   label,
   value,
   last = false,
+  onPress,
 }: {
   label: string;
   value: string;
   last?: boolean;
+  onPress?: () => void;
 }) {
-  return (
-    <View style={[styles.row, !last && styles.rowDivider]}>
+  const content = (
+    <>
       <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={styles.rowValue}>{value}</Text>
-    </View>
+      <View style={styles.rowTrailing}>
+        <Text style={styles.rowValue}>{value}</Text>
+        {onPress ? <Icon name="chevron-right" size={15} color={colors.inkTertiary} /> : null}
+      </View>
+    </>
   );
+  if (onPress) {
+    return (
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [styles.row, !last && styles.rowDivider, pressed && styles.rowPressed]}
+      >
+        {content}
+      </Pressable>
+    );
+  }
+  return <View style={[styles.row, !last && styles.rowDivider]}>{content}</View>;
 }
 
 const styles = StyleSheet.create({
@@ -140,6 +166,14 @@ const styles = StyleSheet.create({
   rowValue: {
     color: colors.inkTertiary,
     fontSize: 12,
+  },
+  rowTrailing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  rowPressed: {
+    backgroundColor: colors.canvas,
   },
   note: {
     marginTop: spacing.sm,

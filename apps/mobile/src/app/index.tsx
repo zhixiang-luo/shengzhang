@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomDock } from '../components/BottomDock';
 import { BrandMark } from '../components/BrandMark';
 import { Icon } from '../components/Icon';
+import { UndoDeleteBanner } from '../components/UndoDeleteBanner';
 import { VoiceActionSheet } from '../components/VoiceActionSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
 import { colors, radii, spacing, typography } from '../theme/tokens';
@@ -164,6 +165,7 @@ export default function LedgerScreen() {
         })}
       </ScrollView>
 
+      <UndoDeleteBanner onRestored={refresh} />
       <BottomDock active="ledger" onVoice={() => setVoiceVisible(true)} />
       <VoiceActionSheet
         visible={voiceVisible}

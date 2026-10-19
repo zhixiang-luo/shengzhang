@@ -25,6 +25,7 @@ import {
   softDeleteTransaction,
   updateTransaction,
 } from '../db/transactionRepository';
+import { useUndoDeleteStore } from '../stores/undoStore';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatDayHeading, formatTime, localDateKey } from '../utils/date';
 
@@ -245,6 +246,8 @@ export default function EntryScreen() {
         text: '删除',
         style: 'destructive',
         onPress: () => {
+          const deleted = findTransaction(db, editingId);
+          if (deleted) useUndoDeleteStore.getState().setDeleted(deleted);
           softDeleteTransaction(db, editingId);
           router.back();
         },
