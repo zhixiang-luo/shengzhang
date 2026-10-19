@@ -1,0 +1,171 @@
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { Icon } from '../components/Icon';
+import { listCategories } from '../db/categoryRepository';
+import { useDatabase } from '../db/DatabaseProvider';
+import { countTransactions } from '../db/transactionRepository';
+import { colors, radii, spacing, typography } from '../theme/tokens';
+
+export default function SettingsScreen() {
+  const db = useDatabase();
+  const [transactionCount, setTransactionCount] = useState(0);
+  const [categoryCount, setCategoryCount] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      setTransactionCount(countTransactions(db));
+      setCategoryCount(listCategories(db).length);
+    }, [db]),
+  );
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+      <View style={styles.header}>
+        <Pressable onPress={() => router.back()} style={styles.backButton} accessibilityLabel="返回">
+          <Icon name="back" size={20} color={colors.inkSecondary} />
+        </Pressable>
+        <Text style={styles.title}>设置</Text>
+        <View style={styles.headerSpace} />
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <Text style={styles.sectionLabel}>本机数据</Text>
+        <View style={styles.group}>
+          <SettingRow label="账单" value={`${transactionCount} 笔`} />
+          <SettingRow label="分类" value={`${categoryCount} 个`} last />
+        </View>
+        <Text style={styles.note}>账本保存在本机，可离线记收入和支出。</Text>
+
+        <Text style={styles.sectionLabel}>即将接入</Text>
+        <View style={styles.group}>
+          <SettingRow label="语音记账" value="下一阶段" />
+          <SettingRow label="微信登录" value="未登录" />
+          <SettingRow label="云备份" value="未开启" />
+          <SettingRow label="导出与恢复" value="待接入" last />
+        </View>
+
+        <Text style={styles.sectionLabel}>关于</Text>
+        <View style={styles.aboutCard}>
+          <Text style={styles.aboutName}>声账</Text>
+          <Text style={styles.aboutTagline}>说一句，就记好。</Text>
+          <Text style={styles.aboutVersion}>MVP 0.1.0 · Expo 58</Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function SettingRow({
+  label,
+  value,
+  last = false,
+}: {
+  label: string;
+  value: string;
+  last?: boolean;
+}) {
+  return (
+    <View style={[styles.row, !last && styles.rowDivider]}>
+      <Text style={styles.rowLabel}>{label}</Text>
+      <Text style={styles.rowValue}>{value}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.canvas,
+  },
+  header: {
+    minHeight: 58,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.xl,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    backgroundColor: colors.surface,
+  },
+  title: {
+    color: colors.ink,
+    fontFamily: typography.display,
+    fontSize: 21,
+  },
+  headerSpace: {
+    width: 44,
+  },
+  content: {
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.huge,
+  },
+  sectionLabel: {
+    marginTop: spacing.xxl,
+    marginBottom: spacing.sm,
+    color: colors.inkTertiary,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  group: {
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    backgroundColor: colors.surface,
+  },
+  row: {
+    minHeight: 54,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+  },
+  rowDivider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
+  rowLabel: {
+    color: colors.ink,
+    fontSize: 14,
+  },
+  rowValue: {
+    color: colors.inkTertiary,
+    fontSize: 12,
+  },
+  note: {
+    marginTop: spacing.sm,
+    paddingHorizontal: 4,
+    color: colors.inkTertiary,
+    fontSize: 10,
+    lineHeight: 16,
+  },
+  aboutCard: {
+    padding: spacing.xl,
+    borderRadius: radii.lg,
+    backgroundColor: colors.ink,
+  },
+  aboutName: {
+    color: colors.surface,
+    fontFamily: typography.display,
+    fontSize: 27,
+  },
+  aboutTagline: {
+    marginTop: 5,
+    color: colors.blushSoft,
+    fontSize: 12,
+  },
+  aboutVersion: {
+    marginTop: spacing.xl,
+    color: 'rgba(255, 253, 248, 0.46)',
+    fontSize: 10,
+  },
+});

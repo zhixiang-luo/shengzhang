@@ -20,11 +20,13 @@
 - ESLint、TypeScript、Vitest、Expo Doctor、EAS 配置和 GitHub Actions 基础 CI 已接入。
 - Expo Doctor 20/20 通过；iOS JavaScript bundle 导出成功。
 - 全仓 TypeScript 检查和现有 Vitest 测试通过。
+- SQLite schema、首版迁移、内置分类种子和数据库 Provider 已实现。
+- 账本首页可读取真实本地账单，按日期分组并显示月度收支。
+- 手动新增、编辑和删除账单已接入本地数据库。
+- 基础月度统计已实现每日支出柱状图和一级分类占比。
 
 ## 当前未实现
 
-- 真实 SQLite 数据库与迁移。
-- 原生账本页面、手动记账、分类和统计。
 - 真实录音、ASR、模型解析。
 - 微信移动端登录。
 - PostgreSQL、对象存储、云备份与恢复。
@@ -32,14 +34,13 @@
 
 ## 下一步最小任务
 
-实现本地账本垂直切片：
+先在 Expo Go 真机验收本地账本闭环：
 
-1. SQLite schema 与第一版迁移。
-2. 写入 PRD 中的内置支出/收入分类。
-3. Transaction/Category repository。
-4. 账本首页读取当日和本月账单。
-5. 手动新增一笔并写入数据库。
-6. 在 Expo Go 真机验证，补自动化测试并更新本文件。
+1. 启动 `pnpm dev:mobile`，iPhone/Android 扫码。
+2. 新建支出、收入，切换分类和日期，重启 App 检查持久化。
+3. 编辑并删除账单，检查账本与统计同步。
+4. 修复真机上的键盘、安全区和滚动问题。
+5. 完成后再进入分类管理、删除撤销和语音模块。
 
 ## 已知风险
 
@@ -57,4 +58,6 @@ pnpm typecheck: passed
 pnpm lint: passed
 pnpm test: passed
 expo export --platform ios: passed
+domain tests: 9 passed
+SQLite schema: sqlite3 语法与 foreign_key_check 通过
 ```

@@ -1,6 +1,7 @@
 export const colors = {
   canvas: '#FAF7F0',
   surface: '#FFFDF8',
+  surfaceSunken: '#F3EEE5',
   ink: '#292624',
   inkSecondary: '#726B64',
   inkTertiary: '#A39A91',
@@ -37,4 +38,5 @@ export const radii = {
 export const typography = {
   display: 'Songti SC',
   body: 'PingFang SC',
+  number: 'SF Pro Display',
 } as const;
