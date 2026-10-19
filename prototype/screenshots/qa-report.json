@@ -11,9 +11,9 @@
       "detail": "overflow=0"
     },
     {
-      "name": "语音面板打开",
+      "name": "底部记账一步进入录音",
       "pass": true,
-      "detail": "{\"orb\":true,\"modal\":true}"
+      "detail": "{\"recording\":true,\"modal\":true,\"extraStartButton\":false}"
     },
     {
       "name": "一句话生成两笔账单",
@@ -101,5 +101,5 @@
     "buttons": 37,
     "text": "晚上好 · 今天也要好好生活\n我的账本\n满\n2026年10月\n本月支出\n¥12.34\n本月收入\n¥ 0.00\n本月结余\n¥ -12.34\n今天\n1 笔记录 · 花得刚刚好\n¥ 12.34\n最近账单\n全"
   },
-  "checkedAt": "2026-10-19T10:11:13.153Z"
+  "checkedAt": "2026-10-19T10:40:25.622Z"
 }

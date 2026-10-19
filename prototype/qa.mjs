@@ -99,13 +99,16 @@ let snapshot = await evaluate(`({
 check("首页加载与演示数据", snapshot.nav && snapshot.overview && snapshot.rows >= 8, JSON.stringify(snapshot));
 check("首页无横向溢出", snapshot.overflow <= 1, `overflow=${snapshot.overflow}`);
 
-await click('[data-action="open-voice"]');
-snapshot = await evaluate(`({ orb: !!document.querySelector('#voiceOrb'), modal: !!document.querySelector('.voice-panel') })`);
-check("语音面板打开", snapshot.orb && snapshot.modal, JSON.stringify(snapshot));
-
 const beforeVoice = await evaluate(`document.querySelectorAll('.transaction-row').length`);
-await click('[data-action="voice-sample"][data-sample="multi"]');
-await wait(1700);
+await click('[data-action="open-voice"]');
+snapshot = await evaluate(`({
+  recording: !!document.querySelector('.voice-orb.recording'),
+  modal: !!document.querySelector('.voice-panel'),
+  extraStartButton: !!document.querySelector('[data-action="voice-sample"]')
+})`);
+check("底部记账一步进入录音", snapshot.recording && snapshot.modal && !snapshot.extraStartButton, JSON.stringify(snapshot));
+
+await wait(2400);
 snapshot = await evaluate(`({
   result: !!document.querySelector('.voice-result'),
   entries: document.querySelectorAll('.voice-entry').length,

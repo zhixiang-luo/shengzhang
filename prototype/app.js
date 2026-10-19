@@ -236,6 +236,7 @@
     lastDeleted: null,
     backupStatus: "idle"
   };
+  let directVoiceGesture = null;
 
   function resetState({ keepScreen = false } = {}) {
     clearTimeout(state.voiceTimer);
@@ -360,7 +361,7 @@
           <span>账本</span>
         </button>
         <div class="voice-nav-wrap">
-          <button class="voice-nav" type="button" data-action="open-voice" aria-label="语音记账">
+          <button class="voice-nav" type="button" data-action="open-voice" aria-label="按住说一句，松手自动记账">
             ${icon("mic", 26, 2.1)}
           </button>
           <span class="voice-nav-label">记账</span>
@@ -990,6 +991,21 @@
   function renderVoice() {
     const voice = state.voice;
     if (!voice) return "";
+    if (voice.phase === "recording") {
+      return voiceShell(`
+        <div class="voice-main">
+          <div class="voice-status">VOICE TO LEDGER</div>
+          <h2 class="voice-title" id="voiceTitle">我在听，请说</h2>
+          <p class="voice-subtitle" id="voiceSubtitle">例如：午饭 25，打车 18</p>
+          <div class="voice-orb recording" aria-hidden="true">
+            ${icon("mic", 46, 1.65)}
+          </div>
+          <div class="waveform" id="voiceWave">${Array.from({ length: 19 }, () => "<span></span>").join("")}</div>
+          <p class="voice-hint" id="voiceHint">松开完成 · 上滑取消</p>
+          <p class="voice-hint" style="margin-top:6px;opacity:.72">正在录音 · 最长 30 秒</p>
+        </div>
+      `);
+    }
     if (voice.phase === "parsing") {
       return voiceShell(`
         <div class="voice-main">
@@ -1583,12 +1599,21 @@
 
   function openVoice(sample = null) {
     clearTimeout(state.voiceTimer);
-    state.voice = { phase: sample ? "parsing" : "idle", sample };
+    if (!sample) {
+      startDirectVoice();
+      return;
+    }
+    state.voice = { phase: "parsing", sample };
     state.modal = { type: "voice" };
     renderApp();
-    if (sample) {
-      state.voiceTimer = setTimeout(() => finishVoiceParsing(sample), 1250);
-    }
+    state.voiceTimer = setTimeout(() => finishVoiceParsing(sample), 1250);
+  }
+
+  function startDirectVoice() {
+    clearTimeout(state.voiceTimer);
+    state.voice = { phase: "recording" };
+    state.modal = { type: "voice" };
+    renderApp();
   }
 
   function beginVoiceParsing(sample = "multi") {
@@ -2284,7 +2309,11 @@
           state.screen = "ledger";
           state.stack = ["ledger"];
         }
-        openVoice();
+        if (state.modal?.type === "voice") break;
+        // Keyboard and assistive activation has no pointerdown/up pair.
+        // Start listening visually, then submit the prototype sample.
+        startDirectVoice();
+        state.voiceTimer = setTimeout(() => beginVoiceParsing("multi"), 720);
         break;
       case "voice-orb":
         if (event.detail === 0) beginVoiceParsing("multi");
@@ -2702,6 +2731,54 @@
       applyScenario(event.target.closest("[data-scenario]").dataset.scenario);
     }
   });
+
+  document.addEventListener("pointerdown", (event) => {
+    const trigger = event.target.closest('[data-action="open-voice"]');
+    if (!trigger || state.modal?.type === "voice" || event.button !== 0) return;
+    event.preventDefault();
+    if (state.screen === "onboarding") {
+      state.screen = "ledger";
+      state.stack = ["ledger"];
+    }
+    directVoiceGesture = {
+      startY: event.clientY,
+      cancelArmed: false,
+      pointerId: event.pointerId
+    };
+    startDirectVoice();
+  });
+
+  document.addEventListener("pointermove", (event) => {
+    if (!directVoiceGesture || event.pointerId !== directVoiceGesture.pointerId) return;
+    const cancelArmed = directVoiceGesture.startY - event.clientY > 55;
+    directVoiceGesture.cancelArmed = cancelArmed;
+    const orb = document.querySelector(".voice-orb.recording");
+    const title = document.getElementById("voiceTitle");
+    const hint = document.getElementById("voiceHint");
+    orb?.classList.toggle("canceling", cancelArmed);
+    if (title) title.textContent = cancelArmed ? "松开就取消" : "我在听，请说";
+    if (hint) {
+      hint.textContent = cancelArmed ? "松手取消这句话" : "松开完成 · 上滑取消";
+      hint.classList.toggle("cancel-hint", cancelArmed);
+    }
+  });
+
+  const finishDirectVoice = (event) => {
+    if (!directVoiceGesture || (event?.pointerId != null && event.pointerId !== directVoiceGesture.pointerId)) return;
+    const canceled = directVoiceGesture.cancelArmed;
+    directVoiceGesture = null;
+    if (canceled) {
+      state.modal = null;
+      state.voice = null;
+      renderApp();
+      toast("已取消，这句话没有记下来", "refresh");
+      return;
+    }
+    beginVoiceParsing("multi");
+  };
+
+  document.addEventListener("pointerup", finishDirectVoice);
+  document.addEventListener("pointercancel", finishDirectVoice);
 
   scenarioToggle.addEventListener("click", () => toggleScenario());
   document.getElementById("scenarioClose").innerHTML = icon("close", 19, 2);
