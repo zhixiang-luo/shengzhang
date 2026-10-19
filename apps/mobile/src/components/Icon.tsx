@@ -4,11 +4,13 @@ import { colors } from '../theme/tokens';
 
 export type IconName =
   | 'back'
+  | 'calendar'
   | 'chart'
   | 'check'
   | 'chevron-left'
   | 'chevron-right'
   | 'close'
+  | 'clock'
   | 'ledger'
   | 'mic'
   | 'plus'
@@ -53,6 +55,18 @@ export function Icon({ name, size = 22, color = colors.ink, strokeWidth = 1.8 }:
       {name === 'chart' && (
         <>
           <Path d="M4 20V10M10 20V4M16 20v-7M22 20H2" {...common} />
+        </>
+      )}
+      {name === 'calendar' && (
+        <>
+          <Rect x="3.5" y="5" width="17" height="15.5" rx="3" {...common} />
+          <Path d="M7.5 3v4M16.5 3v4M3.5 9.5h17M7.5 13h2M11 13h2M14.5 13h2M7.5 16.5h2M11 16.5h2" {...common} />
+        </>
+      )}
+      {name === 'clock' && (
+        <>
+          <Circle cx="12" cy="12" r="8.5" {...common} />
+          <Path d="M12 7.5V12l3.2 2" {...common} />
         </>
       )}
       {name === 'settings' && (

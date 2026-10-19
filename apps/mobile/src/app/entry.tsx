@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { DateTimePickerSheet } from '../components/DateTimePickerSheet';
 import { Icon } from '../components/Icon';
 import { createCategory, listCategories, type CategoryRow } from '../db/categoryRepository';
 import { useDatabase } from '../db/DatabaseProvider';
@@ -25,7 +26,7 @@ import {
   updateTransaction,
 } from '../db/transactionRepository';
 import { colors, radii, spacing, typography } from '../theme/tokens';
-import { dateFromDayInput, formatDateInput, localDateKey } from '../utils/date';
+import { formatDayHeading, formatTime, localDateKey } from '../utils/date';
 
 const NEW_CATEGORY_COLORS = ['#E89A96', '#D7A66F', '#9EAD98', '#91A6B5', '#9B9BB6', '#A39A91'];
 
@@ -46,7 +47,6 @@ interface EntryInitialState {
   amount: string;
   note: string;
   occurredAt: Date;
-  dateInput: string;
   categoryId: string | null;
   subcategoryId: string | null;
   error: string | null;
@@ -66,7 +66,6 @@ function loadEntryState(db: ReturnType<typeof useDatabase>, editingId: string | 
         amount: '',
         note: '',
         occurredAt: now,
-        dateInput: formatDateInput(now),
         categoryId: root?.id ?? null,
         subcategoryId: firstChild?.id ?? null,
         error: null,
@@ -82,7 +81,6 @@ function loadEntryState(db: ReturnType<typeof useDatabase>, editingId: string | 
         amount: '',
         note: '',
         occurredAt: now,
-        dateInput: formatDateInput(now),
         categoryId: null,
         subcategoryId: null,
         error: '这笔账单已经不存在',
@@ -96,7 +94,6 @@ function loadEntryState(db: ReturnType<typeof useDatabase>, editingId: string | 
       amount: (transaction.amountMinor / 100).toFixed(2).replace(/\.00$/, ''),
       note: transaction.note,
       occurredAt,
-      dateInput: formatDateInput(occurredAt),
       categoryId: transaction.categoryId,
       subcategoryId: transaction.subcategoryId,
       error: null,
@@ -109,7 +106,6 @@ function loadEntryState(db: ReturnType<typeof useDatabase>, editingId: string | 
       amount: '',
       note: '',
       occurredAt: now,
-      dateInput: formatDateInput(now),
       categoryId: null,
       subcategoryId: null,
       error: caught instanceof Error ? caught.message : '分类读取失败',
@@ -130,7 +126,6 @@ export default function EntryScreen() {
   const [amount, setAmount] = useState(initial.amount);
   const [note, setNote] = useState(initial.note);
   const [occurredAt, setOccurredAt] = useState(initial.occurredAt);
-  const [dateInput, setDateInput] = useState(initial.dateInput);
   const [categoryId, setCategoryId] = useState<string | null>(initial.categoryId);
   const [subcategoryId, setSubcategoryId] = useState<string | null>(initial.subcategoryId);
   const [error, setError] = useState<string | null>(initial.error);
@@ -138,6 +133,7 @@ export default function EntryScreen() {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryLevel, setNewCategoryLevel] = useState<'root' | 'sub'>('root');
   const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   const rootCategories = useMemo(
     () => allCategories.filter((category) => category.type === type && category.parentId === null),
@@ -212,13 +208,6 @@ export default function EntryScreen() {
     const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysAgo);
     const next = dateWithTime(date, occurredAt);
     setOccurredAt(next);
-    setDateInput(formatDateInput(next));
-  };
-
-  const commitDateInput = (value: string) => {
-    setDateInput(value);
-    const parsed = dateFromDayInput(value);
-    if (parsed) setOccurredAt(dateWithTime(parsed, occurredAt));
   };
 
   const save = () => {
@@ -231,11 +220,6 @@ export default function EntryScreen() {
       setError('请选择分类');
       return;
     }
-    if (!dateFromDayInput(dateInput)) {
-      setError('日期格式应为 YYYY-MM-DD');
-      return;
-    }
-
     try {
       const input = {
         type,
@@ -397,29 +381,43 @@ export default function EntryScreen() {
             </View>
           ) : null}
 
-          <Text style={styles.sectionLabel}>日期</Text>
+          <Text style={styles.sectionLabel}>时间</Text>
           <View style={styles.quickDates}>
             {quickDates.map(({ label, key, days }) => (
               <Pressable
                 key={label}
                 onPress={() => applyQuickDate(days)}
-                style={[styles.quickDate, dateInput === key && styles.quickDateSelected]}
+                style={[
+                  styles.quickDate,
+                  localDateKey(occurredAt) === key && styles.quickDateSelected,
+                ]}
               >
-                <Text style={[styles.quickDateText, dateInput === key && styles.quickDateTextSelected]}>
+                <Text
+                  style={[
+                    styles.quickDateText,
+                    localDateKey(occurredAt) === key && styles.quickDateTextSelected,
+                  ]}
+                >
                   {label}
                 </Text>
               </Pressable>
             ))}
           </View>
-          <TextInput
-            accessibilityLabel="日期"
-            keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'default'}
-            onChangeText={commitDateInput}
-            placeholder="YYYY-MM-DD"
-            placeholderTextColor={colors.inkTertiary}
-            style={styles.dateInput}
-            value={dateInput}
-          />
+          <Pressable
+            accessibilityLabel="选择日期和时间"
+            onPress={() => setDatePickerVisible(true)}
+            style={styles.dateCard}
+          >
+            <View style={styles.dateCardIcon}>
+              <Icon name="calendar" size={20} color={colors.blushDeep} />
+            </View>
+            <View style={styles.dateCardCopy}>
+              <Text style={styles.dateCardLabel}>{formatDayHeading(occurredAt)}</Text>
+              <Text style={styles.dateCardHint}>点击打开月历，精确选择日期和时间</Text>
+            </View>
+            <Text style={styles.dateCardTime}>{formatTime(occurredAt.toISOString())}</Text>
+            <Icon name="chevron-right" size={16} color={colors.inkTertiary} />
+          </Pressable>
 
           <Text style={styles.sectionLabel}>备注</Text>
           <TextInput
@@ -444,6 +442,17 @@ export default function EntryScreen() {
           <Text style={styles.privacy}>账单保存在本机。语音和云备份将在后续阶段接入。</Text>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {datePickerVisible ? (
+        <DateTimePickerSheet
+          value={occurredAt}
+          onClose={() => setDatePickerVisible(false)}
+          onConfirm={(date) => {
+            setOccurredAt(date);
+            setDatePickerVisible(false);
+          }}
+        />
+      ) : null}
 
       <Modal
         animationType="slide"
@@ -775,17 +784,46 @@ const styles = StyleSheet.create({
     color: colors.blushDeep,
     fontWeight: '700',
   },
-  dateInput: {
-    height: 46,
+  dateCard: {
+    minHeight: 68,
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: spacing.md,
-    paddingHorizontal: 14,
+    paddingHorizontal: spacing.lg,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 14,
+    borderRadius: 18,
     backgroundColor: colors.surface,
+  },
+  dateCardIcon: {
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 13,
+    backgroundColor: colors.blushSoft,
+  },
+  dateCardCopy: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  dateCardLabel: {
     color: colors.ink,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  dateCardHint: {
+    marginTop: 4,
+    color: colors.inkTertiary,
+    fontSize: 9,
+  },
+  dateCardTime: {
+    marginRight: 7,
+    color: colors.blushDeep,
     fontFamily: typography.number,
-    fontSize: 14,
+    fontSize: 17,
+    fontWeight: '600',
+    fontVariant: ['tabular-nums'],
   },
   noteInput: {
     minHeight: 48,
