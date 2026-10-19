@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -15,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '../components/Icon';
-import { listCategories, type CategoryRow } from '../db/categoryRepository';
+import { createCategory, listCategories, type CategoryRow } from '../db/categoryRepository';
 import { useDatabase } from '../db/DatabaseProvider';
 import {
   createTransaction,
@@ -23,8 +24,10 @@ import {
   softDeleteTransaction,
   updateTransaction,
 } from '../db/transactionRepository';
-import { colors, spacing, typography } from '../theme/tokens';
+import { colors, radii, spacing, typography } from '../theme/tokens';
 import { dateFromDayInput, formatDateInput, localDateKey } from '../utils/date';
+
+const NEW_CATEGORY_COLORS = ['#E89A96', '#D7A66F', '#9EAD98', '#91A6B5', '#9B9BB6', '#A39A91'];
 
 function dateWithTime(date: Date, template: Date): Date {
   return new Date(
@@ -121,7 +124,7 @@ export default function EntryScreen() {
   const editingId = typeof params.id === 'string' ? params.id : null;
   const [initial] = useState(() => loadEntryState(db, editingId));
 
-  const allCategories = initial.categories;
+  const [allCategories, setAllCategories] = useState(initial.categories);
   const ready = initial.ready;
   const [type, setType] = useState<TransactionType>(initial.type);
   const [amount, setAmount] = useState(initial.amount);
@@ -131,6 +134,10 @@ export default function EntryScreen() {
   const [categoryId, setCategoryId] = useState<string | null>(initial.categoryId);
   const [subcategoryId, setSubcategoryId] = useState<string | null>(initial.subcategoryId);
   const [error, setError] = useState<string | null>(initial.error);
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryLevel, setNewCategoryLevel] = useState<'root' | 'sub'>('root');
+  const [categoryError, setCategoryError] = useState<string | null>(null);
 
   const rootCategories = useMemo(
     () => allCategories.filter((category) => category.type === type && category.parentId === null),
@@ -142,6 +149,7 @@ export default function EntryScreen() {
     () => allCategories.filter((category) => category.parentId === categoryId),
     [allCategories, categoryId],
   );
+  const amountFontSize = amount.length >= 10 ? 34 : amount.length >= 7 ? 42 : 52;
 
   const changeType = (nextType: TransactionType) => {
     const nextRoots = allCategories.filter(
@@ -160,6 +168,43 @@ export default function EntryScreen() {
     const firstChild = allCategories.find((candidate) => candidate.parentId === category.id);
     setCategoryId(category.id);
     setSubcategoryId(firstChild?.id ?? null);
+  };
+
+  const openCategoryModal = () => {
+    setNewCategoryName('');
+    setNewCategoryLevel(categoryId ? 'sub' : 'root');
+    setCategoryError(null);
+    setCategoryModalVisible(true);
+  };
+
+  const saveNewCategory = () => {
+    try {
+      const parentId = newCategoryLevel === 'sub' ? categoryId : null;
+      if (newCategoryLevel === 'sub' && !parentId) {
+        setCategoryError('请先选择一个一级分类');
+        return;
+      }
+      const color = NEW_CATEGORY_COLORS[allCategories.filter((item) => item.parentId === null).length % NEW_CATEGORY_COLORS.length];
+      const created = createCategory(db, {
+        name: newCategoryName,
+        type,
+        parentId,
+        color,
+      });
+      const nextCategories = listCategories(db);
+      setAllCategories(nextCategories);
+      if (parentId) {
+        setCategoryId(parentId);
+        setSubcategoryId(created.id);
+      } else {
+        setCategoryId(created.id);
+        setSubcategoryId(null);
+      }
+      setCategoryModalVisible(false);
+      setCategoryError(null);
+    } catch (caught) {
+      setCategoryError(caught instanceof Error ? caught.message : '分类创建失败');
+    }
   };
 
   const applyQuickDate = (daysAgo: number) => {
@@ -275,26 +320,39 @@ export default function EntryScreen() {
 
           <View style={styles.amountSection}>
             <Text style={styles.amountLabel}>{type === 'expense' ? '花了多少' : '收到多少'}</Text>
-            <View style={styles.amountInputRow}>
-              <Text style={styles.amountCurrency}>¥</Text>
-              <TextInput
-                accessibilityLabel="金额"
-                autoFocus={!editingId}
-                keyboardType="decimal-pad"
-                onChangeText={(value) => {
-                  setAmount(value.replace(/[^\d.]/g, ''));
-                  setError(null);
-                }}
-                placeholder="0.00"
-                placeholderTextColor={colors.inkTertiary}
-                selectionColor={colors.blushDeep}
-                style={styles.amountInput}
-                value={amount}
-              />
+            <View style={styles.amountCard}>
+              <View style={styles.amountInputRow}>
+                <Text style={styles.amountCurrency}>¥</Text>
+                <TextInput
+                  accessibilityLabel="金额"
+                  autoFocus={!editingId}
+                  keyboardType="decimal-pad"
+                  maxLength={12}
+                  multiline={false}
+                  numberOfLines={1}
+                  onChangeText={(value) => {
+                    setAmount(value.replace(/[^\d.]/g, ''));
+                    setError(null);
+                  }}
+                  placeholder="0.00"
+                  placeholderTextColor={colors.inkTertiary}
+                  scrollEnabled={false}
+                  selectionColor={colors.blushDeep}
+                  style={[styles.amountInput, { fontSize: amountFontSize }]}
+                  value={amount}
+                />
+              </View>
+              <Text style={styles.amountHint}>输入金额，保存后会立即进入本月账本</Text>
             </View>
           </View>
 
-          <Text style={styles.sectionLabel}>分类</Text>
+          <View style={styles.sectionHeading}>
+            <Text style={[styles.sectionLabel, styles.sectionLabelInHeading]}>分类</Text>
+            <Pressable onPress={openCategoryModal} style={styles.newCategoryButton}>
+              <Icon name="plus" size={14} color={colors.blushDeep} strokeWidth={2} />
+              <Text style={styles.newCategoryText}>新建分类</Text>
+            </Pressable>
+          </View>
           <ScrollView
             horizontal
             contentContainerStyle={styles.rootCategoryRow}
@@ -386,6 +444,96 @@ export default function EntryScreen() {
           <Text style={styles.privacy}>账单保存在本机。语音和云备份将在后续阶段接入。</Text>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <Modal
+        animationType="slide"
+        onRequestClose={() => setCategoryModalVisible(false)}
+        presentationStyle="overFullScreen"
+        transparent
+        visible={categoryModalVisible}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.modalRoot}
+        >
+          <Pressable
+            accessibilityLabel="关闭新建分类"
+            onPress={() => setCategoryModalVisible(false)}
+            style={styles.modalBackdrop}
+          />
+          <View style={styles.categorySheet}>
+            <View style={styles.sheetHandle} />
+            <Text style={styles.sheetTitle}>新建分类</Text>
+            <Text style={styles.sheetCaption}>新分类会保存在本机，并立即出现在分类选择中。</Text>
+
+            <View style={styles.sheetSegment}>
+              <Pressable
+                onPress={() => setNewCategoryLevel('root')}
+                style={[
+                  styles.sheetSegmentItem,
+                  newCategoryLevel === 'root' && styles.sheetSegmentActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.sheetSegmentText,
+                    newCategoryLevel === 'root' && styles.sheetSegmentTextActive,
+                  ]}
+                >
+                  一级分类
+                </Text>
+              </Pressable>
+              <Pressable
+                disabled={!selectedRoot}
+                onPress={() => setNewCategoryLevel('sub')}
+                style={[
+                  styles.sheetSegmentItem,
+                  newCategoryLevel === 'sub' && styles.sheetSegmentActive,
+                  !selectedRoot && styles.sheetSegmentDisabled,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.sheetSegmentText,
+                    newCategoryLevel === 'sub' && styles.sheetSegmentTextActive,
+                  ]}
+                >
+                  {selectedRoot ? `在「${selectedRoot.name}」下` : '二级分类'}
+                </Text>
+              </Pressable>
+            </View>
+
+            <TextInput
+              accessibilityLabel="新分类名称"
+              autoFocus
+              maxLength={12}
+              onChangeText={(value) => {
+                setNewCategoryName(value);
+                setCategoryError(null);
+              }}
+              placeholder="例如：夜宵、通勤、宠物零食"
+              placeholderTextColor={colors.inkTertiary}
+              selectionColor={colors.blushDeep}
+              style={styles.categoryNameInput}
+              value={newCategoryName}
+            />
+            {categoryError ? <Text style={styles.categoryModalError}>{categoryError}</Text> : null}
+
+            <View style={styles.sheetActions}>
+              <Pressable
+                onPress={() => setCategoryModalVisible(false)}
+                style={styles.sheetCancel}
+              >
+                <Text style={styles.sheetCancelText}>取消</Text>
+              </Pressable>
+              <Pressable onPress={saveNewCategory} style={styles.sheetSave}>
+                <Icon name="plus" size={16} color={colors.surface} />
+                <Text style={styles.sheetSaveText}>添加分类</Text>
+              </Pressable>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -484,7 +632,16 @@ const styles = StyleSheet.create({
   amountInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing.sm,
+  },
+  amountCard: {
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+    borderRadius: radii.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   amountCurrency: {
     color: colors.blushDeep,
@@ -495,12 +652,25 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 8,
     padding: 0,
+    height: 66,
     color: colors.ink,
     fontFamily: typography.number,
-    fontSize: 52,
     fontWeight: '500',
     fontVariant: ['tabular-nums'],
     letterSpacing: -2,
+    textAlignVertical: 'center',
+  },
+  amountHint: {
+    marginTop: 3,
+    color: colors.inkTertiary,
+    fontSize: 9,
+  },
+  sectionHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.xxl,
+    marginBottom: spacing.md,
   },
   sectionLabel: {
     marginTop: spacing.xxl,
@@ -509,6 +679,22 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.8,
+  },
+  sectionLabelInHeading: {
+    marginTop: 0,
+    marginBottom: 0,
+  },
+  newCategoryButton: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+  },
+  newCategoryText: {
+    color: colors.blushDeep,
+    fontSize: 11,
+    fontWeight: '700',
   },
   rootCategoryRow: {
     gap: 8,
@@ -637,5 +823,123 @@ const styles = StyleSheet.create({
     fontSize: 10,
     lineHeight: 16,
     textAlign: 'center',
+  },
+  modalRoot: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: 'rgba(29, 26, 24, 0.46)',
+  },
+  categorySheet: {
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.md,
+    paddingBottom: 34,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    backgroundColor: colors.canvas,
+  },
+  sheetHandle: {
+    width: 38,
+    height: 4,
+    alignSelf: 'center',
+    borderRadius: 2,
+    backgroundColor: colors.border,
+  },
+  sheetTitle: {
+    marginTop: spacing.xl,
+    color: colors.ink,
+    fontFamily: typography.display,
+    fontSize: 25,
+  },
+  sheetCaption: {
+    marginTop: 6,
+    color: colors.inkSecondary,
+    fontSize: 12,
+    lineHeight: 19,
+  },
+  sheetSegment: {
+    flexDirection: 'row',
+    gap: 4,
+    marginTop: spacing.xl,
+    padding: 4,
+    borderRadius: 999,
+    backgroundColor: colors.surfaceSunken,
+  },
+  sheetSegmentItem: {
+    flex: 1,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+    borderRadius: 999,
+  },
+  sheetSegmentActive: {
+    backgroundColor: colors.surface,
+  },
+  sheetSegmentDisabled: {
+    opacity: 0.4,
+  },
+  sheetSegmentText: {
+    color: colors.inkTertiary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  sheetSegmentTextActive: {
+    color: colors.ink,
+  },
+  categoryNameInput: {
+    height: 52,
+    marginTop: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 16,
+    backgroundColor: colors.surface,
+    color: colors.ink,
+    fontSize: 15,
+  },
+  categoryModalError: {
+    marginTop: spacing.sm,
+    color: colors.danger,
+    fontSize: 11,
+  },
+  sheetActions: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginTop: spacing.xl,
+  },
+  sheetCancel: {
+    flex: 1,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 999,
+    backgroundColor: colors.surfaceSunken,
+  },
+  sheetCancelText: {
+    color: colors.inkSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  sheetSave: {
+    flex: 1.35,
+    height: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    borderRadius: 999,
+    backgroundColor: colors.ink,
+  },
+  sheetSaveText: {
+    color: colors.surface,
+    fontSize: 13,
+    fontWeight: '700',
   },
 });

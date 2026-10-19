@@ -1,8 +1,8 @@
 import { formatCents, summarizeAmounts } from '@shengzhang/domain';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -15,11 +15,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomDock } from '../components/BottomDock';
 import { BrandMark } from '../components/BrandMark';
 import { Icon } from '../components/Icon';
+import { VoiceActionSheet } from '../components/VoiceActionSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatDayHeading, formatMonth, formatTime } from '../utils/date';
 
 export default function LedgerScreen() {
+  const [voiceVisible, setVoiceVisible] = useState(false);
   const {
     month,
     groups,
@@ -32,17 +34,6 @@ export default function LedgerScreen() {
   } = useLedgerMonth();
 
   const openManualEntry = () => router.push('/entry');
-
-  const openVoicePlaceholder = () => {
-    Alert.alert(
-      '语音记账正在接入',
-      '本地账本与手动记账已经可用。下一阶段会接入真实录音、识别和自动入账。',
-      [
-        { text: '知道了', style: 'cancel' },
-        { text: '先手动记一笔', onPress: openManualEntry },
-      ],
-    );
-  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -66,13 +57,6 @@ export default function LedgerScreen() {
             style={styles.iconButton}
           >
             <Icon name="settings" size={20} color={colors.inkSecondary} />
-          </Pressable>
-          <Pressable
-            accessibilityLabel="手动记一笔"
-            onPress={openManualEntry}
-            style={[styles.iconButton, styles.addButton]}
-          >
-            <Icon name="plus" size={20} color={colors.surface} strokeWidth={2.1} />
           </Pressable>
         </View>
       </View>
@@ -116,10 +100,10 @@ export default function LedgerScreen() {
           <View style={styles.empty}>
             <BrandMark size={82} />
             <Text style={styles.emptyTitle}>第一笔，说一句就好。</Text>
-            <Text style={styles.emptyBody}>语音正在接入中，现在可以先用原生键盘手动记一笔。</Text>
+            <Text style={styles.emptyBody}>还没有账单。可以直接加一笔，也可以从下方语音入口滑动进入手动记账。</Text>
             <Pressable onPress={openManualEntry} style={styles.emptyButton}>
               <Icon name="plus" size={17} color={colors.surface} />
-              <Text style={styles.emptyButtonText}>手动记一笔</Text>
+              <Text style={styles.emptyButtonText}>加一笔</Text>
             </Pressable>
           </View>
         ) : null}
@@ -180,7 +164,12 @@ export default function LedgerScreen() {
         })}
       </ScrollView>
 
-      <BottomDock active="ledger" onVoice={openVoicePlaceholder} />
+      <BottomDock active="ledger" onVoice={() => setVoiceVisible(true)} />
+      <VoiceActionSheet
+        visible={voiceVisible}
+        onClose={() => setVoiceVisible(false)}
+        onManualEntry={openManualEntry}
+      />
     </SafeAreaView>
   );
 }
@@ -237,10 +226,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 16,
     backgroundColor: colors.surface,
-  },
-  addButton: {
-    borderColor: colors.ink,
-    backgroundColor: colors.ink,
   },
   scrollContent: {
     paddingHorizontal: spacing.xl,

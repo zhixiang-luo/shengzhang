@@ -1,15 +1,18 @@
 import { formatCents } from '@shengzhang/domain';
 import { router } from 'expo-router';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomDock } from '../components/BottomDock';
 import { Icon } from '../components/Icon';
+import { VoiceActionSheet } from '../components/VoiceActionSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatMonth, localDateKey } from '../utils/date';
 
 export default function StatsScreen() {
+  const [voiceVisible, setVoiceVisible] = useState(false);
   const {
     month,
     entries,
@@ -34,13 +37,6 @@ export default function StatsScreen() {
   });
   const maxDaily = Math.max(...dailyValues.map((item) => item.amountMinor), 1);
   const topCategories = expenseCategories.slice(0, 5);
-
-  const voicePlaceholder = () => {
-    Alert.alert('语音记账正在接入', '下一阶段会接入真实录音与识别，当前可以继续使用手动记账。', [
-      { text: '知道了', style: 'cancel' },
-      { text: '手动记一笔', onPress: () => router.push('/entry') },
-    ]);
-  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -140,7 +136,12 @@ export default function StatsScreen() {
         )}
       </ScrollView>
 
-      <BottomDock active="stats" onVoice={voicePlaceholder} />
+      <BottomDock active="stats" onVoice={() => setVoiceVisible(true)} />
+      <VoiceActionSheet
+        visible={voiceVisible}
+        onClose={() => setVoiceVisible(false)}
+        onManualEntry={() => router.push('/entry')}
+      />
     </SafeAreaView>
   );
 }
