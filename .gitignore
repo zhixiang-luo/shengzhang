@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+.expo/
+.next/
+coverage/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.p8
+*.p12
+*.mobileprovision
+*.keystore
+*.jks
+
+# Native and editor files
+.idea/
+.vscode/
+*.xcuserstate
+ios/Pods/
+android/.gradle/
+
+# Logs and temporary files
+*.log
+*.tmp
+.cache/
+
+# Prototype runtime artifacts
+prototype/.local/

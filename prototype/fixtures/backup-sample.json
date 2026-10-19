@@ -1,0 +1,22 @@
+{
+  "app": "声账",
+  "schemaVersion": 1,
+  "transactions": [
+    {
+      "id": "import-1",
+      "type": "expense",
+      "amount": 1234,
+      "categoryId": "food",
+      "subcategory": "早餐",
+      "note": "导入测试",
+      "occurredAt": "2026-10-19T08:30:00.000Z",
+      "source": "manual",
+      "createdAt": "2026-10-19T08:30:00.000Z"
+    }
+  ],
+  "categories": [],
+  "settings": {
+    "autoPost": true,
+    "voiceTips": true
+  }
+}

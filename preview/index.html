@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf7f0">
+  <title>声账 · 项目原型预览</title>
+  <style>
+    :root {
+      --paper: #faf7f0;
+      --surface: #fffdf8;
+      --ink: #292624;
+      --muted: #726b64;
+      --blush: #e89a96;
+      --blush-deep: #9d5657;
+      --sage: #9ead98;
+      --border: #e8e0d6;
+      --display: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+      --body: "PingFang SC", "Noto Sans CJK SC", sans-serif;
+      --number: "SF Pro Display", "Avenir Next", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 92% 4%, rgba(232, 154, 150, .2), transparent 24rem),
+        radial-gradient(circle at 8% 38%, rgba(158, 173, 152, .13), transparent 26rem),
+        var(--paper);
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .25;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+    a { color: inherit; }
+    .shell { width: min(1200px, calc(100% - 40px)); margin: 0 auto; position: relative; z-index: 1; }
+    header {
+      min-height: 88vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr);
+      align-items: center;
+      gap: clamp(40px, 7vw, 100px);
+      padding: 60px 0 40px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--blush-deep);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; }
+    h1 {
+      margin: 24px 0 0;
+      font-family: var(--display);
+      font-size: clamp(58px, 8.6vw, 116px);
+      font-weight: 500;
+      letter-spacing: -.065em;
+      line-height: .98;
+    }
+    h1 em { color: var(--blush-deep); font-style: normal; }
+    .lede {
+      max-width: 34rem;
+      margin: 30px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      background: var(--surface);
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .button:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(67, 54, 45, .08); }
+    .button.primary { color: #fffaf5; background: var(--blush-deep); border-color: var(--blush-deep); }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 28px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sage); box-shadow: 0 0 0 5px rgba(158, 173, 152, .18); }
+    .hero-art {
+      position: relative;
+      min-height: 560px;
+      display: grid;
+      place-items: center;
+    }
+    .hero-art::before {
+      content: "";
+      position: absolute;
+      width: min(92%, 460px);
+      aspect-ratio: 1;
+      border-radius: 48% 52% 46% 54%;
+      background: var(--blush);
+      transform: rotate(-7deg);
+      box-shadow: 0 40px 80px rgba(157, 86, 87, .15);
+    }
+    .hero-card {
+      position: relative;
+      width: min(88%, 400px);
+      padding: 30px;
+      border: 1px solid rgba(41, 38, 36, .1);
+      border-radius: 34px;
+      background: rgba(255, 253, 248, .94);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 60px rgba(67, 54, 45, .14);
+      transform: rotate(2.5deg);
+    }
+    .hero-card img { width: 72px; height: 72px; }
+    .hero-card .label { margin-top: 24px; color: var(--muted); font-size: 12px; letter-spacing: .12em; }
+    .hero-card .amount { margin-top: 8px; font: 500 clamp(48px, 7vw, 82px)/1 var(--number); letter-spacing: -.055em; }
+    .hero-card .meta { margin-top: 20px; display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+    .hero-card .meta strong { color: var(--ink); font-weight: 500; }
+    main { padding-bottom: 100px; }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 30px;
+      margin: 90px 0 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-head h2 { margin: 0; font-family: var(--display); font-size: clamp(32px, 4vw, 52px); font-weight: 500; letter-spacing: -.04em; }
+    .section-head p { max-width: 28rem; margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px;
+    }
+    figure { margin: 0; min-width: 0; }
+    .shot {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: #eee7dc;
+      box-shadow: 0 16px 44px rgba(67, 54, 45, .08);
+      aspect-ratio: 390 / 844;
+    }
+    .shot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    figcaption { display: flex; justify-content: space-between; gap: 10px; padding: 12px 4px 0; color: var(--muted); font-size: 12px; }
+    figcaption span:first-child { color: var(--ink); }
+    .docs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .doc {
+      min-height: 166px;
+      display: flex;
+      flex-direction: column;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(255, 253, 248, .72);
+      text-decoration: none;
+      transition: transform .2s ease, background .2s ease;
+    }
+    .doc:hover { transform: translateY(-3px); background: var(--surface); }
+    .doc small { color: var(--blush-deep); font: 600 10px/1 var(--number); letter-spacing: .15em; }
+    .doc h3 { margin: 18px 0 8px; font-family: var(--display); font-size: 23px; font-weight: 500; }
+    .doc p { margin: auto 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; }
+    @media (max-width: 900px) {
+      header { grid-template-columns: 1fr; min-height: auto; }
+      .hero-art { min-height: 440px; order: -1; }
+      .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .docs { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 28px, 1200px); }
+      header { padding-top: 26px; }
+      .hero-art { min-height: 340px; }
+      .hero-card { padding: 22px; }
+      .gallery { gap: 12px; }
+      .section-head { align-items: start; flex-direction: column; margin-top: 64px; }
+      .shot { border-radius: 16px; }
+      figcaption span:last-child { display: none; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div>
+        <span class="eyebrow">Voice-first ledger · Prototype v0.1</span>
+        <h1>说一句，<br><em>就记好。</em></h1>
+        <p class="lede">声账把记账压缩成一次按压和一句话。金额、分类、日期自动整理；本地优先，微信登录后开启云备份。</p>
+        <div class="actions">
+          <a class="button primary" href="../prototype/index.html">打开可点击原型</a>
+          <a class="button" href="./prototype-contact-sheet.png">全页面预览图</a>
+          <a class="button" href="../docs/01-prd.md">查看产品需求</a>
+        </div>
+        <div class="status">MVP 需求已锁定 · 等待原型评审</div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="hero-card">
+          <img src="../design/assets/piggy-mark.svg" alt="">
+          <div class="label">今天已经记好</div>
+          <div class="amount">¥ 83.00</div>
+          <div class="meta"><span>餐饮 · 午餐</span><strong>¥ 25.00</strong></div>
+          <div class="meta"><span>交通 · 打车</span><strong>¥ 18.00</strong></div>
+          <div class="meta"><span>娱乐 · 电影</span><strong>¥ 40.00</strong></div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section>
+        <div class="section-head">
+          <h2>核心界面</h2>
+          <p>从游客第一笔，到多笔语音、登录备份和月度统计。以下图片由当前可点击原型导出。</p>
+        </div>
+        <div class="gallery">
+          <figure><div class="shot"><img src="../prototype/screenshots/onboarding.png" alt="声账首次引导界面"></div><figcaption><span>首次引导</span><span>01</span></figcaption></figure>
+          <figure><div class="shot"><img src="../prototype/screenshots/home.png" alt="声账账本首页"></div><figcaption><span>账本</span><span>02</span></figcaption></figure>
+          <figure><div class="shot"><img src="../prototype/screenshots/voice-result.png" alt="语音多笔入账结果"></div><figcaption><span>多笔语音</span><span>03</span></figcaption></figure>
+          <figure><div class="shot"><img src="../prototype/screenshots/manual-entry.png" alt="声账手动记账"></div><figcaption><span>手动记账</span><span>04</span></figcaption></figure>
+          <figure><div class="shot"><img src="../prototype/screenshots/stats.png" alt="声账月度统计"></div><figcaption><span>月度统计</span><span>05</span></figcaption></figure>
+          <figure><div class="shot"><img src="../prototype/screenshots/category-management.png" alt="声账分类管理"></div><figcaption><span>分类管理</span><span>06</span></figcaption></figure>
+          <figure><div class="shot"><img src="../prototype/screenshots/cloud-backup.png" alt="声账云备份"></div><figcaption><span>云备份</span><span>07</span></figcaption></figure>
+          <figure><div class="shot"><img src="../prototype/screenshots/restore-conflict.png" alt="声账换机恢复冲突"></div><figcaption><span>换机恢复</span><span>08</span></figcaption></figure>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <h2>项目文档</h2>
+          <p>需求、流程、语音规格、账号备份、隐私和验收标准全部保存在仓库内。</p>
+        </div>
+        <div class="docs">
+          <a class="doc" href="../docs/01-prd.md"><small>PRODUCT</small><h3>产品需求</h3><p>定位、用户、范围、优先级与成功指标。</p></a>
+          <a class="doc" href="../docs/03-user-flows.md"><small>FLOWS</small><h3>核心流程</h3><p>首次记账、多笔识别、登录备份和异常恢复。</p></a>
+          <a class="doc" href="../docs/08-acceptance-criteria.md"><small>QUALITY</small><h3>验收标准</h3><p>双端、语音质量、隐私和商店发布检查。</p></a>
+        </div>
+      </section>
+    </main>
+    <footer><span>声账 · 一句话语音记账</span><span>Prototype v0.1 · 2026.10</span></footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+{
+  "checkedAt": "2026-10-19T10:11:27.073Z",
+  "scenarios": [
+    {
+      "name": "onboarding",
+      "title": "说一句，就记好。",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "home",
+      "title": "我的账本",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "voice-result",
+      "title": "我的账本",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "stats",
+      "title": "读懂每一笔",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "manual-entry",
+      "title": "我的账本",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "category-management",
+      "title": "分类管理",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "settings",
+      "title": "设置",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "cloud-backup",
+      "title": "云备份",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "restore-conflict",
+      "title": "云备份",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "wechat-login",
+      "title": "设置",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "export-options",
+      "title": "设置",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    },
+    {
+      "name": "voice-network-error",
+      "title": "我的账本",
+      "screenOverflowX": 0,
+      "bodyOverflowX": 0,
+      "small": []
+    }
+  ]
+}

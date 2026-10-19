@@ -1,0 +1,112 @@
+{
+  "meta": {
+    "name": "声账",
+    "version": "0.1.0",
+    "theme": "warm-restrained",
+    "grid": 8
+  },
+  "color": {
+    "canvas": {
+      "default": "#FAF7F0",
+      "raised": "#FFFDF8",
+      "sunken": "#F3EEE5",
+      "overlay": "rgba(41, 38, 36, 0.42)"
+    },
+    "ink": {
+      "primary": "#292624",
+      "secondary": "#726B64",
+      "tertiary": "#A39A91",
+      "inverse": "#FFFDF8"
+    },
+    "accent": {
+      "blush": "#E89A96",
+      "blushDeep": "#9D5657",
+      "blushSoft": "#F7DDD8",
+      "sage": "#9EAD98",
+      "sageSoft": "#E5EBE1",
+      "sand": "#E1BD7B",
+      "sandSoft": "#F4E8CF"
+    },
+    "semantic": {
+      "expense": "#9D5657",
+      "income": "#63795E",
+      "success": "#638061",
+      "warning": "#A77935",
+      "danger": "#B34F48",
+      "border": "#E8E0D6",
+      "disabled": "#D4CCC2"
+    }
+  },
+  "typography": {
+    "family": {
+      "display": "\"Songti SC\", \"STSong\", \"Noto Serif CJK SC\", serif",
+      "body": "\"PingFang SC\", \"Noto Sans CJK SC\", sans-serif",
+      "number": "\"SF Pro Display\", \"Avenir Next\", \"DIN Alternate\", sans-serif"
+    },
+    "size": {
+      "caption": 11,
+      "label": 13,
+      "body": 15,
+      "bodyLarge": 17,
+      "titleSmall": 20,
+      "title": 24,
+      "display": 34,
+      "hero": 48
+    },
+    "lineHeight": {
+      "tight": 1.1,
+      "title": 1.25,
+      "body": 1.55
+    },
+    "weight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600
+    }
+  },
+  "space": {
+    "0": 0,
+    "1": 4,
+    "2": 8,
+    "3": 12,
+    "4": 16,
+    "5": 20,
+    "6": 24,
+    "8": 32,
+    "10": 40,
+    "12": 48,
+    "16": 64
+  },
+  "radius": {
+    "small": 10,
+    "medium": 16,
+    "large": 24,
+    "xlarge": 32,
+    "pill": 999
+  },
+  "shadow": {
+    "card": "0 2px 10px rgba(67, 54, 45, 0.04)",
+    "float": "0 12px 30px rgba(67, 54, 45, 0.10)",
+    "voice": "0 10px 24px rgba(157, 86, 87, 0.24)"
+  },
+  "motion": {
+    "fast": 140,
+    "base": 200,
+    "slow": 280,
+    "easing": "cubic-bezier(0.22, 1, 0.36, 1)"
+  },
+  "chart": {
+    "primary": "#E89A96",
+    "secondary": "#9EAD98",
+    "tertiary": "#E1BD7B",
+    "neutral": "#C9BEB3",
+    "grid": "#EAE3D9"
+  },
+  "layout": {
+    "screenWidth": 390,
+    "screenHeight": 844,
+    "pageGutter": 20,
+    "minTouchTarget": 44,
+    "bottomNavHeight": 82
+  }
+}

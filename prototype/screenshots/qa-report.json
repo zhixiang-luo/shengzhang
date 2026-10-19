@@ -1,0 +1,105 @@
+{
+  "results": [
+    {
+      "name": "首页加载与演示数据",
+      "pass": true,
+      "detail": "{\"nav\":true,\"overview\":true,\"rows\":8,\"overflow\":0}"
+    },
+    {
+      "name": "首页无横向溢出",
+      "pass": true,
+      "detail": "overflow=0"
+    },
+    {
+      "name": "语音面板打开",
+      "pass": true,
+      "detail": "{\"orb\":true,\"modal\":true}"
+    },
+    {
+      "name": "一句话生成两笔账单",
+      "pass": true,
+      "detail": "{\"result\":true,\"entries\":2,\"undo\":true,\"text\":\"已记入 2 笔\"}"
+    },
+    {
+      "name": "语音结果逐笔编辑",
+      "pass": true,
+      "detail": "{\"editor\":true,\"amount\":\"¥25\",\"note\":\"午饭\"}"
+    },
+    {
+      "name": "语音撤销",
+      "pass": true,
+      "detail": "{\"undoGone\":true,\"modalClosed\":true}"
+    },
+    {
+      "name": "撤销后账单数恢复",
+      "pass": true,
+      "detail": "before=8"
+    },
+    {
+      "name": "手动记账金额键盘与保存",
+      "pass": true,
+      "detail": "{\"editorClosed\":true,\"amount\":\"\",\"toast\":true}"
+    },
+    {
+      "name": "月度统计图表",
+      "pass": true,
+      "detail": "{\"bars\":31,\"donut\":true,\"totals\":4,\"overflow\":0}"
+    },
+    {
+      "name": "统计页无横向溢出",
+      "pass": true,
+      "detail": "overflow=0"
+    },
+    {
+      "name": "微信登录授权流程",
+      "pass": true,
+      "detail": "{\"success\":true,\"rows\":3}"
+    },
+    {
+      "name": "换机恢复冲突选择",
+      "pass": true,
+      "detail": "{\"compare\":2,\"choices\":3}"
+    },
+    {
+      "name": "合并云端备份",
+      "pass": true,
+      "detail": "{\"closed\":true,\"toast\":true}"
+    },
+    {
+      "name": "二级分类管理",
+      "pass": true,
+      "detail": "{\"visible\":true,\"closed\":true}"
+    },
+    {
+      "name": "新增分类",
+      "pass": true,
+      "detail": "{\"visible\":true,\"formClosed\":true}"
+    },
+    {
+      "name": "网络失败恢复路径",
+      "pass": true,
+      "detail": "{\"title\":\"网络没有接上\",\"retry\":true}"
+    },
+    {
+      "name": "云备份页面",
+      "pass": true,
+      "detail": "{\"backupHero\":true,\"actions\":2,\"overflow\":0}"
+    },
+    {
+      "name": "云备份页无横向溢出",
+      "pass": true,
+      "detail": "overflow=0"
+    },
+    {
+      "name": "JSON 备份恢复",
+      "pass": true,
+      "detail": "{\"imported\":true,\"restoredScreen\":true,\"toast\":true}"
+    }
+  ],
+  "runtimeErrors": [],
+  "domSummary": {
+    "buttons": 37,
+    "text": "晚上好 · 今天也要好好生活\n我的账本\n满\n2026年10月\n本月支出\n¥12.34\n本月收入\n¥ 0.00\n本月结余\n¥ -12.34\n今天\n1 笔记录 · 花得刚刚好\n¥ 12.34\n最近账单\n全"
+  },
+  "checkedAt": "2026-10-19T10:11:13.153Z"
+}

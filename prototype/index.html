@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f3ed">
+  <meta name="description" content="声账 · 一句话语音记账，可点击产品原型">
+  <title>声账 · 一句话语音记账</title>
+  <link rel="icon" href="assets/pig.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <main class="showcase">
+    <div class="showcase-copy" aria-hidden="true">
+      <div class="showcase-kicker">VOICE-FIRST LEDGER</div>
+      <h1>说一句，<br>就记好。</h1>
+      <p>声账 · 一句话语音记账<br>可点击产品原型 v0.1</p>
+    </div>
+
+    <div class="device-wrap">
+      <div class="device-shadow" aria-hidden="true"></div>
+      <div class="phone-shell">
+        <div class="phone-screen" id="phoneScreen">
+          <div class="dynamic-island" aria-hidden="true"></div>
+          <div class="status-bar" id="statusBar"></div>
+          <div class="app" id="app" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="scenario-toggle" id="scenarioToggle" type="button" aria-controls="scenarioPanel" aria-expanded="false">
+      <span class="scenario-toggle-dot"></span>
+      演示导航
+      <span class="scenario-toggle-key">D</span>
+    </button>
+
+    <aside class="scenario-panel" id="scenarioPanel" aria-label="原型演示导航" aria-hidden="true">
+      <div class="scenario-head">
+        <div>
+          <span class="eyebrow">PROTOTYPE MAP</span>
+          <h2>场景索引</h2>
+        </div>
+        <button class="icon-button" id="scenarioClose" type="button" aria-label="关闭演示导航"></button>
+      </div>
+      <p class="scenario-note">直接跳到关键状态，快速检查完整产品流程。</p>
+      <div class="scenario-groups" id="scenarioGroups"></div>
+      <div class="scenario-footer">
+        <button class="text-button" id="resetDemo" type="button">重置全部演示</button>
+        <span>v0.1 · 2026.10</span>
+      </div>
+    </aside>
+  </main>
+
+  <div class="toast-region" id="toastRegion" aria-live="assertive"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

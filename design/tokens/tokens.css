@@ -1,0 +1,60 @@
+:root {
+  --color-canvas: #faf7f0;
+  --color-surface: #fffdf8;
+  --color-surface-sunken: #f3eee5;
+  --color-ink: #292624;
+  --color-ink-secondary: #726b64;
+  --color-ink-tertiary: #a39a91;
+  --color-inverse: #fffdf8;
+  --color-blush: #e89a96;
+  --color-blush-deep: #9d5657;
+  --color-blush-soft: #f7ddd8;
+  --color-sage: #9ead98;
+  --color-sage-soft: #e5ebe1;
+  --color-sand: #e1bd7b;
+  --color-sand-soft: #f4e8cf;
+  --color-expense: #9d5657;
+  --color-income: #63795e;
+  --color-success: #638061;
+  --color-warning: #a77935;
+  --color-danger: #b34f48;
+  --color-border: #e8e0d6;
+
+  --font-display: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  --font-body: "PingFang SC", "Noto Sans CJK SC", sans-serif;
+  --font-number: "SF Pro Display", "Avenir Next", "DIN Alternate", sans-serif;
+
+  --text-caption: 11px;
+  --text-label: 13px;
+  --text-body: 15px;
+  --text-body-large: 17px;
+  --text-title-small: 20px;
+  --text-title: 24px;
+  --text-display: 34px;
+  --text-hero: 48px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 2px 10px rgba(67, 54, 45, 0.04);
+  --shadow-float: 0 12px 30px rgba(67, 54, 45, 0.1);
+  --shadow-voice: 0 10px 24px rgba(157, 86, 87, 0.24);
+
+  --motion-fast: 140ms;
+  --motion-base: 200ms;
+  --motion-slow: 280ms;
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+}
