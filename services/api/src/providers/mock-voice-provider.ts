@@ -1,6 +1,24 @@
-import type { VoiceProvider, VoiceProviderInput } from './voice.js';
+import type { VoiceCategory, VoiceProvider, VoiceProviderInput } from './voice.js';
 
 export class MockVoiceProvider implements VoiceProvider {
+  async transcribe(): Promise<string> {
+    return '午饭 25，打车 18';
+  }
+
+  async parseTranscript(input: {
+    transcript: string;
+    timezone: string;
+    categories: VoiceCategory[];
+  }) {
+    const result = await this.parse({
+      audio: Buffer.alloc(0),
+      mimeType: 'audio/wav',
+      timezone: input.timezone,
+      categories: input.categories,
+    });
+    return { ...result, transcript: input.transcript };
+  }
+
   async parse(_input: VoiceProviderInput): Promise<{
     transcript: string;
     entries: [

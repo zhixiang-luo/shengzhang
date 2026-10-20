@@ -26,5 +26,11 @@ export interface VoiceProviderOutput {
 }
 
 export interface VoiceProvider {
+  transcribe(input: Pick<VoiceProviderInput, 'audio' | 'mimeType'>): Promise<string>;
+  parseTranscript(input: {
+    transcript: string;
+    timezone: string;
+    categories: VoiceCategory[];
+  }): Promise<VoiceProviderOutput>;
   parse(input: VoiceProviderInput): Promise<VoiceProviderOutput>;
 }

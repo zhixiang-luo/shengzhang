@@ -6,13 +6,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomDock } from '../components/BottomDock';
 import { Icon } from '../components/Icon';
-import { VoiceActionSheet } from '../components/VoiceActionSheet';
+import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
+import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
+import { useVoiceCapture } from '../features/voice/useVoiceCapture';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatMonth, localDateKey } from '../utils/date';
 
 export default function StatsScreen() {
-  const [voiceVisible, setVoiceVisible] = useState(false);
+  const voice = useVoiceCapture();
   const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [today] = useState(() => new Date());
@@ -23,6 +25,7 @@ export default function StatsScreen() {
     summary,
     previousSummary,
     expenseCategories,
+    refresh,
     previousMonth,
     nextMonth,
   } = useLedgerMonth();
@@ -253,13 +256,23 @@ export default function StatsScreen() {
         )}
       </ScrollView>
 
-      <BottomDock active="stats" onVoice={() => setVoiceVisible(true)} />
-      <VoiceActionSheet
-        visible={voiceVisible}
-        onClose={() => setVoiceVisible(false)}
-        onManualEntry={() => router.push('/entry')}
-        onSaved={() => router.replace('/')}
+      <BottomDock
+        active="stats"
+        voiceActive={voice.phase === 'recording'}
+        onVoiceStart={() => void voice.startHold()}
+        onVoiceModeChange={voice.setGestureMode}
+        onVoiceEnd={voice.endHold}
+        onVoiceManual={() => router.push('/entry')}
       />
+      <VoiceCaptureOverlay
+        phase={voice.phase}
+        transcript={voice.transcript}
+        error={voice.error}
+        cancelArmed={voice.cancelArmed}
+        manualArmed={voice.manualArmed}
+        audioLevel={voice.audioLevel}
+      />
+      <VoiceResultSheet onSaved={refresh} />
     </SafeAreaView>
   );
 }

@@ -18,6 +18,19 @@ describe('ledger summaries', () => {
     });
   });
 
+  it('shows an expense-only draft total as a negative balance', () => {
+    expect(
+      summarizeAmounts([
+        { type: 'expense', amountMinor: 2600 },
+        { type: 'expense', amountMinor: 17400 },
+      ]),
+    ).toEqual({
+      expenseMinor: 20000,
+      incomeMinor: 0,
+      balanceMinor: -20000,
+    });
+  });
+
   it('summarizes expenses by category in descending order', () => {
     expect(summarizeExpenseCategories(transactions)).toEqual([
       { categoryId: 'food', amountMinor: 3700, count: 2 },

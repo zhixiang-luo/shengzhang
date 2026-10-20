@@ -82,7 +82,7 @@ Expo Go 可用于早期界面开发；微信 SDK、正式签名和商店构建�
 | 数据访问 | Drizzle ORM + SQL migration | 与移动端保持同类查询模型 |
 | 对象存储 | 阿里云 OSS 或同类 S3 兼容服务 | 私有 Bucket，服务端签名访问 |
 | 加密 | KMS + AES-256-GCM | 每用户数据密钥，密钥由 KMS 包装 |
-| ASR | 供应商适配器，默认阿里云语音识别 | 录音文件转文字，不把音频交给 LLM |
+| ASR | 火山大模型双向流式 WebSocket | 实时 PCM 转文字，不把音频交给 LLM |
 | 结构化解析 | 供应商适配器，默认 DeepSeek 文本模型 | 文字 + 分类目录 -> JSON，严格 Schema |
 | 微信登录 | 微信开放平台移动应用 | 服务端使用 code 换 openid/unionid |
 
@@ -249,20 +249,24 @@ schema_migrations
 移动端状态机：
 
 ```text
-idle -> requesting_permission -> recording -> uploading -> parsing
+idle -> requesting_permission -> recording -> uploading_partial? -> uploading -> parsing
                                       └-> cancelled
-parsing -> saving -> success
-        ├-> needs_amount -> editing -> saving
+parsing -> draft_confirmation -> saving -> success
+        ├-> needs_amount -> editing -> draft_confirmation -> saving
         └-> failed -> retry/uploading | manual
 ```
 
-- 按下立即开始，松手停止；上滑 64pt 进入取消态。
+- 按下立即开始，松手停止；上滑 36pt 进入取消态，向下回到 16pt 内恢复；右滑 48pt 进入手动记账态。
+- 录音期间用 `expo-audio` 的 `useAudioStream` 获取 PCM，通过 `/v1/voice/stream` WebSocket 持续发送给自有网关；网关连接火山双向流式 ASR，并把 `ready/partial/final/error` 事件回传客户端。
+- 松手后发送 `{"type":"stop"}`，等待火山最终负包返回，再把 cumulative transcript 提交到 `/v1/voice/parse-transcript` 做结构化。
+- 松手时实时文字为空则直接视为取消，不调用任何识别或结构化接口。
 - 录音不足 300ms 提示“再按住说一句”，不发起请求。
 - 最长 30 秒，客户端停止并提交。
 - 上传成功后立即删除临时音频文件。
 - 解析结果先通过 Zod 校验，再按分类名称解析为稳定 ID。
 - 分类无法匹配时落到“其他”，但在结果卡提示可修改。
 - 金额缺失时不写任何账单，进入修正面板。
+- 结构化结果只展示一个确认卡；左侧“撤销”丢弃草稿，右侧“确认记账”写入 SQLite 并立即关闭。
 
 ### 5.7 登录与备份
 

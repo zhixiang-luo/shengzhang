@@ -38,7 +38,47 @@
 }
 ```
 
-## 3. 语音解析
+## 3. 实时语音转写
+
+### 主链路：WebSocket
+
+`GET /v1/voice/stream?installationId=...`
+
+- 升级为 WebSocket。
+- 客户端发送二进制 16kHz、16-bit、单声道 PCM。
+- 松手时发送文本 `{"type":"stop"}`。
+- 网关返回：
+
+```json
+{ "type": "ready" }
+{ "type": "partial", "text": "午饭25" }
+{ "type": "final", "text": "午饭25，打车18。" }
+{ "type": "error", "code": "VOLCANO_ASR_ERROR", "message": "..." }
+```
+
+网关内部连接火山官方 `wss://openspeech.bytedance.com/api/v3/sauc/bigmodel`。
+
+### HTTP 备用：单块转写
+
+`POST /v1/voice/transcribe`
+
+`multipart/form-data`：
+
+| 字段 | 必填 | 说明 |
+| --- | --- | --- |
+| `audio` | 是 | 当前 PCM 音频块编码后的 WAV，≤5MB |
+| `installationId` | 是 | 匿名安装标识；服务端哈希后限流 |
+
+```json
+{
+  "transcript": "午饭25，打车18",
+  "latencyMs": 420
+}
+```
+
+该接口只返回实时字幕，不生成账单，也不消耗正式语音记账次数。客户端按约 1 秒的 PCM 音频块并行调用；服务端另有独立额度。松手后把合并后的完整实时文字提交到 `/v1/voice/parse-transcript`，实时文字为空则直接取消。
+
+## 4. 语音解析
 
 `POST /v1/voice/parse`
 
@@ -46,7 +86,7 @@
 
 | 字段 | 必填 | 说明 |
 | --- | --- | --- |
-| `audio` | 是 | AAC/M4A，≤30 秒，≤5MB |
+| `audio` | 是 | WAV，≤30 秒，≤5MB |
 | `timezone` | 是 | IANA 时区，例如 `Asia/Shanghai` |
 | `locale` | 是 | 首版固定 `zh-CN` |
 | `categoryTree` | 是 | 当前启用分类名称 JSON |
@@ -80,7 +120,7 @@
 - 客户端用共享 Zod schema 校验后才入账。
 - 服务端不持久化音频、转写和 note。
 
-## 4. 微信登录
+## 5. 微信登录
 
 `POST /v1/auth/wechat/mobile`
 
@@ -112,7 +152,7 @@
 
 Bearer 鉴权，成功返回 `204`，不删除本地账本。
 
-## 5. 云备份
+## 6. 云备份
 
 `GET /v1/backup/latest`
 

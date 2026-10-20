@@ -21,7 +21,9 @@ export class SiliconFlowAsrProvider implements AsrProvider {
     form.append('model', this.model);
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15_000);
+    // Provider cold starts can occasionally exceed 20 seconds; keep the request
+    // alive long enough to avoid turning a transient delay into a failed entry.
+    const timeout = setTimeout(() => controller.abort(), 30_000);
     try {
       const response = await fetch(`${this.baseUrl.replace(/\/$/, '')}/audio/transcriptions`, {
         method: 'POST',
@@ -33,7 +35,8 @@ export class SiliconFlowAsrProvider implements AsrProvider {
         signal: controller.signal,
       });
       if (!response.ok) {
-        throw new Error(`ASR_REQUEST_FAILED_${response.status}`);
+        const detail = (await response.text()).slice(0, 500);
+        throw new Error(`ASR_REQUEST_FAILED_${response.status}:${detail}`);
       }
       const payload = (await response.json()) as { text?: unknown };
       if (typeof payload.text !== 'string' || payload.text.trim().length === 0) {

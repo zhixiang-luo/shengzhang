@@ -1,24 +1,26 @@
-import { formatCents } from '@shengzhang/domain';
+import { formatCents, summarizeAmounts } from '@shengzhang/domain';
+import { useRef, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useDatabase } from '../db/DatabaseProvider';
-import { softDeleteVoiceBatch } from '../db/transactionRepository';
+import { createVoiceBatch } from '../db/transactionRepository';
 import { useVoiceResultStore } from '../stores/voiceResultStore';
 import { colors, spacing, typography } from '../theme/tokens';
 import { Icon } from './Icon';
 
-export function VoiceResultSheet({ onUndone }: { onUndone: () => void }) {
+export function VoiceResultSheet({ onSaved }: { onSaved: () => void }) {
   const db = useDatabase();
   const insets = useSafeAreaInsets();
   const result = useVoiceResultStore((state) => state.result);
   const clear = useVoiceResultStore((state) => state.clear);
+  const savingRef = useRef(false);
+  const [error, setError] = useState<string | null>(null);
+
   if (!result) return null;
 
-  const total = result.entries.reduce(
-    (sum, entry) => sum + (entry.type === 'expense' ? entry.amountMinor : -entry.amountMinor),
-    0,
-  );
+  const summary = summarizeAmounts(result.entries);
+  const totalMinor = summary.balanceMinor;
 
   return (
     <Modal animationType="slide" onRequestClose={clear} presentationStyle="overFullScreen" transparent visible>
@@ -31,12 +33,15 @@ export function VoiceResultSheet({ onUndone }: { onUndone: () => void }) {
               <Icon name="check" size={24} color={colors.surface} strokeWidth={2.3} />
             </View>
             <View style={styles.headingCopy}>
-              <Text style={styles.title}>已记好 {result.entries.length} 笔</Text>
+              <Text style={styles.title}>要记这几笔吗？</Text>
               <Text style={styles.subtitle}>“{result.transcript}”</Text>
             </View>
-            <Text style={styles.total}>
-              {total <= 0 ? '−' : '+'}¥{formatCents(Math.abs(total))}
-            </Text>
+            <View style={styles.totalWrap}>
+              <Text style={styles.totalLabel}>合计</Text>
+              <Text style={styles.total}>
+                {totalMinor <= 0 ? '−' : '+'}¥{formatCents(Math.abs(totalMinor))}
+              </Text>
+            </View>
           </View>
 
           <ScrollView style={styles.entries} showsVerticalScrollIndicator={false}>
@@ -64,20 +69,36 @@ export function VoiceResultSheet({ onUndone }: { onUndone: () => void }) {
             ))}
           </ScrollView>
 
-          <Text style={styles.undoHint}>8 秒内可以整批撤销</Text>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <Text style={styles.undoHint}>确认后写入账本，撤销则不保存</Text>
           <View style={styles.actions}>
             <Pressable
               onPress={() => {
-                softDeleteVoiceBatch(db, result.requestId);
+                setError(null);
                 clear();
-                onUndone();
               }}
               style={styles.undoButton}
             >
-              <Text style={styles.undoText}>撤销入账</Text>
+              <Text style={styles.undoText}>撤销</Text>
             </Pressable>
-            <Pressable onPress={clear} style={styles.doneButton}>
-              <Text style={styles.doneText}>完成</Text>
+            <Pressable
+              onPress={() => {
+                if (savingRef.current) return;
+                savingRef.current = true;
+                setError(null);
+                try {
+                  createVoiceBatch(db, result);
+                  clear();
+                  onSaved();
+                } catch (caught) {
+                  setError(caught instanceof Error ? caught.message : '记账失败，请重试。');
+                } finally {
+                  savingRef.current = false;
+                }
+              }}
+              style={styles.doneButton}
+            >
+              <Text style={styles.doneText}>确认记账</Text>
             </Pressable>
           </View>
         </View>
@@ -148,6 +169,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontVariant: ['tabular-nums'],
   },
+  totalWrap: {
+    alignItems: 'flex-end',
+  },
+  totalLabel: {
+    marginBottom: 2,
+    color: colors.inkTertiary,
+    fontSize: 9,
+    fontWeight: '600',
+  },
   entries: {
     marginTop: spacing.xl,
   },
@@ -202,6 +232,13 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontSize: 13,
     fontWeight: '700',
+  },
+  error: {
+    marginTop: spacing.md,
+    color: colors.danger,
+    fontSize: 11,
+    lineHeight: 18,
+    textAlign: 'center',
   },
   doneButton: {
     flex: 1.5,

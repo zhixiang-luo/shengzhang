@@ -1,17 +1,97 @@
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useRef, useState } from 'react';
+import { PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { resolveVoiceGestureMode, type VoiceGestureMode } from '../features/voice/gesture';
 import { colors } from '../theme/tokens';
 import { Icon } from './Icon';
 
 type BottomDockProps = {
   active: 'ledger' | 'stats';
-  onVoice: () => void;
+  voiceActive?: boolean;
+  onVoiceStart: () => void;
+  onVoiceModeChange: (mode: VoiceGestureMode) => void;
+  onVoiceEnd: (cancelled: boolean) => void;
+  onVoiceManual: () => void;
 };
 
-export function BottomDock({ active, onVoice }: BottomDockProps) {
+export function BottomDock({
+  active,
+  voiceActive = false,
+  onVoiceStart,
+  onVoiceModeChange,
+  onVoiceEnd,
+  onVoiceManual,
+}: BottomDockProps) {
   const insets = useSafeAreaInsets();
+  const [pressing, setPressing] = useState(false);
+  const [cancelArmed, setCancelArmed] = useState(false);
+  const [manualArmed, setManualArmed] = useState(false);
+  const modeRef = useRef<VoiceGestureMode>('idle');
+  const callbacksRef = useRef({
+    onVoiceStart,
+    onVoiceModeChange,
+    onVoiceEnd,
+    onVoiceManual,
+  });
+  callbacksRef.current = {
+    onVoiceStart,
+    onVoiceModeChange,
+    onVoiceEnd,
+    onVoiceManual,
+  };
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderTerminationRequest: () => false,
+        onPanResponderGrant: () => {
+          modeRef.current = 'idle';
+          setPressing(true);
+          setCancelArmed(false);
+          setManualArmed(false);
+          callbacksRef.current.onVoiceModeChange('idle');
+          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          callbacksRef.current.onVoiceStart();
+        },
+        onPanResponderMove: (_, gesture) => {
+          const nextMode = resolveVoiceGestureMode(modeRef.current, gesture.dx, gesture.dy);
+          if (nextMode !== modeRef.current) {
+            modeRef.current = nextMode;
+            setCancelArmed(nextMode === 'cancel');
+            setManualArmed(nextMode === 'manual');
+            callbacksRef.current.onVoiceModeChange(nextMode);
+            if (__DEV__) console.info('[voice] gesture mode', { mode: nextMode, dx: gesture.dx, dy: gesture.dy });
+            void Haptics.selectionAsync();
+          }
+        },
+        onPanResponderRelease: (_, gesture) => {
+          const finalMode = resolveVoiceGestureMode(modeRef.current, gesture.dx, gesture.dy);
+          setPressing(false);
+          setCancelArmed(false);
+          setManualArmed(false);
+          callbacksRef.current.onVoiceModeChange('idle');
+          if (__DEV__) console.info('[voice] gesture released', { mode: finalMode, dx: gesture.dx, dy: gesture.dy });
+          if (finalMode === 'manual') {
+            callbacksRef.current.onVoiceEnd(true);
+            requestAnimationFrame(callbacksRef.current.onVoiceManual);
+            return;
+          }
+          callbacksRef.current.onVoiceEnd(finalMode === 'cancel');
+        },
+        onPanResponderTerminate: () => {
+          setPressing(false);
+          setCancelArmed(false);
+          setManualArmed(false);
+          callbacksRef.current.onVoiceModeChange('idle');
+          callbacksRef.current.onVoiceEnd(true);
+        },
+      }),
+    [],
+  );
 
   return (
     <View style={[styles.wrap, { paddingBottom: Math.max(insets.bottom, 10) }]} pointerEvents="box-none">
@@ -39,16 +119,31 @@ export function BottomDock({ active, onVoice }: BottomDockProps) {
         </Pressable>
       </View>
 
-      <Pressable
+      <View
+        {...panResponder.panHandlers}
+        accessible
+        accessibilityRole="button"
         accessibilityLabel="语音记账"
-        accessibilityHint="语音功能将在下一阶段接入，当前可先手动记账"
-        onPress={onVoice}
-        style={({ pressed }) => [styles.voice, pressed && styles.voicePressed]}
+        accessibilityHint="按住说话，松手记账，上滑取消"
+        style={[
+          styles.voice,
+          (pressing || voiceActive) && styles.voicePressed,
+          cancelArmed && styles.voiceCancel,
+          manualArmed && styles.voiceManual,
+        ]}
       >
         <Icon name="mic" color={colors.surface} size={27} strokeWidth={2} />
         <View style={styles.voiceDot} />
-      </Pressable>
-      <Text style={styles.voiceLabel}>说一句</Text>
+      </View>
+      <Text
+        style={[
+          styles.voiceLabel,
+          cancelArmed && styles.voiceCancelLabel,
+          manualArmed && styles.voiceManualLabel,
+        ]}
+      >
+        {cancelArmed ? '松手取消' : manualArmed ? '松手手动记账' : '按住说'}
+      </Text>
     </View>
   );
 }
@@ -110,6 +205,14 @@ const styles = StyleSheet.create({
   },
   voicePressed: {
     transform: [{ scale: 0.94 }],
+    backgroundColor: colors.ink,
+  },
+  voiceCancel: {
+    transform: [{ scale: 0.9 }],
+    backgroundColor: colors.danger,
+  },
+  voiceManual: {
+    backgroundColor: colors.sand,
   },
   voiceLabel: {
     position: 'absolute',
@@ -131,5 +234,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sand,
     borderWidth: 2,
     borderColor: colors.blushDeep,
+  },
+  voiceCancelLabel: {
+    color: colors.danger,
+  },
+  voiceManualLabel: {
+    color: colors.sand,
   },
 });

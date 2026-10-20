@@ -42,6 +42,7 @@ export function buildApp(options: FastifyServerOptions = {}) {
   app.register(voiceRoutes, {
     provider: createVoiceProvider(environment),
     quota: new InMemoryDailyVoiceQuota(environment.VOICE_DAILY_LIMIT),
+    partialQuota: new InMemoryDailyVoiceQuota(environment.VOICE_PARTIAL_DAILY_LIMIT),
   });
 
   return app;

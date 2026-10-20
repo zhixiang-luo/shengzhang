@@ -23,6 +23,11 @@ export const voiceParseResponseSchema = z.object({
   latencyMs: z.number().int().nonnegative(),
 });
 
+export const voiceTranscribeResponseSchema = z.object({
+  transcript: z.string().min(1).max(2000),
+  latencyMs: z.number().int().nonnegative(),
+});
+
 export const backupMetadataSchema = z.object({
   id: z.uuid(),
   schemaVersion: z.number().int().positive(),
@@ -35,4 +40,5 @@ export const backupMetadataSchema = z.object({
 
 export type VoiceEntryPayload = z.infer<typeof voiceEntrySchema>;
 export type VoiceParseResponse = z.infer<typeof voiceParseResponseSchema>;
+export type VoiceTranscribeResponse = z.infer<typeof voiceTranscribeResponseSchema>;
 export type BackupMetadata = z.infer<typeof backupMetadataSchema>;

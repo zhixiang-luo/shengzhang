@@ -13,18 +13,10 @@ interface VoiceResultState {
   clear: () => void;
 }
 
-let clearTimer: ReturnType<typeof setTimeout> | null = null;
-
 export const useVoiceResultStore = create<VoiceResultState>((set) => ({
   result: null,
-  setResult: (result) => {
-    if (clearTimer) clearTimeout(clearTimer);
-    set({ result });
-    clearTimer = setTimeout(() => set({ result: null }), 8000);
-  },
+  setResult: (result) => set({ result }),
   clear: () => {
-    if (clearTimer) clearTimeout(clearTimer);
-    clearTimer = null;
     set({ result: null });
   },
 }));

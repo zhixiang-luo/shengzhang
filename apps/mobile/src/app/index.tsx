@@ -1,6 +1,5 @@
 import { formatCents, summarizeAmounts } from '@shengzhang/domain';
 import { router } from 'expo-router';
-import { useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -16,14 +15,15 @@ import { BottomDock } from '../components/BottomDock';
 import { BrandMark } from '../components/BrandMark';
 import { Icon } from '../components/Icon';
 import { UndoDeleteBanner } from '../components/UndoDeleteBanner';
-import { VoiceActionSheet } from '../components/VoiceActionSheet';
+import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
 import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
+import { useVoiceCapture } from '../features/voice/useVoiceCapture';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatDayHeading, formatMonth, formatTime } from '../utils/date';
 
 export default function LedgerScreen() {
-  const [voiceVisible, setVoiceVisible] = useState(false);
+  const voice = useVoiceCapture();
   const {
     month,
     groups,
@@ -167,14 +167,23 @@ export default function LedgerScreen() {
       </ScrollView>
 
       <UndoDeleteBanner onRestored={refresh} />
-      <BottomDock active="ledger" onVoice={() => setVoiceVisible(true)} />
-      <VoiceActionSheet
-        visible={voiceVisible}
-        onClose={() => setVoiceVisible(false)}
-        onManualEntry={openManualEntry}
-        onSaved={refresh}
+      <BottomDock
+        active="ledger"
+        voiceActive={voice.phase === 'recording'}
+        onVoiceStart={() => void voice.startHold()}
+        onVoiceModeChange={voice.setGestureMode}
+        onVoiceEnd={voice.endHold}
+        onVoiceManual={openManualEntry}
       />
-      <VoiceResultSheet onUndone={refresh} />
+      <VoiceCaptureOverlay
+        phase={voice.phase}
+        transcript={voice.transcript}
+        error={voice.error}
+        cancelArmed={voice.cancelArmed}
+        manualArmed={voice.manualArmed}
+        audioLevel={voice.audioLevel}
+      />
+      <VoiceResultSheet onSaved={refresh} />
     </SafeAreaView>
   );
 }
