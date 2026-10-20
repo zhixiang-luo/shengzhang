@@ -1,0 +1,4090 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "single-001",
+      "utterance": "今天早餐买了包子和豆浆8块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "餐饮",
+            "早餐"
+          ],
+          "dateRule": "today"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-002",
+      "utterance": "中午吃午饭6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "餐饮",
+            "午餐"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-003",
+      "utterance": "晚上吃晚饭12块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "餐饮",
+            "晚餐"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-004",
+      "utterance": "买了一杯咖啡18元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-005",
+      "utterance": "点了一杯奶茶25块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-006",
+      "utterance": "点了一份外卖26元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "餐饮",
+            "外卖"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-007",
+      "utterance": "买了水果30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "餐饮",
+            "水果零食"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-008",
+      "utterance": "10月5号买了零食32元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "餐饮",
+            "水果零食"
+          ],
+          "dateRule": "oct5"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-009",
+      "utterance": "和朋友聚餐46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "餐饮",
+            "聚餐"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-010",
+      "utterance": "坐公交上班50元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-011",
+      "utterance": "坐地铁回家65块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-012",
+      "utterance": "打车去公司88元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "交通",
+            "打车"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-013",
+      "utterance": "打车回家120块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "交通",
+            "打车"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-014",
+      "utterance": "给车加油128元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "交通",
+            "加油充电"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-015",
+      "utterance": "前天充电桩充电200块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "交通",
+            "加油充电"
+          ],
+          "dateRule": "dayBefore"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-016",
+      "utterance": "商场停车8元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "交通",
+            "停车"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-017",
+      "utterance": "买了高铁票6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "交通",
+            "火车飞机"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-018",
+      "utterance": "骑共享单车12元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "交通",
+            "单车"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-019",
+      "utterance": "买了一件衣服18块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "购物",
+            "服饰"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-020",
+      "utterance": "买了日用品25元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "购物",
+            "日用品"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-021",
+      "utterance": "买了一个键盘26块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "购物",
+            "数码"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-022",
+      "utterance": "昨天买了护肤品30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "购物",
+            "美妆个护"
+          ],
+          "dateRule": "yesterday"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-023",
+      "utterance": "买了家居用品32块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "购物",
+            "家居"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-024",
+      "utterance": "交房租46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "居住",
+            "房租"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-025",
+      "utterance": "交水电费50块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "居住",
+            "水电燃气"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-026",
+      "utterance": "交物业费65元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "居住",
+            "物业"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-027",
+      "utterance": "修了水龙头88块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "居住",
+            "维修"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-028",
+      "utterance": "看电影120元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "娱乐",
+            "电影演出"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-029",
+      "utterance": "今天买了游戏128块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "娱乐",
+            "游戏"
+          ],
+          "dateRule": "today"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-030",
+      "utterance": "续费视频会员200元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "娱乐",
+            "会员订阅"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-031",
+      "utterance": "旅行订了民宿8块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "旅行",
+            "住宿"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-032",
+      "utterance": "看了一场电影6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "娱乐",
+            "电影演出"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-033",
+      "utterance": "去医院看门诊12块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "医疗健康",
+            "门诊"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-034",
+      "utterance": "去药店买药18元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "医疗健康",
+            "药品"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-035",
+      "utterance": "做了体检25块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "医疗健康",
+            "体检"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-036",
+      "utterance": "10月5号交保险费26元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "医疗健康",
+            "保险"
+          ],
+          "dateRule": "oct5"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-037",
+      "utterance": "买了两本书30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "学习教育",
+            "书籍"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-038",
+      "utterance": "报名线上课程32元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "学习教育",
+            "课程"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-039",
+      "utterance": "交考试报名费46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "学习教育",
+            "考试"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-040",
+      "utterance": "购买文具50元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "学习教育",
+            "文具"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-041",
+      "utterance": "发了红包65块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "人情礼物",
+            "红包"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-042",
+      "utterance": "买了一份礼物88元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "人情礼物",
+            "礼物"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-043",
+      "utterance": "前天和朋友聚餐120块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "餐饮",
+            "聚餐"
+          ],
+          "dateRule": "dayBefore"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-044",
+      "utterance": "给父母生活费128元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "人情礼物",
+            "孝敬"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-045",
+      "utterance": "交话费200块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "通讯网络",
+            "话费"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-046",
+      "utterance": "交宽带费8元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "通讯网络",
+            "宽带"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-047",
+      "utterance": "续费云服务器6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "通讯网络",
+            "云服务"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-048",
+      "utterance": "买了猫粮12元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "宠物",
+            "主粮零食"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-049",
+      "utterance": "带猫看病18块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "宠物",
+            "医疗"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-050",
+      "utterance": "昨天买了宠物用品25元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "宠物",
+            "用品"
+          ],
+          "dateRule": "yesterday"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-051",
+      "utterance": "宠物洗澡26块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "宠物",
+            "服务"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-052",
+      "utterance": "订了羽毛球场地30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "运动",
+            "场地"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-053",
+      "utterance": "买了运动鞋32块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "运动",
+            "装备"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-054",
+      "utterance": "报名健身课46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "运动",
+            "课程"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-055",
+      "utterance": "订了酒店50块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "旅行",
+            "住宿"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-056",
+      "utterance": "买了景区门票65元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "旅行",
+            "门票"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-057",
+      "utterance": "今天旅行途中打车88块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "旅行",
+            "交通"
+          ],
+          "dateRule": "today"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-058",
+      "utterance": "旅行购买景区门票120元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "旅行",
+            "门票"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-059",
+      "utterance": "交了一笔杂费128块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "其他",
+            "其他"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-060",
+      "utterance": "早餐买了包子和豆浆200元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "餐饮",
+            "早餐"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-061",
+      "utterance": "中午吃午饭8块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "餐饮",
+            "午餐"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-062",
+      "utterance": "晚上吃晚饭6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "餐饮",
+            "晚餐"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-063",
+      "utterance": "买了一杯咖啡12块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-064",
+      "utterance": "10月5号点了一杯奶茶18元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ],
+          "dateRule": "oct5"
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-065",
+      "utterance": "点了一份外卖25块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "餐饮",
+            "外卖"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-066",
+      "utterance": "买了水果26元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "餐饮",
+            "水果零食"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-067",
+      "utterance": "买了零食30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "餐饮",
+            "水果零食"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-068",
+      "utterance": "和朋友聚餐32元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "餐饮",
+            "聚餐"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-069",
+      "utterance": "坐公交上班46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "single-070",
+      "utterance": "坐地铁回家50元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ],
+          "dateRule": null
+        }
+      ],
+      "tags": [
+        "single",
+        "expense"
+      ]
+    },
+    {
+      "id": "income-001",
+      "utterance": "发工资25块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "工资"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-002",
+      "utterance": "收到奖金26元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "奖金"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-003",
+      "utterance": "收到兼职工资30块五",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "兼职"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-004",
+      "utterance": "收到理财收益32元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "理财收益"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-005",
+      "utterance": "收到生日红包46块8",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "红包"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-006",
+      "utterance": "收到退款50元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "退款"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-007",
+      "utterance": "公司报销到账65块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "报销"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-008",
+      "utterance": "收到一笔转账88元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "其他"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-009",
+      "utterance": "发工资120块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "工资"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-010",
+      "utterance": "收到奖金128元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "奖金"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-011",
+      "utterance": "收到兼职工资200块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "兼职"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-012",
+      "utterance": "收到理财收益8元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 800,
+          "categoryPath": [
+            "理财收益"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-013",
+      "utterance": "收到生日红包6块五",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 650,
+          "categoryPath": [
+            "红包"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-014",
+      "utterance": "收到退款12元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "退款"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-015",
+      "utterance": "公司报销到账18块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "报销"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-016",
+      "utterance": "收到一笔转账25元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "其他"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-017",
+      "utterance": "发工资26块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "工资"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-018",
+      "utterance": "收到奖金30块五",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "奖金"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-019",
+      "utterance": "收到兼职工资32块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "兼职"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-020",
+      "utterance": "收到理财收益46块8",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "理财收益"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-021",
+      "utterance": "收到生日红包50块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "红包"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-022",
+      "utterance": "收到退款65元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "退款"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-023",
+      "utterance": "公司报销到账88块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "报销"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-024",
+      "utterance": "收到一笔转账120元",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "其他"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "income-025",
+      "utterance": "发工资128块",
+      "expected": [
+        {
+          "type": "income",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "工资"
+          ]
+        }
+      ],
+      "tags": [
+        "single",
+        "income"
+      ]
+    },
+    {
+      "id": "multi-001",
+      "utterance": "早餐买了包子和豆浆12块，然后打车去公司46块8，然后交房租120块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "餐饮",
+            "早餐"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "交通",
+            "打车"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "居住",
+            "房租"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-002",
+      "utterance": "买了一杯咖啡18元，然后充电桩充电50块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "交通",
+            "加油充电"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-003",
+      "utterance": "买了水果25块，然后骑共享单车65元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "餐饮",
+            "水果零食"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "交通",
+            "单车"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-004",
+      "utterance": "坐公交上班26元，然后买了一个键盘88块，然后去医院看门诊8元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "购物",
+            "数码"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "医疗健康",
+            "门诊"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-005",
+      "utterance": "打车回家30块五，然后交房租120元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "交通",
+            "打车"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "居住",
+            "房租"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-006",
+      "utterance": "商场停车32元，然后修了水龙头128块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "交通",
+            "停车"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "居住",
+            "维修"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-007",
+      "utterance": "买了一件衣服46块8，然后续费视频会员200元，然后买了一份礼物18块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "购物",
+            "服饰"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "娱乐",
+            "会员订阅"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "人情礼物",
+            "礼物"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-008",
+      "utterance": "买了护肤品50元，然后去医院看门诊8块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "购物",
+            "美妆个护"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "医疗健康",
+            "门诊"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-009",
+      "utterance": "交水电费65块，然后交保险费6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "居住",
+            "水电燃气"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "医疗健康",
+            "保险"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-010",
+      "utterance": "看电影88元，然后交考试报名费12块，然后宠物洗澡30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "娱乐",
+            "电影演出"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "学习教育",
+            "考试"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "宠物",
+            "服务"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-011",
+      "utterance": "旅行订了民宿120块，然后买了一份礼物18元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "旅行",
+            "住宿"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "人情礼物",
+            "礼物"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-012",
+      "utterance": "去药店买药128元，然后交话费25块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "医疗健康",
+            "药品"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "通讯网络",
+            "话费"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-013",
+      "utterance": "买了两本书200块，然后买了猫粮26元，然后早餐买了包子和豆浆50块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "学习教育",
+            "书籍"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "宠物",
+            "主粮零食"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "餐饮",
+            "早餐"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-014",
+      "utterance": "购买文具8元，然后宠物洗澡30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "学习教育",
+            "文具"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "宠物",
+            "服务"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-015",
+      "utterance": "和朋友聚餐6块五，然后报名健身课32元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "餐饮",
+            "聚餐"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "运动",
+            "课程"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-016",
+      "utterance": "交宽带费12元，然后旅行途中打车46块8，然后坐公交上班120元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "通讯网络",
+            "宽带"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "旅行",
+            "交通"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-017",
+      "utterance": "带猫看病18块，然后早餐买了包子和豆浆50元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "宠物",
+            "医疗"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "餐饮",
+            "早餐"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-018",
+      "utterance": "订了羽毛球场地25元，然后买了一杯咖啡65块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "运动",
+            "场地"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-019",
+      "utterance": "订了酒店26块，然后买了水果88元，然后买了一件衣服8块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "旅行",
+            "住宿"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "餐饮",
+            "水果零食"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "购物",
+            "服饰"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-020",
+      "utterance": "旅行购买景区门票30块五，然后坐公交上班120块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "旅行",
+            "门票"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-021",
+      "utterance": "中午吃午饭32块，然后打车回家128元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "餐饮",
+            "午餐"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "交通",
+            "打车"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-022",
+      "utterance": "点了一杯奶茶46块8，然后商场停车200块，然后看电影18元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "交通",
+            "停车"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "娱乐",
+            "电影演出"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-023",
+      "utterance": "买了零食50块，然后买了一件衣服8元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "餐饮",
+            "水果零食"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "购物",
+            "服饰"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-024",
+      "utterance": "坐地铁回家65元，然后买了护肤品6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "购物",
+            "美妆个护"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-025",
+      "utterance": "给车加油88块，然后交水电费12元，然后买了两本书30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "交通",
+            "加油充电"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "居住",
+            "水电燃气"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "学习教育",
+            "书籍"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-026",
+      "utterance": "买了高铁票120元，然后看电影18块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "交通",
+            "火车飞机"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "娱乐",
+            "电影演出"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-027",
+      "utterance": "买了日用品128块，然后旅行订了民宿25元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "购物",
+            "日用品"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "旅行",
+            "住宿"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-028",
+      "utterance": "买了家居用品200元，然后去药店买药26块，然后交宽带费50元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "购物",
+            "家居"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "医疗健康",
+            "药品"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "通讯网络",
+            "宽带"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-029",
+      "utterance": "交物业费8块，然后买了两本书30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "居住",
+            "物业"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "学习教育",
+            "书籍"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-030",
+      "utterance": "买了游戏6块五，然后购买文具32块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "娱乐",
+            "游戏"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "学习教育",
+            "文具"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-031",
+      "utterance": "看了一场电影12块，然后和朋友聚餐46块8，然后订了酒店120块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "娱乐",
+            "电影演出"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "餐饮",
+            "聚餐"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "旅行",
+            "住宿"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-032",
+      "utterance": "做了体检18元，然后交宽带费50块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "医疗健康",
+            "体检"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "通讯网络",
+            "宽带"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-033",
+      "utterance": "报名线上课程25块，然后带猫看病65元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "学习教育",
+            "课程"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "宠物",
+            "医疗"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-034",
+      "utterance": "发了红包26元，然后订了羽毛球场地88块，然后点了一杯奶茶8元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "人情礼物",
+            "红包"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "运动",
+            "场地"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-035",
+      "utterance": "给父母生活费30块五，然后订了酒店120元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "人情礼物",
+            "孝敬"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "旅行",
+            "住宿"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-036",
+      "utterance": "续费云服务器32元，然后旅行购买景区门票128块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "通讯网络",
+            "云服务"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "旅行",
+            "门票"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-037",
+      "utterance": "买了宠物用品46块8，然后中午吃午饭200元，然后给车加油18块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "宠物",
+            "用品"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "餐饮",
+            "午餐"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "交通",
+            "加油充电"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-038",
+      "utterance": "买了运动鞋50元，然后点了一杯奶茶8块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "运动",
+            "装备"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-039",
+      "utterance": "买了景区门票65块，然后买了零食6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "旅行",
+            "门票"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "餐饮",
+            "水果零食"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-040",
+      "utterance": "交了一笔杂费88元，然后坐地铁回家12块，然后买了家居用品30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "其他",
+            "其他"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "购物",
+            "家居"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-041",
+      "utterance": "晚上吃晚饭120块，然后给车加油18元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "餐饮",
+            "晚餐"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "交通",
+            "加油充电"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-042",
+      "utterance": "点了一份外卖128元，然后买了高铁票25块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "餐饮",
+            "外卖"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "交通",
+            "火车飞机"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-043",
+      "utterance": "和朋友聚餐200块，然后买了日用品26元，然后看了一场电影50块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "餐饮",
+            "聚餐"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "购物",
+            "日用品"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "娱乐",
+            "电影演出"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-044",
+      "utterance": "打车去公司8元，然后买了家居用品30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "交通",
+            "打车"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "购物",
+            "家居"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "multi-045",
+      "utterance": "充电桩充电6块五，然后交物业费32元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "交通",
+            "加油充电"
+          ]
+        },
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "居住",
+            "物业"
+          ]
+        }
+      ],
+      "tags": [
+        "multi",
+        "expense"
+      ]
+    },
+    {
+      "id": "amount-001",
+      "utterance": "骑共享单车30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "交通",
+            "单车"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-002",
+      "utterance": "买了一件衣服32块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3250,
+          "categoryPath": [
+            "购物",
+            "服饰"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-003",
+      "utterance": "买了日用品18块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "购物",
+            "日用品"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-004",
+      "utterance": "买了一个键盘46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "购物",
+            "数码"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-005",
+      "utterance": "买了护肤品6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "购物",
+            "美妆个护"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-006",
+      "utterance": "买了家居用品30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "购物",
+            "家居"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-007",
+      "utterance": "交房租32块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3250,
+          "categoryPath": [
+            "居住",
+            "房租"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-008",
+      "utterance": "交水电费18元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "居住",
+            "水电燃气"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-009",
+      "utterance": "交物业费46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "居住",
+            "物业"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-010",
+      "utterance": "修了水龙头6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "居住",
+            "维修"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-011",
+      "utterance": "看电影30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "娱乐",
+            "电影演出"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-012",
+      "utterance": "买了游戏32块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3250,
+          "categoryPath": [
+            "娱乐",
+            "游戏"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-013",
+      "utterance": "续费视频会员18块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "娱乐",
+            "会员订阅"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-014",
+      "utterance": "旅行订了民宿46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "旅行",
+            "住宿"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-015",
+      "utterance": "看了一场电影6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "娱乐",
+            "电影演出"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-016",
+      "utterance": "去医院看门诊30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "医疗健康",
+            "门诊"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-017",
+      "utterance": "去药店买药32块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3250,
+          "categoryPath": [
+            "医疗健康",
+            "药品"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-018",
+      "utterance": "做了体检18元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "医疗健康",
+            "体检"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-019",
+      "utterance": "交保险费46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "医疗健康",
+            "保险"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-020",
+      "utterance": "买了两本书6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "学习教育",
+            "书籍"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-021",
+      "utterance": "报名线上课程30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "学习教育",
+            "课程"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-022",
+      "utterance": "交考试报名费32块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3250,
+          "categoryPath": [
+            "学习教育",
+            "考试"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-023",
+      "utterance": "购买文具18块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "学习教育",
+            "文具"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-024",
+      "utterance": "发了红包46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "人情礼物",
+            "红包"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-025",
+      "utterance": "买了一份礼物6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "人情礼物",
+            "礼物"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-026",
+      "utterance": "和朋友聚餐30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "餐饮",
+            "聚餐"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-027",
+      "utterance": "给父母生活费32块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3250,
+          "categoryPath": [
+            "人情礼物",
+            "孝敬"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-028",
+      "utterance": "交话费18元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "通讯网络",
+            "话费"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-029",
+      "utterance": "交宽带费46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "通讯网络",
+            "宽带"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "amount-030",
+      "utterance": "续费云服务器6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "通讯网络",
+            "云服务"
+          ]
+        }
+      ],
+      "tags": [
+        "amount"
+      ]
+    },
+    {
+      "id": "date-001",
+      "utterance": "今天买了一杯咖啡30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ],
+          "dateRule": "today"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-002",
+      "utterance": "昨天和朋友聚餐32元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "餐饮",
+            "聚餐"
+          ],
+          "dateRule": "yesterday"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-003",
+      "utterance": "前天给车加油46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "交通",
+            "加油充电"
+          ],
+          "dateRule": "dayBefore"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-004",
+      "utterance": "10月5号买了一件衣服50元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "购物",
+            "服饰"
+          ],
+          "dateRule": "oct5"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-005",
+      "utterance": "今天交房租65块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "居住",
+            "房租"
+          ],
+          "dateRule": "today"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-006",
+      "utterance": "昨天买了游戏88元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 8800,
+          "categoryPath": [
+            "娱乐",
+            "游戏"
+          ],
+          "dateRule": "yesterday"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-007",
+      "utterance": "前天去药店买药120块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12000,
+          "categoryPath": [
+            "医疗健康",
+            "药品"
+          ],
+          "dateRule": "dayBefore"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-008",
+      "utterance": "10月5号交考试报名费128元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 12800,
+          "categoryPath": [
+            "学习教育",
+            "考试"
+          ],
+          "dateRule": "oct5"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-009",
+      "utterance": "今天给父母生活费200块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 20000,
+          "categoryPath": [
+            "人情礼物",
+            "孝敬"
+          ],
+          "dateRule": "today"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-010",
+      "utterance": "昨天带猫看病8元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 800,
+          "categoryPath": [
+            "宠物",
+            "医疗"
+          ],
+          "dateRule": "yesterday"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-011",
+      "utterance": "前天报名健身课6块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 650,
+          "categoryPath": [
+            "运动",
+            "课程"
+          ],
+          "dateRule": "dayBefore"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-012",
+      "utterance": "10月5号交了一笔杂费12元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1200,
+          "categoryPath": [
+            "其他",
+            "其他"
+          ],
+          "dateRule": "oct5"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-013",
+      "utterance": "今天点了一杯奶茶18块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 1800,
+          "categoryPath": [
+            "餐饮",
+            "咖啡奶茶"
+          ],
+          "dateRule": "today"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-014",
+      "utterance": "昨天坐公交上班25元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2500,
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ],
+          "dateRule": "yesterday"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-015",
+      "utterance": "前天充电桩充电26块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 2600,
+          "categoryPath": [
+            "交通",
+            "加油充电"
+          ],
+          "dateRule": "dayBefore"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-016",
+      "utterance": "10月5号买了日用品30块五",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3050,
+          "categoryPath": [
+            "购物",
+            "日用品"
+          ],
+          "dateRule": "oct5"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-017",
+      "utterance": "今天交水电费32块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 3200,
+          "categoryPath": [
+            "居住",
+            "水电燃气"
+          ],
+          "dateRule": "today"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-018",
+      "utterance": "昨天续费视频会员46块8",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 4680,
+          "categoryPath": [
+            "娱乐",
+            "会员订阅"
+          ],
+          "dateRule": "yesterday"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-019",
+      "utterance": "前天做了体检50块",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 5000,
+          "categoryPath": [
+            "医疗健康",
+            "体检"
+          ],
+          "dateRule": "dayBefore"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "date-020",
+      "utterance": "10月5号购买文具65元",
+      "expected": [
+        {
+          "type": "expense",
+          "amountMinor": 6500,
+          "categoryPath": [
+            "学习教育",
+            "文具"
+          ],
+          "dateRule": "oct5"
+        }
+      ],
+      "tags": [
+        "date"
+      ]
+    },
+    {
+      "id": "missing-001",
+      "utterance": "晚上吃晚饭",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "餐饮",
+            "晚餐"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    },
+    {
+      "id": "missing-002",
+      "utterance": "坐公交上班",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "交通",
+            "公交地铁"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    },
+    {
+      "id": "missing-003",
+      "utterance": "买了高铁票",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "交通",
+            "火车飞机"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    },
+    {
+      "id": "missing-004",
+      "utterance": "交房租",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "居住",
+            "房租"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    },
+    {
+      "id": "missing-005",
+      "utterance": "旅行订了民宿",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "旅行",
+            "住宿"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    },
+    {
+      "id": "missing-006",
+      "utterance": "报名线上课程",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "学习教育",
+            "课程"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    },
+    {
+      "id": "missing-007",
+      "utterance": "交话费",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "通讯网络",
+            "话费"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    },
+    {
+      "id": "missing-008",
+      "utterance": "订了羽毛球场地",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "运动",
+            "场地"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    },
+    {
+      "id": "missing-009",
+      "utterance": "交了一笔杂费",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "其他",
+            "其他"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    },
+    {
+      "id": "missing-010",
+      "utterance": "买了水果",
+      "expected": [
+        {
+          "type": "expense",
+          "categoryPath": [
+            "餐饮",
+            "水果零食"
+          ],
+          "missingAmount": true
+        }
+      ],
+      "tags": [
+        "missing-amount"
+      ]
+    }
+  ]
+}

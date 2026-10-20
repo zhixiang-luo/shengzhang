@@ -201,6 +201,7 @@ export function useVoiceCapture() {
         showError('语音连接已断开，请重试。');
         return;
       }
+      await wait(150);
       socket.send(JSON.stringify({ type: 'stop' }));
 
       try {

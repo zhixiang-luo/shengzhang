@@ -8,7 +8,7 @@ import type { VoiceQuota } from './security/voice-quota.js';
 
 const VOLCANO_WS_URL = 'wss://openspeech.bytedance.com/api/v3/sauc/bigmodel';
 const AUDIO_CHUNK_BYTES = 6400;
-const FINALIZE_DELAY_MS = 450;
+const FINALIZE_DELAY_MS = 1500;
 const FINAL_TIMEOUT_MS = 3000;
 
 type StreamOptions = {
@@ -150,7 +150,10 @@ class VolcanoVoiceSession {
   stop() {
     if (this.stopping || this.finished) return;
     this.stopping = true;
-    const finalPayload = this.audioBuffer.length > 0 ? this.audioBuffer : Buffer.alloc(0);
+    const finalPayload = Buffer.concat([
+      this.audioBuffer,
+      Buffer.alloc(AUDIO_CHUNK_BYTES),
+    ]);
     this.audioBuffer = Buffer.alloc(0);
     this.upstream.send(buildFrame(0x02, 0x02, finalPayload));
     this.finalTimeout = setTimeout(() => this.finish(), FINAL_TIMEOUT_MS);
@@ -186,7 +189,12 @@ class VolcanoVoiceSession {
       }
       if (this.stopping) {
         if (this.finalizeTimer) clearTimeout(this.finalizeTimer);
-        this.finalizeTimer = setTimeout(() => this.finish(), FINALIZE_DELAY_MS);
+        const definite = payload.result?.utterances?.some((utterance) => utterance.definite);
+        if (definite) {
+          this.finish();
+        } else {
+          this.finalizeTimer = setTimeout(() => this.finish(), FINALIZE_DELAY_MS);
+        }
       }
     } catch {
       // Ignore malformed upstream packets; the final timeout still closes cleanly.

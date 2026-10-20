@@ -58,20 +58,21 @@
 - 火山真实 Key 已通过 WebSocket 验证：2.3 秒音频约 1 秒开始出现“午饭”，之后持续更新，最终返回“午饭25，打车18。”。
 - SiliconFlow HTTP 备用路径已验证；React Native 的 Blob 不支持从 ArrayBuffer 创建，因此备用上传使用临时 WAV 文件。
 - 滑动闪动的根因是父组件每次状态更新都会重建 PanResponder；现已把回调存入 ref，手势实例全程只创建一次，并采用 36pt 取消区/16pt 回退线、48pt 手动态/24pt 回退线。
+- 200 条中文 TTS 自动化评测已全部通过：金额、类型、分类、日期、多笔和缺金额指标均为 100%；首字 P50 1.28s，松手到结构化完成约 P50 1.68s、P95 2.20s。报告见 `docs/20-voice-eval-report.md`。
 
 ## 当前未实现
 
-- 200 条中文生活口语测试集、准确率基准和 P50/P95 延迟统计。
+- 真人噪声/口音语料、iPhone/Android 中低端矩阵和 7 天封闭试用。
 - 微信移动端登录。
 - PostgreSQL、对象存储、云备份与恢复。
 - 高保真 UI 页面和最终自适应图标。
 
 ## 下一步最小任务（M5）
 
-1. 建立并版本化 200 条中文生活口语评测集。
-2. 用火山流式 ASR + DeepSeek 跑金额、收支类型、一级分类、多笔完整性和日期指标。
-3. 记录首字延迟、最终文字延迟和结构化总耗时 P50/P95。
-4. 修复评测暴露的 P0/P1 问题，冻结内测候选版本。
+1. 200 条合成 TTS 自动化基线已完成，结果见 `docs/20-voice-eval-report.md`。
+2. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字。
+3. 执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
+4. 修复真人评测暴露的 P0/P1 问题，冻结内测候选版本。
 5. M4 微信登录和云备份在 AppID、PostgreSQL、对象存储与 HTTPS 域名就绪后启动。
 
 ## 已知风险
@@ -90,6 +91,8 @@ pnpm typecheck: passed
 pnpm lint: passed
 pnpm test: passed
 expo export --platform ios: passed
-domain tests: 13 passed
+expo export --platform android: passed
+domain tests: 14 passed
+voice eval: 200/200 exact, amount/type/category/date 100%
 SQLite schema: sqlite3 语法与 foreign_key_check 通过
 ```
