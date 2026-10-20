@@ -67,6 +67,12 @@ pnpm dev:api
 
 移动端第一阶段可直接使用 Expo Go 真机预览。真实微信 SDK 和商店构建将在外部账号就绪后使用 EAS Build。
 
+## 开启真实 AI
+
+在项目根目录 `.env` 填入 `DEEPSEEK_API_KEY` 和 `SILICONFLOW_API_KEY`，然后把 `VOICE_PROVIDER=mock` 改为 `cloud`，重启 `pnpm dev:api`。密钥只在服务端使用，不能写入移动端。
+
+详细配置、额度、多用户部署和 ASR 对比见 `docs/19-ai-providers.md`。
+
 ## 查看原型
 
 原型不依赖构建工具。进入 `prototype/` 后直接打开 `index.html`，或使用任意静态文件服务器：

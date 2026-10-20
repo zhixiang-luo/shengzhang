@@ -8,10 +8,16 @@ const environmentSchema = z.object({
   JWT_SECRET: z.string().min(32).optional(),
   WECHAT_APP_ID: z.string().optional(),
   WECHAT_APP_SECRET: z.string().optional(),
-  VOICE_PROVIDER: z.enum(['mock', 'aliyun']).default('mock'),
+  VOICE_PROVIDER: z.enum(['mock', 'cloud']).default('mock'),
+  VOICE_DAILY_LIMIT: z.coerce.number().int().positive().default(20),
+  SILICONFLOW_API_KEY: z.string().optional(),
+  SILICONFLOW_BASE_URL: z.string().url().default('https://api.siliconflow.cn/v1'),
+  SILICONFLOW_ASR_MODEL: z.string().default('FunAudioLLM/SenseVoiceSmall'),
+  DEEPSEEK_API_KEY: z.string().optional(),
+  DEEPSEEK_BASE_URL: z.string().url().default('https://api.deepseek.com'),
+  DEEPSEEK_MODEL: z.string().default('deepseek-chat'),
   ALIYUN_ACCESS_KEY_ID: z.string().optional(),
   ALIYUN_ACCESS_KEY_SECRET: z.string().optional(),
-  DEEPSEEK_API_KEY: z.string().optional(),
 });
 
 export type Environment = z.infer<typeof environmentSchema>;

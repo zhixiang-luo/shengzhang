@@ -19,7 +19,7 @@
 2. `docs/HANDOFF.md`：当前进度、最近决策、已知问题和下一步。
 3. `docs/README.md`：完整文档索引和事实来源。
 4. `docs/01-prd.md`：产品范围与验收目标。
-5. 任务相关文档：用户流程、语音、账号备份、数据隐私、`docs/18-ui-handoff.md`、技术架构。
+5. 任务相关文档：用户流程、语音、账号备份、数据隐私、`docs/18-ui-handoff.md`、`docs/19-ai-providers.md`、技术架构。
 6. 涉及代码时：`packages/contracts/`、`packages/domain/`、对应模块的测试和 README。
 
 不要根据聊天摘要猜测已经实现的接口、字段或页面。先检索代码和文档。

@@ -15,6 +15,7 @@
     "@fastify/multipart": "^9.2.1",
     "@shengzhang/contracts": "workspace:*",
     "@shengzhang/domain": "workspace:*",
+    "dotenv": "^18.0.8",
     "fastify": "^5.12.7",
     "zod": "^4.1.11"
   },

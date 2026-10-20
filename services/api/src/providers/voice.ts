@@ -2,15 +2,21 @@ export interface VoiceProviderInput {
   audio: Buffer;
   mimeType: string;
   timezone: string;
-  categoryNames: string[];
+  categories: VoiceCategory[];
+}
+
+export interface VoiceCategory {
+  name: string;
+  type: 'expense' | 'income';
+  children: string[];
 }
 
 export interface VoiceProviderEntry {
-  type: 'expense' | 'income';
-  amountMinor: number;
-  categoryPath: [string] | [string, string];
-  occurredAt: string;
-  note: string;
+  type?: 'expense' | 'income' | undefined;
+  amountMinor?: number | undefined;
+  categoryPath?: [string] | [string, string] | undefined;
+  occurredAt?: string | undefined;
+  note?: string | undefined;
 }
 
 export interface VoiceProviderOutput {

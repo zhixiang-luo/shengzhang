@@ -1,5 +1,9 @@
+import { config as loadDotenv } from 'dotenv';
+
 import { buildApp } from './app.js';
 import { loadEnvironment } from './config.js';
+
+loadDotenv({ path: new URL('../../../.env', import.meta.url) });
 
 const environment = loadEnvironment();
 const app = buildApp();

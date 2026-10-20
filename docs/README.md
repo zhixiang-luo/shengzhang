@@ -26,6 +26,7 @@
 - [实施路线](./14-implementation-roadmap.md)
 - [测试与发布](./15-testing-and-release.md)
 - [UI 交接](./18-ui-handoff.md)
+- [AI 供应商配置与 ASR 调研](./19-ai-providers.md)
 
 ## 决策与交接
 

@@ -2,11 +2,22 @@ import { voiceParseResponseSchema, type VoiceParseResponse } from '@shengzhang/c
 
 import type { CategoryRow } from '../db/categoryRepository';
 import { API_BASE_URL } from '../config/env';
+import { getInstallationId } from './installationId';
 
 export async function parseVoiceAudio(
   audioUri: string,
   categories: CategoryRow[],
 ): Promise<VoiceParseResponse> {
+  const activeCategories = categories.filter((category) => !category.isArchived);
+  const categoryTree = activeCategories
+    .filter((category) => category.parentId === null)
+    .map((root) => ({
+      name: root.name,
+      type: root.type,
+      children: activeCategories
+        .filter((category) => category.parentId === root.id)
+        .map((category) => category.name),
+    }));
   const formData = new FormData();
   formData.append(
     'audio',
@@ -20,17 +31,9 @@ export async function parseVoiceAudio(
   formData.append('locale', 'zh-CN');
   formData.append(
     'categoryTree',
-    JSON.stringify(
-      categories
-        .filter((category) => !category.isArchived)
-        .map((category) => ({
-          name: category.name,
-          type: category.type,
-          parentId: category.parentId,
-        })),
-    ),
+    JSON.stringify(categoryTree),
   );
-  formData.append('installationId', 'local-device');
+  formData.append('installationId', await getInstallationId());
 
   const response = await fetch(`${API_BASE_URL}/v1/voice/parse`, {
     method: 'POST',
