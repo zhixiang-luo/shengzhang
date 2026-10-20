@@ -5,9 +5,7 @@ import type { VoiceCategory, VoiceProviderEntry, VoiceProviderInput } from './vo
 const llmEntrySchema = z.object({
   type: z.enum(['expense', 'income']).optional(),
   amountMinor: z.number().int().positive().nullable().optional(),
-  categoryPath: z
-    .tuple([z.string().min(1), z.string().min(1).optional()])
-    .optional(),
+  categoryPath: z.array(z.string().min(1)).min(1).max(4).optional(),
   occurredAt: z.string().optional(),
   note: z.string().max(40).optional(),
 });
@@ -70,6 +68,7 @@ export class DeepSeekStructuredParser implements StructuredParser {
                   '你是“声账”的记账结构化解析器，只输出 JSON。',
                   '根据用户语音转写生成 1–5 笔账单。',
                   '字段：type(expense|income)、amountMinor(整数分)、categoryPath(数组)、occurredAt(ISO 8601)、note。',
+                  'categoryPath 只能包含一级/二级分类名称，不要包含“支出”或“收入”。',
                   '不能猜测缺失金额；缺失时 amountMinor 输出 null，并把条目索引写入 unresolvedFields。',
                   '优先使用给定分类；不确定收支类型时默认 expense。',
                   `时区：${input.timezone}`,
@@ -101,10 +100,14 @@ export class DeepSeekStructuredParser implements StructuredParser {
 
       const entries = parsed.entries.map((entry, index) => {
         if (entry.amountMinor == null) unresolvedFields.push(`entries[${index}].amountMinor`);
-        const categoryPath = entry.categoryPath
-          ? entry.categoryPath[1]
-            ? [entry.categoryPath[0], entry.categoryPath[1]]
-            : [entry.categoryPath[0]]
+        const rawPath =
+          entry.categoryPath?.[0] === '支出' || entry.categoryPath?.[0] === '收入'
+            ? entry.categoryPath.slice(1)
+            : entry.categoryPath;
+        const categoryPath = rawPath
+          ? rawPath[1]
+            ? [rawPath[0], rawPath[1]]
+            : [rawPath[0]]
           : undefined;
         return {
           type: entry.type,

@@ -23,7 +23,7 @@ describe('DeepSeekStructuredParser', () => {
                       {
                         type: 'expense',
                         amountMinor: 2500,
-                        categoryPath: ['餐饮', '午餐'],
+                        categoryPath: ['支出', '餐饮', '午餐'],
                         note: '午饭',
                       },
                       {

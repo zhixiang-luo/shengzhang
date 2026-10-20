@@ -37,6 +37,8 @@
 - 语音多笔结果会自动入账并弹出 8 秒整批撤销卡；音频上传后立即删除。
 - 服务端已增加 SiliconFlow ASR + DeepSeek JSON 解析适配器，支持 `mock/cloud` 切换。
 - 本地 `.env` 配置入口、安装 ID 和每日语音额度已实现；真实 Key 尚未填入。
+- DeepSeek Key 已通过真实请求验证，示例“午饭二十五，打车十八”能稳定返回两笔结构化账单。
+- SiliconFlow Key 当前被官方接口拒绝为 `Token is invalid`，真实 ASR 端到端仍待替换有效 Key。
 
 ## 当前未实现
 
