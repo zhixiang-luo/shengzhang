@@ -4,6 +4,8 @@ import type { FastifyPluginAsync, FastifyReply } from 'fastify';
 import { z } from 'zod';
 
 import type { VoiceProvider } from '../providers/voice.js';
+import { resolveClientIp } from '../security/client-ip.js';
+import type { VoiceAccessDecision, VoiceAccessGuard } from '../security/rate-limit.js';
 import type { VoiceQuota } from '../security/voice-quota.js';
 
 const categorySchema = z.object({
@@ -23,7 +25,26 @@ export const voiceRoutes: FastifyPluginAsync<{
   provider: VoiceProvider;
   quota: VoiceQuota;
   partialQuota: VoiceQuota;
+  accessGuard: VoiceAccessGuard;
 }> = async (app, options) => {
+  const accessLimitError = (
+    reply: FastifyReply,
+    decision: Extract<VoiceAccessDecision, { allowed: false }>,
+  ) => {
+    const isGlobalLimit =
+      decision.reason === 'GLOBAL_MINUTE_LIMIT' ||
+      decision.reason === 'GLOBAL_DAILY_LIMIT';
+    reply.header('Retry-After', String(decision.retryAfterSeconds));
+    return reply.code(429).send({
+      error: {
+        code: isGlobalLimit ? 'VOICE_CAPACITY_LIMITED' : 'VOICE_TRAFFIC_LIMITED',
+        message: isGlobalLimit
+          ? '语音服务当前请求较多，请稍后再试。'
+          : '语音请求太频繁，请稍后再试。',
+      },
+    });
+  };
+
   const providerError = (reply: FastifyReply, error: unknown) => {
     const providerMessage = error instanceof Error ? error.message : '';
     if (error instanceof DOMException && error.name === 'AbortError') {
@@ -51,6 +72,9 @@ export const voiceRoutes: FastifyPluginAsync<{
   };
 
   app.post('/v1/voice/transcribe', async (request, reply) => {
+    const access = options.accessGuard.consume(resolveClientIp(request.raw));
+    if (!access.allowed) return accessLimitError(reply, access);
+
     const startedAt = performance.now();
     const data = await request.file();
     if (!data) {
@@ -104,6 +128,9 @@ export const voiceRoutes: FastifyPluginAsync<{
   });
 
   app.post('/v1/voice/parse-transcript', async (request, reply) => {
+    const access = options.accessGuard.consume(resolveClientIp(request.raw));
+    if (!access.allowed) return accessLimitError(reply, access);
+
     const startedAt = performance.now();
     const parsedBody = parseTranscriptSchema.safeParse(request.body);
     if (!parsedBody.success) {
@@ -139,6 +166,9 @@ export const voiceRoutes: FastifyPluginAsync<{
   });
 
   app.post('/v1/voice/parse', async (request, reply) => {
+    const access = options.accessGuard.consume(resolveClientIp(request.raw));
+    if (!access.allowed) return accessLimitError(reply, access);
+
     const startedAt = performance.now();
     const data = await request.file();
 

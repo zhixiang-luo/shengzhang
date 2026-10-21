@@ -4,13 +4,13 @@ export interface VoiceQuota {
   consume(installationId: string): boolean;
 }
 
-function shanghaiDateKey(): string {
+export function shanghaiDateKey(date = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Shanghai',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-  }).format(new Date());
+  }).format(date);
 }
 
 export class InMemoryDailyVoiceQuota implements VoiceQuota {

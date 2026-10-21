@@ -11,4 +11,30 @@ describe('API foundation', () => {
     expect(response.json()).toMatchObject({ status: 'ok', service: 'shengzhang-api' });
     await app.close();
   });
+
+  it('limits repeated voice requests from one IP', async () => {
+    const app = buildApp();
+
+    for (let index = 0; index < 10; index += 1) {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/v1/voice/parse-transcript',
+        payload: {},
+      });
+      expect(response.statusCode).toBe(400);
+    }
+
+    const limited = await app.inject({
+      method: 'POST',
+      url: '/v1/voice/parse-transcript',
+      payload: {},
+    });
+
+    expect(limited.statusCode).toBe(429);
+    expect(limited.headers['retry-after']).toBeDefined();
+    expect(limited.json()).toMatchObject({
+      error: { code: 'VOICE_TRAFFIC_LIMITED' },
+    });
+    await app.close();
+  });
 });

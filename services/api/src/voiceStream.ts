@@ -1,9 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import type { Server } from 'node:http';
+import type { IncomingMessage, Server } from 'node:http';
 
 import type { FastifyBaseLogger } from 'fastify';
 import WebSocket, { WebSocketServer } from 'ws';
 
+import { resolveClientIp } from './security/client-ip.js';
+import type { VoiceAccessGuard } from './security/rate-limit.js';
 import type { VoiceQuota } from './security/voice-quota.js';
 import {
   isSilentVoiceStop,
@@ -19,6 +21,11 @@ type StreamOptions = {
   apiKey: string;
   resourceId: string;
   quota: VoiceQuota;
+  accessGuard: VoiceAccessGuard;
+  maxStreamBytes: number;
+  maxStreamMs: number;
+  maxConcurrentPerIp: number;
+  maxConcurrentGlobal: number;
   logger: FastifyBaseLogger;
 };
 
@@ -65,8 +72,10 @@ class VolcanoVoiceSession {
   private stopping = false;
   private finished = false;
   private latestText = '';
+  private receivedAudioBytes = 0;
   private finalizeTimer: ReturnType<typeof setTimeout> | null = null;
   private finalTimeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly maxSessionTimer: ReturnType<typeof setTimeout>;
 
   constructor(
     private readonly client: WebSocket,
@@ -80,6 +89,11 @@ class VolcanoVoiceSession {
         'X-Api-Connect-Id': randomUUID(),
       },
     });
+    this.maxSessionTimer = setTimeout(
+      () => this.abort('VOICE_STREAM_TOO_LONG', '单次语音时间过长，请缩短后重试。'),
+      options.maxStreamMs,
+    );
+    this.maxSessionTimer.unref();
     this.upstream.on('open', () => this.handleUpstreamOpen(installationId));
     this.upstream.on('message', (data) => this.handleUpstreamMessage(Buffer.from(data as Buffer)));
     this.upstream.on('error', (error) => {
@@ -142,6 +156,11 @@ class VolcanoVoiceSession {
   }
 
   pushAudio(chunk: Buffer) {
+    this.receivedAudioBytes += chunk.byteLength;
+    if (this.receivedAudioBytes > this.options.maxStreamBytes) {
+      this.abort('VOICE_AUDIO_TOO_LARGE', '单次语音时间过长，请缩短后重试。');
+      return;
+    }
     if (!this.ready) {
       this.audioQueue.push(chunk);
       return;
@@ -220,6 +239,7 @@ class VolcanoVoiceSession {
   private finish() {
     if (this.finished) return;
     this.finished = true;
+    clearTimeout(this.maxSessionTimer);
     if (this.finalizeTimer) clearTimeout(this.finalizeTimer);
     if (this.finalTimeout) clearTimeout(this.finalTimeout);
     this.send({ type: 'final', text: this.latestText });
@@ -234,6 +254,7 @@ class VolcanoVoiceSession {
 
   private close() {
     this.finished = true;
+    clearTimeout(this.maxSessionTimer);
     if (this.finalizeTimer) clearTimeout(this.finalizeTimer);
     if (this.finalTimeout) clearTimeout(this.finalTimeout);
     if (
@@ -248,26 +269,67 @@ class VolcanoVoiceSession {
   private closeClient() {
     if (this.client.readyState === WebSocket.OPEN) this.client.close();
   }
+
+  private abort(code: string, message: string) {
+    if (this.finished) return;
+    this.send({ type: 'error', code, message });
+    this.close();
+  }
+}
+
+function rejectUpgrade(
+  socket: NodeJS.WritableStream & { destroy(): void },
+  status: string,
+  retryAfterSeconds?: number,
+) {
+  const retryAfter = retryAfterSeconds
+    ? `Retry-After: ${retryAfterSeconds}\r\n`
+    : '';
+  socket.write(
+    `HTTP/1.1 ${status}\r\nConnection: close\r\n${retryAfter}Content-Length: 0\r\n\r\n`,
+  );
+  socket.destroy();
 }
 
 export function attachVoiceStreamServer(server: Server, options: StreamOptions) {
   const wss = new WebSocketServer({ noServer: true });
+  const activeByIp = new Map<string, number>();
+  let activeGlobal = 0;
 
   server.on('upgrade', (request, socket, head) => {
     const url = new URL(request.url ?? '/', 'http://localhost');
     if (url.pathname !== '/v1/voice/stream') return;
     const installationId = url.searchParams.get('installationId');
     if (!installationId) {
-      socket.write('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n');
-      socket.destroy();
+      rejectUpgrade(socket, '400 Bad Request');
+      return;
+    }
+    const ip = resolveClientIp(request);
+    const access = options.accessGuard.consume(ip);
+    if (!access.allowed) {
+      rejectUpgrade(socket, '429 Too Many Requests', access.retryAfterSeconds);
       return;
     }
     if (!options.quota.consume(installationId)) {
-      socket.write('HTTP/1.1 429 Too Many Requests\r\nConnection: close\r\n\r\n');
-      socket.destroy();
+      rejectUpgrade(socket, '429 Too Many Requests', 60);
+      return;
+    }
+    if (
+      activeGlobal >= options.maxConcurrentGlobal ||
+      (activeByIp.get(ip) ?? 0) >= options.maxConcurrentPerIp
+    ) {
+      rejectUpgrade(socket, '503 Service Unavailable', 5);
       return;
     }
     wss.handleUpgrade(request, socket, head, (client) => {
+      activeGlobal += 1;
+      activeByIp.set(ip, (activeByIp.get(ip) ?? 0) + 1);
+      client.once('close', () => {
+        activeGlobal = Math.max(0, activeGlobal - 1);
+        const next = Math.max(0, (activeByIp.get(ip) ?? 1) - 1);
+        if (next === 0) activeByIp.delete(ip);
+        else activeByIp.set(ip, next);
+      });
       wss.emit('connection', client, request);
     });
   });

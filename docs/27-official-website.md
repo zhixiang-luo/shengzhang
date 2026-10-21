@@ -63,11 +63,11 @@
 
 当前下载入口：
 
-- Android 内测：EAS Build 页面 `7567289d-de66-4472-8df8-8d88c38243b7`；
+- Android 内测：官网直接下载 `/downloads/shengzhang-android-preview.apk`；
 - 全量版本索引：GitHub Releases；
 - 源码：`https://github.com/zhixiang-luo/shengzhang`。
 
-正式发布后，首屏主按钮应优先指向 GitHub Release 的稳定 APK 或已上架商店，不再长期使用单次 EAS 构建页。iOS 未上架前不得展示可点击的 App Store 下载按钮。
+官网直接下载不要求 Expo 账户，适合把测试包发给没有 Expo 账号的用户。正式发布后，首屏主按钮应优先指向 GitHub Release 的稳定 APK 或已上架商店；每次替换 APK 都要同步版本号、文件大小和 SHA-256。iOS 未上架前不得展示可点击的 App Store 下载按钮。
 
 首版验收时，EAS 构建页匿名访问返回 200；GitHub 仓库与 Releases 匿名访问返回 404，但当前 SSH 推送正常。正式公开发布前必须确认仓库可见性已改为 Public，并从无登录浏览器复验这两个入口。
 
@@ -84,6 +84,8 @@ python3 -m http.server 4174 -d deploy/site
 2026-10-21 已部署到现有 ECS，临时公网入口为 `http://8.152.201.57/`。首页、CSS、JavaScript、产品截图与原有 `/health` 均从公网返回 `200`。
 
 该 IP 入口只用于备案完成前的临时访问，不配置表单、登录或支付，也不应作为长期推广地址。中国大陆服务器绑定正式域名前，必须完成 ICP 备案；备案通过并配置 HTTPS 后，再替换当前测试入口。
+
+Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-android-preview.apk`，官网直接提供下载，不依赖 Expo 登录。当前文件大小为 108,028,872 字节，SHA-256 为 `fbff3118433caf01565581de7bff3ce68dbb2e4f6f626db85fd42a7a89a68f98`。
 
 ## 7. 验收基线
 

@@ -87,6 +87,10 @@
 - 官网使用无外部依赖的 `index.html`、`styles.css`、`app.js`，并纳入品牌 SVG、分享图和原型截图；支持滚动揭示、鼠标光晕、设备倾斜、声波和转写循环，并对 `prefers-reduced-motion` 做完整降级。
 - 官网已在 `1440×1000`、`768×1024`、`390×844` 和 `375×812` 四种视口完成布局验收；均无横向滚动，移动端导航、三个产品界面标签和方向键切换通过，页面自身无控制台错误。详细规格见 `docs/27-official-website.md`。
 - 官网已部署到现有阿里云 ECS 的 `/opt/shengzhang/site`，临时入口 `http://8.152.201.57/` 已从公网验证；首页、样式、脚本、产品截图和原有语音 `/health` 均返回 `200`。正式域名仍等待 ICP 备案与 HTTPS。
+- Android 内测 APK 已上传到官网 `/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；服务器端 SHA-256 与内测构建一致。
+- 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。公网 11 次连续无效请求验证为前 10 次 `400`、第 11 次 `429`。
+- GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Release `v0.1.0-preview.2`。
+- GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
 
 ## 测试发布状态（2026-10-21）
 
@@ -114,7 +118,7 @@
 ## 下一步最小任务
 
 1. 评审官网首版视觉、文案与下载入口；确认后用真实设备截图替换原型素材。
-2. 在 Expo Go 真机上验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
+2. 从官网直接下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
 3. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
 4. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
 5. 用真实供应商账单补齐成本看板的 DeepSeek、网关和存储成本。
@@ -134,6 +138,7 @@
 - App 图标 PNG 已由品牌 SVG 生成，但 Android 自适应前景和启动页仍需高保真阶段复核。
 - GitHub 仓库匿名访问当前返回 404，而 SSH 推送正常；正式官网上线前必须确认仓库已设为 Public，否则访客无法打开源码与 Releases。
 - 临时 IP 入口使用明文 HTTP，只适合当前静态官网预览；备案和域名就绪后应尽快切换 HTTPS，不把临时 IP 作为长期推广地址。
+- 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
 
 ## 最近验证
 
@@ -145,8 +150,8 @@ pnpm lint: passed
 pnpm test: passed
 expo export --platform ios: passed
 expo export --platform android: passed
-domain tests: 19 passed
-api tests: 19 passed
+domain tests: 23 passed
+api tests: 26 passed
 voice eval: 200/200 exact, amount/type/category/date 100%
 cost dashboard: ASR scenario generated
 account/payment feasibility: official Apple/WeChat/Alipay pages reviewed on 2026-10-20
