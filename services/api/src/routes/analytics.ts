@@ -87,6 +87,18 @@ export const analyticsRoutes: FastifyPluginAsync<{
         now,
       );
       if (!day.allowed) return reject(reply, day.retryAfterSeconds);
+      const globalMinute = options.limiter.consume(
+        'analytics:global-minute',
+        { limit: 600, windowMs: MINUTE_MS },
+        now,
+      );
+      if (!globalMinute.allowed) return reject(reply, globalMinute.retryAfterSeconds);
+      const globalDay = options.limiter.consume(
+        `analytics:global-day:${shanghaiDateKey(new Date(now))}`,
+        { limit: 50_000, windowMs: DAY_MS },
+        now,
+      );
+      if (!globalDay.allowed) return reject(reply, globalDay.retryAfterSeconds);
 
       const parsed = eventsSchema.safeParse(request.body);
       if (!parsed.success) {
