@@ -104,6 +104,8 @@
 - APK 文件大小 107,834,162 字节，SHA-256 为 `30f63e53349ff65fab6c2add525fd9fe991fc6e9d1efc624258ab37af83b4e36`；ZIP 完整性检查通过。
 - 分类拖拽、Sheet 动画、录音浮层触摸拦截和滚动删除阈值修复后的第二个 Android 内测 APK 已构建完成：构建 ID `7567289d-de66-4472-8df8-8d88c38243b7`，构建耗时 15 分 38 秒。
 - 第二个 APK 下载页：`https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/7567289d-de66-4472-8df8-8d88c38243b7`；文件大小 108,028,872 字节，SHA-256 为 `fbff3118433caf01565581de7bff3ce68dbb2e4f6f626db85fd42a7a89a68f98`。
+- Android `0.1.1` 匿名统计内测包已构建完成：EAS Build `f7643fc9-7eeb-48af-9272-15dc099b9809`，源码提交 `531c128`；文件大小 108,035,320 字节，SHA-256 为 `7d25239c7ed9429362b1cbbccc1df78a1d9063a366c7bfcf4c076f1a643b5d3a`。
+- 官网 `/downloads/shengzhang-android-preview.apk` 已原子替换为 `0.1.1`，GitHub Pre-release `v0.1.1-preview.1` 提供无需 Expo 账户的下载入口。
 - 两次 build 均使用同一 Android 签名证书，证书 MD5 为 `440A483CAFA42B8CE655EBC15DBAA2F2`；第二个 APK 的 ZIP 完整性和签名证书解析均通过。
 - 该 APK 使用 `preview` 配置中的临时测试 API `http://8.152.201.57` 和本地明文 HTTP 插件；本地手记账、统计和设置不依赖该接口。2026-10-21 08:46（Asia/Shanghai）复测 `/health` 返回正常，ECS 与 `shengzhang-api` 已恢复运行，可以开始语音真机测试。
 - 阿里云 ECS 已完成系统盘快照与格式化，部署环境为 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 和 systemd；`bigai.xin` 的公开 HTTP 入口仍受中国内地 ICP 备案阻断。
@@ -162,4 +164,7 @@ cost dashboard: ASR scenario generated
 account/payment feasibility: official Apple/WeChat/Alipay pages reviewed on 2026-10-20
 SQLite schema: sqlite3 语法与 foreign_key_check 通过
 official website: desktop/tablet/mobile viewport checks passed, 0 local console errors
+analytics ingestion: public POST 202, hashed install id, report aggregation passed
+analytics test data: cleared after verification
+android bundle export: passed
 ```
