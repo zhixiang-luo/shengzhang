@@ -1,7 +1,7 @@
 import { moveItem } from '@shengzhang/domain';
 import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   NestedReorderableList,
@@ -19,6 +19,7 @@ import {
   type CategoryRow,
 } from '../db/categoryRepository';
 import { useDatabase } from '../db/DatabaseProvider';
+import { trackAnalyticsEvent } from '../services/analytics';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 
 const CATEGORY_COLORS = ['#E89A96', '#D7A66F', '#9EAD98', '#91A6B5', '#9B9BB6', '#A39A91'];
@@ -213,6 +214,10 @@ export default function CategoriesScreen() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
+
+  useEffect(() => {
+    trackAnalyticsEvent('categories_opened');
+  }, []);
 
   const load = useCallback(() => {
     setCategories(listCategories(db, true));

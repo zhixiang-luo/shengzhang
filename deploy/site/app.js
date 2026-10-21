@@ -1,5 +1,54 @@
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const finePointer = window.matchMedia("(pointer: fine)").matches;
+const analyticsDisabled =
+  navigator.doNotTrack === "1" ||
+  window.globalPrivacyControl === true;
+const visitorStorageKey = "shengzhang.site-visitor";
+
+function getVisitorId() {
+  try {
+    const existing = window.localStorage.getItem(visitorStorageKey);
+    if (existing) return existing;
+    const created =
+      typeof window.crypto?.randomUUID === "function"
+        ? window.crypto.randomUUID()
+        : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+    window.localStorage.setItem(visitorStorageKey, created);
+    return created;
+  } catch {
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+  }
+}
+
+function trackSiteEvent(name) {
+  if (analyticsDisabled) return;
+  try {
+    void fetch("/v1/analytics/events", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      keepalive: true,
+      body: JSON.stringify({
+        anonymousId: getVisitorId(),
+        events: [
+          {
+            name,
+            occurredAt: new Date().toISOString(),
+            properties: {
+              platform: "web",
+              appVersion: "website",
+              source: "official_site",
+            },
+          },
+        ],
+      }),
+    });
+  } catch {
+    // Analytics must never block the site or download.
+  }
+}
 
 const header = document.querySelector("[data-header]");
 const menuButton = document.querySelector("[data-menu-button]");
@@ -28,6 +77,11 @@ menuButton?.addEventListener("click", () => {
 
 navigation?.addEventListener("click", (event) => {
   if (event.target instanceof HTMLAnchorElement) closeMenu();
+});
+
+trackSiteEvent("site_viewed");
+document.querySelectorAll("a[download]").forEach((link) => {
+  link.addEventListener("click", () => trackSiteEvent("download_started"));
 });
 
 document.addEventListener("keydown", (event) => {

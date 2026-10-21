@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useDatabase } from '../db/DatabaseProvider';
 import { createVoiceBatch, softDeleteVoiceBatch } from '../db/transactionRepository';
+import { trackAnalyticsEvent } from '../services/analytics';
 import { useVoiceResultStore } from '../stores/voiceResultStore';
 import { colors, spacing, typography } from '../theme/tokens';
 import { AnimatedSheetModal } from './AnimatedSheetModal';
@@ -36,12 +37,14 @@ export function VoiceResultSheet({ onSaved }: { onSaved: () => void }) {
     } catch (caught) {
       setSaveState('failed');
       setError(caught instanceof Error ? caught.message : '记账失败，请重试。');
+      trackAnalyticsEvent('voice_failed', { reason: 'save_failed' });
     } finally {
       savingRef.current = false;
     }
     if (!didSave) return;
 
     setSaveState('saved');
+    trackAnalyticsEvent('voice_saved', { entryCount: result.entries.length });
     try {
       onSaved();
     } catch {
@@ -157,6 +160,7 @@ export function VoiceResultSheet({ onSaved }: { onSaved: () => void }) {
                 <Pressable
                   onPress={() => {
                     softDeleteVoiceBatch(db, result.requestId);
+                    trackAnalyticsEvent('voice_undone', { entryCount: result.entries.length });
                     onSaved();
                     setSheetVisible(false);
                   }}

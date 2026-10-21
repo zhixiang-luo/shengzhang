@@ -2,8 +2,10 @@ import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import Fastify, { type FastifyServerOptions } from 'fastify';
 
+import { AnalyticsEventStore } from './analytics/event-store.js';
 import { loadEnvironment } from './config.js';
 import { createVoiceProvider } from './providers/factory.js';
+import { analyticsRoutes } from './routes/analytics.js';
 import { healthRoutes } from './routes/health.js';
 import { voiceRoutes } from './routes/voice.js';
 import {
@@ -58,6 +60,14 @@ export function buildApp(
   });
 
   app.register(healthRoutes);
+  app.register(analyticsRoutes, {
+    enabled: environment.ANALYTICS_ENABLED,
+    store: new AnalyticsEventStore({
+      directory: environment.ANALYTICS_DATA_DIR,
+      hashSalt: environment.ANALYTICS_HASH_SALT ?? 'development-only-analytics-salt',
+    }),
+    limiter: new InMemoryFixedWindowRateLimiter(),
+  });
   app.register(voiceRoutes, {
     provider: createVoiceProvider(environment),
     quota: new InMemoryDailyVoiceQuota(environment.VOICE_DAILY_LIMIT),

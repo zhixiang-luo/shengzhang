@@ -1,18 +1,30 @@
+import Constants from 'expo-constants';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '../components/Icon';
 import { listCategories } from '../db/categoryRepository';
 import { useDatabase } from '../db/DatabaseProvider';
 import { countTransactions } from '../db/transactionRepository';
+import {
+  isAnalyticsEnabled,
+  setAnalyticsEnabled,
+  trackAnalyticsEvent,
+} from '../services/analytics';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 
 export default function SettingsScreen() {
   const db = useDatabase();
   const [transactionCount, setTransactionCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
+  const [analyticsEnabled, setAnalyticsEnabledState] = useState(true);
+
+  useEffect(() => {
+    trackAnalyticsEvent('settings_opened');
+    void isAnalyticsEnabled().then(setAnalyticsEnabledState);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -56,11 +68,33 @@ export default function SettingsScreen() {
           <SettingRow label="微信登录" value="暂缓评估" last />
         </View>
 
+        <Text style={styles.sectionLabel}>隐私</Text>
+        <View style={styles.group}>
+          <View style={[styles.row, styles.analyticsRow]}>
+            <View style={styles.analyticsCopy}>
+              <Text style={styles.rowLabel}>匿名使用统计</Text>
+              <Text style={styles.analyticsHint}>只记录功能次数和账单条数，不含金额、分类、备注或录音。</Text>
+            </View>
+            <Switch
+              accessibilityLabel="匿名使用统计"
+              onValueChange={(value) => {
+                setAnalyticsEnabledState(value);
+                void setAnalyticsEnabled(value);
+              }}
+              thumbColor={colors.surface}
+              trackColor={{ false: colors.surfaceSunken, true: colors.blush }}
+              value={analyticsEnabled}
+            />
+          </View>
+        </View>
+
         <Text style={styles.sectionLabel}>关于</Text>
         <View style={styles.aboutCard}>
           <Text style={styles.aboutName}>声账</Text>
           <Text style={styles.aboutTagline}>说一句，就记好。</Text>
-          <Text style={styles.aboutVersion}>MVP 0.1.0 · Expo 58</Text>
+          <Text style={styles.aboutVersion}>
+            MVP {Constants.expoConfig?.version ?? '0.1.1'} · Expo 58
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -173,6 +207,19 @@ const styles = StyleSheet.create({
   },
   rowPressed: {
     backgroundColor: colors.canvas,
+  },
+  analyticsRow: {
+    minHeight: 76,
+    gap: spacing.lg,
+  },
+  analyticsCopy: {
+    flex: 1,
+  },
+  analyticsHint: {
+    marginTop: 4,
+    color: colors.inkTertiary,
+    fontSize: 10,
+    lineHeight: 16,
   },
   note: {
     marginTop: spacing.sm,

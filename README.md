@@ -7,7 +7,7 @@
   <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-292624?logo=expo&logoColor=white" />
   <img alt="React Native 0.88" src="https://img.shields.io/badge/React_Native-0.88-61DAFB?logo=react&logoColor=111111" />
   <img alt="TypeScript 6" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
-  <img alt="Tests 49" src="https://img.shields.io/badge/tests-49_passed-63795E" />
+  <img alt="Tests 52" src="https://img.shields.io/badge/tests-52_passed-63795E" />
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-E89A96" /></a>
 </p>
 
@@ -70,6 +70,7 @@
 | 本地 SQLite 与删除撤销 | ✅ 已完成 |
 | Android 内测 APK | ✅ 已通过 EAS Build |
 | 官网首版与移动端下载入口 | ✅ 已完成，等待域名发布 |
+| 匿名产品统计与用户开关 | ✅ 已完成 |
 | 30–50 条真人语音与双端真机矩阵 | 🚧 进行中 |
 | 月末回顾、JSON/CSV 导出、隐私中心 | 🚧 规划中 |
 | 微信登录、云备份、会员与支付 | 🧭 外部依赖就绪后再启动 |
@@ -83,7 +84,7 @@
 - **共享领域模型**：金额统一使用整数分，客户端、服务端和测试共用 Zod 契约与领域函数。
 - **流式语音链路**：手机 PCM → Fastify WebSocket → 火山双向流式 ASR → DeepSeek 结构化。
 - **隐私边界明确**：录音仅用于本次识别，服务端不长期保存音频；语音模型不接收历史账单。
-- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 49 项自动化测试。
+- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 52 项自动化测试。
 
 ### 架构概览
 
@@ -106,7 +107,7 @@ flowchart LR
 | --- | --- |
 | TypeScript 严格检查 | 通过 |
 | ESLint | 通过 |
-| 自动化测试 | 49 / 49 通过 |
+| 自动化测试 | 52 / 52 通过 |
 | Expo Doctor | 20 / 20 通过 |
 | 中文 TTS 语音评测 | 200 / 200 通过 |
 | 松手到结构化完成 | P50 1.68s / P95 2.20s |

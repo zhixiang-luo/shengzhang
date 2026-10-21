@@ -1,6 +1,6 @@
 import { formatCents } from '@shengzhang/domain';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,6 +10,7 @@ import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
 import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
 import { useVoiceCapture } from '../features/voice/useVoiceCapture';
+import { trackAnalyticsEvent } from '../services/analytics';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatMonth, localDateKey } from '../utils/date';
 
@@ -29,6 +30,10 @@ export default function StatsScreen() {
     previousMonth,
     nextMonth,
   } = useLedgerMonth();
+
+  useEffect(() => {
+    trackAnalyticsEvent('stats_opened');
+  }, []);
 
   const categoryMap = new Map(categories.map((category) => [category.id, category]));
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();

@@ -35,6 +35,7 @@ import {
   softDeleteTransaction,
   updateTransaction,
 } from '../db/transactionRepository';
+import { trackAnalyticsEvent } from '../services/analytics';
 import { useUndoDeleteStore } from '../stores/undoStore';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatDayHeading, formatTime, localDateKey } from '../utils/date';
@@ -153,6 +154,10 @@ export default function EntryScreen() {
   const categoryNameOffsetRef = useRef(0);
   const categoryInputFocusedRef = useRef(false);
 
+  useEffect(() => {
+    trackAnalyticsEvent('manual_entry_opened');
+  }, []);
+
   const rootCategories = useMemo(
     () => allCategories.filter((category) => category.type === type && category.parentId === null),
     [allCategories, type],
@@ -255,8 +260,13 @@ export default function EntryScreen() {
         occurredAt: occurredAt.toISOString(),
         note,
       };
-      if (editingId) updateTransaction(db, editingId, input);
-      else createTransaction(db, input);
+      if (editingId) {
+        updateTransaction(db, editingId, input);
+        trackAnalyticsEvent('transaction_updated');
+      } else {
+        createTransaction(db, input);
+        trackAnalyticsEvent('manual_transaction_created');
+      }
       router.back();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : '保存失败');
@@ -338,6 +348,7 @@ export default function EntryScreen() {
           const deleted = findTransaction(db, editingId);
           if (deleted) useUndoDeleteStore.getState().setDeleted(deleted);
           softDeleteTransaction(db, editingId);
+          trackAnalyticsEvent('transaction_deleted');
           router.back();
         },
       },

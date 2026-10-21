@@ -162,8 +162,6 @@ cp .env.example .env
 | 变量 | 用途 | 何时需要 |
 | --- | --- | --- |
 | `DATABASE_URL` | PostgreSQL 连接 | 接入登录和备份时 |
-
-生产部署、对象存储和客服/支付资源的详细取舍见 [生产基础设施与上线清单](./26-production-infrastructure.md)。
 | `JWT_SECRET` | 访问令牌签名 | 接入登录时 |
 | `WECHAT_APP_ID` | 微信移动应用 ID | 微信登录 |
 | `WECHAT_APP_SECRET` | 微信密钥 | 仅服务端 |
@@ -171,9 +169,15 @@ cp .env.example .env
 | `ALIYUN_ACCESS_KEY_ID` | ASR 访问 | 真实语音识别 |
 | `ALIYUN_ACCESS_KEY_SECRET` | ASR 密钥 | 仅服务端 |
 | `DEEPSEEK_API_KEY` | 结构化解析 | 真实语音解析 |
+| `ANALYTICS_ENABLED` | 是否接收匿名产品事件 | 默认开启 |
+| `ANALYTICS_DATA_DIR` | 统计 JSONL 私有目录 | 生产必须指向持久目录 |
+| `ANALYTICS_HASH_SALT` | 匿名 ID 哈希盐 | 生产必须配置且只放服务端 |
 | `EXPO_PUBLIC_API_BASE_URL` | 移动端 API 地址 | 真机测试 |
+| `EXPO_PUBLIC_ANALYTICS_ENABLED` | 构建时统计总开关 | 默认开启 |
 
 `EXPO_PUBLIC_*` 会进入客户端包，禁止放入任何密钥。
+
+生产部署、对象存储和客服/支付资源的详细取舍见 [生产基础设施与上线清单](./26-production-infrastructure.md)。
 
 ## 6. iOS 开发流程
 

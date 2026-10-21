@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -9,9 +9,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { BootScreen } from '../components/BootScreen';
 import { DatabaseProvider } from '../db/DatabaseProvider';
 import { migrateDatabase } from '../db/migrations';
+import { trackAppOpenedOnce } from '../services/analytics';
 import { colors } from '../theme/tokens';
 
 export default function RootLayout() {
+  useEffect(() => {
+    trackAppOpenedOnce();
+  }, []);
+
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>

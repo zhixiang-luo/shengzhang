@@ -26,6 +26,7 @@
 - [生产基础设施与上线清单](./26-production-infrastructure.md)
 - [官网首版与发布说明](./27-official-website.md)
 - [开源项目运营边界](./28-open-source-operations.md)
+- [隐私优先的产品统计](./29-privacy-first-analytics.md)
 
 ## 技术与工程
 
@@ -56,6 +57,7 @@
 | 生产部署与存储 | `docs/26-production-infrastructure.md` |
 | 官网内容、视觉与下载入口 | `docs/27-official-website.md` |
 | 开源授权、品牌与线上服务边界 | `docs/28-open-source-operations.md` + `TRADEMARK.md` |
+| 产品事件、匿名统计与报告口径 | `docs/29-privacy-first-analytics.md` |
 | 技术与目录 | `docs/09`–`docs/12` |
 | 工程与发布流程 | `docs/13`–`docs/15` |
 | 视觉令牌 | `design/tokens/design-tokens.json` |

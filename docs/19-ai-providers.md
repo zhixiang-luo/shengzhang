@@ -41,10 +41,10 @@ VOICE_PROVIDER=cloud
 ASR_PROVIDER=volcano
 VOICE_DAILY_LIMIT=20
 VOICE_PARTIAL_DAILY_LIMIT=300
-VOICE_IP_MINUTE_LIMIT=10
-VOICE_IP_DAILY_LIMIT=120
-VOICE_GLOBAL_MINUTE_LIMIT=30
-VOICE_GLOBAL_DAILY_LIMIT=1000
+VOICE_IP_MINUTE_LIMIT=30
+VOICE_IP_DAILY_LIMIT=600
+VOICE_GLOBAL_MINUTE_LIMIT=120
+VOICE_GLOBAL_DAILY_LIMIT=5000
 VOLCENGINE_ASR_API_KEY=...
 VOLCENGINE_ASR_RESOURCE_ID=volc.seedasr.sauc.duration
 SILICONFLOW_API_KEY=sk-...
@@ -76,17 +76,17 @@ DEEPSEEK_MODEL=deepseek-chat
 | 层级 | 默认值 | 目的 |
 | --- | --- | --- |
 | 单安装每日完整解析 | 20 次 | 保证正常个人使用 |
-| 单 IP 每分钟 | 10 次 | 拦截脚本突发请求 |
-| 单 IP 每日 | 120 次 | 限制同一网络长期刷量 |
-| 全服务每分钟 | 30 次 | 防止瞬时并发拖垮服务 |
-| 全服务每日 | 1000 次 | 形成供应商成本硬上限 |
+| 单 IP 每分钟 | 30 次 | 兼顾共享网络并拦截脚本突发请求 |
+| 单 IP 每日 | 600 次 | 限制同一网络长期刷量 |
+| 全服务每分钟 | 120 次 | 防止瞬时并发拖垮服务 |
+| 全服务每日 | 5000 次 | 面向千级注册用户形成成本上限 |
 
 WebSocket 另外限制：
 
-- 单 IP 最多 4 条并发语音连接；
-- 全服务最多 30 条并发语音连接；
-- 单次音频最多约 62 秒、2,000,000 字节；
-- 单次会话最长 70 秒。
+- 单 IP 最多 8 条并发语音连接；
+- 全服务最多 80 条并发语音连接；
+- 单次音频最多 30 秒、960,000 字节；
+- 单次会话最长 32 秒。
 
 Nginx 在应用层之前再执行每 IP `30r/m` 与 5 条连接限制。应用内部计数在当前单实例阶段保存在内存中，服务重启会清零；扩容前必须迁移到 PostgreSQL 或 Redis。无论限流如何配置，都应在火山、DeepSeek 和 SiliconFlow 控制台设置余额告警与硬预算。
 

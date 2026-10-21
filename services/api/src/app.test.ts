@@ -15,7 +15,7 @@ describe('API foundation', () => {
   it('limits repeated voice requests from one IP', async () => {
     const app = buildApp();
 
-    for (let index = 0; index < 10; index += 1) {
+    for (let index = 0; index < 30; index += 1) {
       const response = await app.inject({
         method: 'POST',
         url: '/v1/voice/parse-transcript',

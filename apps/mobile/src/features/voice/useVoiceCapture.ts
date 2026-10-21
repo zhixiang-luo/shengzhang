@@ -9,6 +9,7 @@ import { Animated } from 'react-native';
 
 import { listCategories } from '../../db/categoryRepository';
 import { useDatabase } from '../../db/DatabaseProvider';
+import { trackAnalyticsEvent } from '../../services/analytics';
 import { getVoiceStreamUrl, parseVoiceTranscript } from '../../services/voiceApi';
 import { useVoiceResultStore } from '../../stores/voiceResultStore';
 import { pcm16Level } from './audioChunks';
@@ -46,6 +47,14 @@ function withTimeout<T>(promise: Promise<T>, milliseconds: number, message: stri
       throw new Error(message);
     }),
   ]);
+}
+
+function voiceFailureReason(message: string) {
+  if (message.includes('允许声账使用麦克风')) return 'permission' as const;
+  if (message.includes('超时')) return 'timeout' as const;
+  if (message.includes('连接') || message.includes('火山')) return 'connection' as const;
+  if (message.includes('再按住')) return 'too_short' as const;
+  return 'unknown' as const;
 }
 
 export function useVoiceCapture() {
@@ -105,6 +114,7 @@ export function useVoiceCapture() {
 
   const showError = useCallback(
     (message: string) => {
+      trackAnalyticsEvent('voice_failed', { reason: voiceFailureReason(message) });
       updatePhase('error');
       setError(message);
       audioLevel.setValue(0);
@@ -182,6 +192,7 @@ export function useVoiceCapture() {
         closeSocket();
         resetCaptureState();
         updatePhase('idle');
+        trackAnalyticsEvent('voice_cancelled', { reason: 'cancelled' });
         return;
       }
 
@@ -199,7 +210,10 @@ export function useVoiceCapture() {
         closeSocket();
         resetCaptureState();
         if (transcriptRef.current.trim()) showError('语音连接已断开，请重试。');
-        else updatePhase('idle');
+        else {
+          trackAnalyticsEvent('voice_failed', { reason: 'connection' });
+          updatePhase('idle');
+        }
         return;
       }
       await wait(150);
@@ -213,6 +227,7 @@ export function useVoiceCapture() {
         if (!finalTranscript) {
           resetCaptureState();
           updatePhase('idle');
+          trackAnalyticsEvent('voice_cancelled', { reason: 'empty' });
           return;
         }
 
@@ -225,6 +240,10 @@ export function useVoiceCapture() {
           requestId: response.requestId,
           transcript: response.transcript,
           entries,
+        });
+        trackAnalyticsEvent('voice_completed', {
+          entryCount: entries.length,
+          durationMs: response.latencyMs,
         });
         resetCaptureState();
         updatePhase('idle');
@@ -338,7 +357,11 @@ export function useVoiceCapture() {
       if (released) {
         closeSocket();
         resetCaptureState();
-        if (!released.cancelled) showError('再按住说一句。');
+        if (released.cancelled) {
+          trackAnalyticsEvent('voice_cancelled', { reason: 'cancelled' });
+        } else {
+          showError('再按住说一句。');
+        }
         return;
       }
 
@@ -346,6 +369,7 @@ export function useVoiceCapture() {
       await stream.start();
       recordingStartedAtRef.current = Date.now();
       updatePhase('recording');
+      trackAnalyticsEvent('voice_started');
       maxDurationTimerRef.current = setTimeout(() => {
         void finishRecording(false);
       }, MAX_RECORDING_MS);

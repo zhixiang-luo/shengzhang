@@ -37,3 +37,6 @@ android/.gradle/
 
 # Prototype runtime artifacts
 prototype/.local/
+
+# Local analytics event files
+.analytics/
