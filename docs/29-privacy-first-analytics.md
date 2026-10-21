@@ -79,11 +79,17 @@
 
 ## 6. 运行报告
 
-本地或服务器：
+本地：
 
 ```bash
 ANALYTICS_DATA_DIR=/opt/shengzhang/shared/analytics \
   pnpm --filter @shengzhang/api analytics:report
+```
+
+服务器安装版：
+
+```bash
+/opt/shengzhang/bin/analytics-report.sh
 ```
 
 报告输出官网访客、下载点击、活跃安装、启动频率、语音保存与失败、手动新增、累计账单条数和每日趋势。
