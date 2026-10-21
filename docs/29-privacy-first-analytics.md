@@ -83,7 +83,7 @@
 
 ```bash
 ANALYTICS_DATA_DIR=/opt/shengzhang/shared/analytics \
-  pnpm --filter @shengzhang/api analytics:report
+  pnpm --filter @shengzhang/api analytics:report -- --date=2026-10-21
 ```
 
 服务器安装版：
@@ -93,6 +93,16 @@ ANALYTICS_DATA_DIR=/opt/shengzhang/shared/analytics \
 ```
 
 报告输出官网访客、下载点击、活跃安装、启动频率、语音保存与失败、手动新增、累计账单条数和每日趋势。
+
+服务器每日运营脚本：
+
+```bash
+/opt/shengzhang/bin/daily-ops-report.sh
+```
+
+默认统计北京时间前一日，同时检查 Nginx、API、健康接口、磁盘、内存和错误日志，并把 Markdown 报告写入 `/opt/shengzhang/shared/reports/`。
+
+Codex 每日自动化 `声账每日运营简报` 会在北京时间 01:00 调用该脚本；自动化只读取报告，不修改代码、不部署、不重启服务。报告优先提示服务不可用、磁盘超过 80%、语音失败率和下载/启动转化异常。
 
 ## 7. 保留与安全
 

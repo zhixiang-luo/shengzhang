@@ -7,4 +7,4 @@ source /opt/shengzhang/shared/.env
 set +a
 
 cd /opt/shengzhang/current
-pnpm --filter @shengzhang/api analytics:report
+pnpm --filter @shengzhang/api analytics:report -- "$@"

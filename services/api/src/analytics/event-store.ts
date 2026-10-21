@@ -89,7 +89,10 @@ export class AnalyticsEventStore {
   }
 }
 
-export async function readAnalyticsEvents(directory: string): Promise<StoredAnalyticsEvent[]> {
+export async function readAnalyticsEvents(
+  directory: string,
+  options: { fromDate?: string; toDate?: string } = {},
+): Promise<StoredAnalyticsEvent[]> {
   let files: string[];
   try {
     files = await readdir(directory);
@@ -99,7 +102,15 @@ export async function readAnalyticsEvents(directory: string): Promise<StoredAnal
   }
 
   const events: StoredAnalyticsEvent[] = [];
-  for (const file of files.filter((name) => /^events-\d{4}-\d{2}-\d{2}\.jsonl$/.test(name)).sort()) {
+  for (const file of files
+    .filter((name) => /^events-\d{4}-\d{2}-\d{2}\.jsonl$/.test(name))
+    .filter((name) => {
+      const date = name.slice('events-'.length, -'.jsonl'.length);
+      if (options.fromDate && date < options.fromDate) return false;
+      if (options.toDate && date > options.toDate) return false;
+      return true;
+    })
+    .sort()) {
     const content = await readFile(path.join(directory, file), 'utf8');
     for (const line of content.split(/\r?\n/)) {
       if (!line.trim()) continue;

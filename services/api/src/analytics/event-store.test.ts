@@ -40,5 +40,8 @@ describe('AnalyticsEventStore', () => {
     });
     expect(events[0]?.installationHash).toMatch(/^[a-f0-9]{64}$/);
     expect(JSON.stringify(events)).not.toContain('anonymous-installation-id');
+    await expect(
+      readAnalyticsEvents(directory, { fromDate: '2999-01-01', toDate: '2999-01-01' }),
+    ).resolves.toEqual([]);
   });
 });

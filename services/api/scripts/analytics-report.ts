@@ -6,13 +6,20 @@ import { summarizeAnalytics } from '../src/analytics/summary.js';
 loadDotenv({ path: new URL('../../../.env', import.meta.url) });
 
 const dataDirectory = process.env.ANALYTICS_DATA_DIR || '.analytics';
-const events = await readAnalyticsEvents(dataDirectory);
+const dateArgument = process.argv.find((argument) => argument.startsWith('--date='))?.slice('--date='.length);
+if (dateArgument && !/^\d{4}-\d{2}-\d{2}$/.test(dateArgument)) {
+  throw new Error('--date must use YYYY-MM-DD');
+}
+const events = await readAnalyticsEvents(dataDirectory, {
+  fromDate: dateArgument,
+  toDate: dateArgument,
+});
 const summary = summarizeAnalytics(events);
 const percent = (value: number | null) =>
   value === null ? '—' : `${(value * 100).toFixed(1)}%`;
 const average = (value: number | null) => (value === null ? '—' : value.toFixed(2));
 
-console.log(`声账匿名使用报告 · ${dataDirectory}`);
+console.log(`声账匿名使用报告 · ${dateArgument ?? '全部日期'} · ${dataDirectory}`);
 console.log('');
 console.log(`官网独立访客        ${summary.siteVisitors}`);
 console.log(`下载点击独立访客    ${summary.downloadVisitors}`);
