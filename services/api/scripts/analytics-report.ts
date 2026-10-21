@@ -33,7 +33,7 @@ console.log(`完成首笔记账用户    ${summary.activatedUsers}`);
 console.log(`激活率              ${percent(summary.activationRate)}`);
 console.log(`App 启动次数        ${summary.appOpens}`);
 console.log(`人均启动次数        ${average(summary.appOpensPerActiveUser)}`);
-console.log(`人均活跃天数        ${average(summary.averageActiveDaysPerUser)}`);
+console.log(`人均累计活跃天数    ${average(summary.averageActiveDaysPerUser)}`);
 console.log(`平均会话时长        ${average(summary.averageSessionSeconds)} 秒`);
 console.log(
   `D1 / D7 留存        ${percent(summary.d1Retention.rate)} / ${percent(summary.d7Retention.rate)}`,

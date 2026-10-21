@@ -31,6 +31,6 @@ mkdir -p "$report_directory"
   echo "## 错误日志"
   echo
   echo '```text'
-  journalctl -u shengzhang-api --since "${report_date} 00:00:00" --until "${report_date} 23:59:59" -p err --no-pager 2>/dev/null | tail -10 || true
+  journalctl -u shengzhang-api --since "${report_date} 00:00:00 +0800" --until "${report_date} 23:59:59 +0800" -p err --no-pager 2>/dev/null | tail -10 || true
   echo '```'
 } | tee "$report_path"
