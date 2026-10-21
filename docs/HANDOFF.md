@@ -91,6 +91,7 @@
 - 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。公网 11 次连续无效请求验证为前 10 次 `400`、第 11 次 `429`。
 - GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Release `v0.1.0-preview.2`。
 - GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
+- Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；49 项测试仍全部通过。
 
 ## 测试发布状态（2026-10-21）
 
@@ -139,6 +140,7 @@
 - GitHub 仓库匿名访问当前返回 404，而 SSH 推送正常；正式官网上线前必须确认仓库已设为 Public，否则访客无法打开源码与 Releases。
 - 临时 IP 入口使用明文 HTTP，只适合当前静态官网预览；备案和域名就绪后应尽快切换 HTTPS，不把临时 IP 作为长期推广地址。
 - 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
+- `pnpm audit` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 高危项，以及 `uuid` 中危项；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。
 
 ## 最近验证
 
