@@ -8,6 +8,7 @@ export const ANALYTICS_EVENT_NAMES = [
   'site_viewed',
   'download_started',
   'app_opened',
+  'app_backgrounded',
   'voice_started',
   'voice_completed',
   'voice_saved',

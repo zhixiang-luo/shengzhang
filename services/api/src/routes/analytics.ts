@@ -14,7 +14,7 @@ const propertiesSchema = z
     platform: z.enum(['android', 'ios', 'web']).optional(),
     appVersion: z.string().max(32).optional(),
     entryCount: z.number().int().min(0).max(5).optional(),
-    durationMs: z.number().int().min(0).max(120_000).optional(),
+    durationMs: z.number().int().min(0).max(43_200_000).optional(),
     reason: z
       .enum([
         'cancelled',

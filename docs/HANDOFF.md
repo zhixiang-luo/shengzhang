@@ -91,7 +91,7 @@
 - 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。面向千级注册用户，生产值已调整为 IP 每分钟 30、每日 600、全局每分钟 120、每日 5000；内部连续 31 次无效请求验证为前 30 次 `400`、第 31 次 `429`。
 - GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Release `v0.1.0-preview.2`。
 - GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
-- Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；52 项测试全部通过。
+- Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；53 项测试全部通过。
 - 已接入隐私优先的第一方匿名统计：官网访问/下载、App 启动、语音开始/完成/保存/撤销/取消/失败、手动新增/编辑/删除、统计、分类和设置事件。事件只包含固定名称、平台、版本、条数、耗时和错误原因；金额、分类名、备注、转写和录音不上报。
 - 匿名安装 ID 在服务端使用私有 Salt 哈希后写入按日 JSONL；设置页提供“匿名使用统计”关闭开关，官网遵循 DNT/GPC。
 - 已增加 `pnpm --filter @shengzhang/api analytics:report` 报告脚本，可查看独立下载访客、活跃安装、启动频率、语音成功率、累计新增账单和每日趋势。
@@ -160,7 +160,7 @@ pnpm test: passed
 expo export --platform ios: passed
 expo export --platform android: passed
 domain tests: 23 passed
-api tests: 26 passed
+api tests: 30 passed
 voice eval: 200/200 exact, amount/type/category/date 100%
 cost dashboard: ASR scenario generated
 account/payment feasibility: official Apple/WeChat/Alipay pages reviewed on 2026-10-20

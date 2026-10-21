@@ -8,6 +8,7 @@ import { getInstallationId } from './installationId';
 
 export type AnalyticsEventName =
   | 'app_opened'
+  | 'app_backgrounded'
   | 'voice_started'
   | 'voice_completed'
   | 'voice_saved'

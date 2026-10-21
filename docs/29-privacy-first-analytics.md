@@ -43,6 +43,7 @@
 | `site_viewed` | 官网页面打开 | 平台、站点版本 |
 | `download_started` | 点击官网 APK 下载 | 来源、平台 |
 | `app_opened` | App 每次冷启动 | 平台、App 版本 |
+| `app_backgrounded` | App 进入后台 | 前台会话时长 |
 | `voice_started` | 语音连接可用并开始录入 | 平台、App 版本 |
 | `voice_completed` | 结构化成功并生成结果 | 账单条数、服务耗时 |
 | `voice_saved` | 语音批次实际写入本机 SQLite | 账单条数 |
@@ -61,11 +62,16 @@
 
 - 下载人数：按官网匿名访客 ID 去重后的 `download_started` 人数，是下载点击的近似值。
 - 使用人数：至少产生一次 `app_opened` 的匿名安装数量。
+- 激活人数：至少成功保存过一笔语音或手动账单的匿名安装数量。
 - 使用频率：App 启动次数 / App 活跃安装数；也可结合每日启动次数分析。
 - 语音使用率：发生 `voice_started` 的安装数 / App 活跃安装数。
 - 语音成功率：`voice_completed` / `voice_started`。
 - 累计新增账单：所有 `voice_saved.entryCount` 加所有 `manual_transaction_created`。
 - 语音撤销：`voice_undone` 次数和撤销条数。
+- D1/D7 留存：用户首次活跃日之后第 1 天/第 7 天是否再次产生 `app_opened`。
+- 功能渗透率：分别统计语音保存、手动新增、统计和分类管理的独立安装数。
+- 会话时长：`app_backgrounded.durationMs` 的截断值，仅用于平均使用时长。
+- 语音质量：完成/保存率、客户端结构化耗时 P50/P95 和失败原因分布。
 
 统计文件分散在用户设备本地，卸载重装会生成新的匿名安装 ID。离线期间事件当前不补传，因此报告是产品趋势数据，不等同于财务级审计。
 
