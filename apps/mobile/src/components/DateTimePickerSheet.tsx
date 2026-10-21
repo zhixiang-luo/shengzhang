@@ -1,7 +1,6 @@
 import { buildMonthGrid, combineLocalDateTime, type CalendarCell } from '@shengzhang/domain';
-import { useRef, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import {
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,6 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, radii, spacing, typography } from '../theme/tokens';
+import { AnimatedSheetModal } from './AnimatedSheetModal';
 import { Icon } from './Icon';
 
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
@@ -19,6 +19,7 @@ const HOURS = Array.from({ length: 24 }, (_, index) => index);
 const MINUTES = Array.from({ length: 60 }, (_, index) => index);
 
 type DateTimePickerSheetProps = {
+  visible: boolean;
   value: Date;
   onClose: () => void;
   onConfirm: (date: Date) => void;
@@ -49,7 +50,12 @@ function scrollToIndex(
   ref.current?.scrollTo({ x: Math.max(0, (index - 2) * itemWidth), animated: false });
 }
 
-export function DateTimePickerSheet({ value, onClose, onConfirm }: DateTimePickerSheetProps) {
+export function DateTimePickerSheet({
+  visible,
+  value,
+  onClose,
+  onConfirm,
+}: DateTimePickerSheetProps) {
   const insets = useSafeAreaInsets();
   const [today] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState(value);
@@ -60,6 +66,17 @@ export function DateTimePickerSheet({ value, onClose, onConfirm }: DateTimePicke
   const [minute, setMinute] = useState(value.getMinutes());
   const hourScrollRef = useRef<ScrollViewInstance>(null);
   const minuteScrollRef = useRef<ScrollViewInstance>(null);
+
+  useEffect(() => {
+    if (!visible) return;
+    const frame = requestAnimationFrame(() => {
+      setSelectedDate(value);
+      setVisibleMonth(new Date(value.getFullYear(), value.getMonth(), 1));
+      setHour(value.getHours());
+      setMinute(value.getMinutes());
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [value, visible]);
 
   const cells = buildMonthGrid(visibleMonth.getFullYear(), visibleMonth.getMonth(), today);
 
@@ -85,192 +102,167 @@ export function DateTimePickerSheet({ value, onClose, onConfirm }: DateTimePicke
   };
 
   return (
-    <Modal
-      animationType="slide"
+    <AnimatedSheetModal
+      closeAccessibilityLabel="关闭时间选择器"
       onRequestClose={onClose}
-      presentationStyle="overFullScreen"
-      transparent
-      visible
+      sheetStyle={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 18) }]}
+      visible={visible}
     >
-      <View style={styles.modalRoot}>
-        <Pressable
-          accessibilityLabel="关闭时间选择器"
-          onPress={onClose}
-          style={styles.backdrop}
-        />
-        <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 18) }]}>
-          <View style={styles.handle} />
-          <View style={styles.header}>
-            <View>
-              <Text style={styles.eyebrow}>SELECT DATE & TIME</Text>
-              <Text style={styles.title}>选择时间</Text>
-            </View>
-            <Pressable onPress={chooseNow} style={styles.nowButton}>
-              <Icon name="clock" size={15} color={colors.blushDeep} />
-              <Text style={styles.nowText}>现在</Text>
+      <View style={styles.handle} />
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.eyebrow}>SELECT DATE & TIME</Text>
+          <Text style={styles.title}>选择时间</Text>
+        </View>
+        <Pressable onPress={chooseNow} style={styles.nowButton}>
+          <Icon name="clock" size={15} color={colors.blushDeep} />
+          <Text style={styles.nowText}>现在</Text>
+        </Pressable>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <Text style={styles.selectedLabel}>
+          {formatSelectedDate(selectedDate, hour, minute)}
+        </Text>
+
+        <View style={styles.calendar}>
+          <View style={styles.monthHeader}>
+            <Pressable
+              accessibilityLabel="上个月"
+              onPress={() => shiftVisibleMonth(-1)}
+              style={styles.monthArrow}
+            >
+              <Icon name="chevron-left" size={19} color={colors.inkSecondary} />
+            </Pressable>
+            <Text style={styles.monthTitle}>
+              {visibleMonth.getFullYear()}年{visibleMonth.getMonth() + 1}月
+            </Text>
+            <Pressable
+              accessibilityLabel="下个月"
+              onPress={() => shiftVisibleMonth(1)}
+              style={styles.monthArrow}
+            >
+              <Icon name="chevron-right" size={19} color={colors.inkSecondary} />
             </Pressable>
           </View>
 
-          <ScrollView
-            contentContainerStyle={styles.content}
-            showsVerticalScrollIndicator={false}
-          >
-            <Text style={styles.selectedLabel}>
-              {formatSelectedDate(selectedDate, hour, minute)}
-            </Text>
+          <View style={styles.weekdayRow}>
+            {WEEKDAYS.map((weekday) => (
+              <Text key={weekday} style={styles.weekday}>
+                {weekday}
+              </Text>
+            ))}
+          </View>
 
-            <View style={styles.calendar}>
-              <View style={styles.monthHeader}>
+          <View style={styles.dayGrid}>
+            {cells.map((cell) => {
+              const selected = sameDay(cell.date, selectedDate);
+              return (
                 <Pressable
-                  accessibilityLabel="上个月"
-                  onPress={() => shiftVisibleMonth(-1)}
-                  style={styles.monthArrow}
+                  accessibilityLabel={`${cell.date.getFullYear()}年${cell.date.getMonth() + 1}月${cell.date.getDate()}日`}
+                  key={cell.date.toISOString()}
+                  onPress={() => chooseDay(cell)}
+                  style={styles.dayCell}
                 >
-                  <Icon name="chevron-left" size={19} color={colors.inkSecondary} />
-                </Pressable>
-                <Text style={styles.monthTitle}>
-                  {visibleMonth.getFullYear()}年{visibleMonth.getMonth() + 1}月
-                </Text>
-                <Pressable
-                  accessibilityLabel="下个月"
-                  onPress={() => shiftVisibleMonth(1)}
-                  style={styles.monthArrow}
-                >
-                  <Icon name="chevron-right" size={19} color={colors.inkSecondary} />
-                </Pressable>
-              </View>
-
-              <View style={styles.weekdayRow}>
-                {WEEKDAYS.map((weekday) => (
-                  <Text key={weekday} style={styles.weekday}>
-                    {weekday}
-                  </Text>
-                ))}
-              </View>
-
-              <View style={styles.dayGrid}>
-                {cells.map((cell) => {
-                  const selected = sameDay(cell.date, selectedDate);
-                  return (
-                    <Pressable
-                      accessibilityLabel={`${cell.date.getFullYear()}年${cell.date.getMonth() + 1}月${cell.date.getDate()}日`}
-                      key={cell.date.toISOString()}
-                      onPress={() => chooseDay(cell)}
-                      style={styles.dayCell}
-                    >
-                      <View
-                        style={[
-                          styles.dayCircle,
-                          selected && styles.daySelected,
-                          !selected && cell.isToday && styles.dayToday,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.dayText,
-                            !cell.inCurrentMonth && styles.dayMuted,
-                            selected && styles.dayTextSelected,
-                          ]}
-                        >
-                          {cell.date.getDate()}
-                        </Text>
-                      </View>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            </View>
-
-            <View style={styles.timeSection}>
-              <View style={styles.timeHeading}>
-                <Text style={styles.timeTitle}>具体时间</Text>
-                <Text style={styles.timeValue}>{pad(hour)}:{pad(minute)}</Text>
-              </View>
-
-              <Text style={styles.timeLabel}>小时</Text>
-              <ScrollView
-                contentContainerStyle={styles.timeRow}
-                horizontal
-                onContentSizeChange={() => scrollToIndex(hourScrollRef, hour, 50)}
-                ref={hourScrollRef}
-                showsHorizontalScrollIndicator={false}
-              >
-                {HOURS.map((item) => (
-                  <Pressable
-                    key={item}
-                    onPress={() => setHour(item)}
-                    style={[styles.timePill, hour === item && styles.timePillSelected]}
+                  <View
+                    style={[
+                      styles.dayCircle,
+                      selected && styles.daySelected,
+                      !selected && cell.isToday && styles.dayToday,
+                    ]}
                   >
                     <Text
                       style={[
-                        styles.timePillText,
-                        hour === item && styles.timePillTextSelected,
+                        styles.dayText,
+                        !cell.inCurrentMonth && styles.dayMuted,
+                        selected && styles.dayTextSelected,
                       ]}
                     >
-                      {pad(item)}
+                      {cell.date.getDate()}
                     </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-
-              <Text style={styles.timeLabel}>分钟</Text>
-              <ScrollView
-                contentContainerStyle={styles.timeRow}
-                horizontal
-                onContentSizeChange={() => scrollToIndex(minuteScrollRef, minute, 50)}
-                ref={minuteScrollRef}
-                showsHorizontalScrollIndicator={false}
-              >
-                {MINUTES.map((item) => (
-                  <Pressable
-                    key={item}
-                    onPress={() => setMinute(item)}
-                    style={[styles.timePill, minute === item && styles.timePillSelected]}
-                  >
-                    <Text
-                      style={[
-                        styles.timePillText,
-                        minute === item && styles.timePillTextSelected,
-                      ]}
-                    >
-                      {pad(item)}
-                    </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-            </View>
-          </ScrollView>
-
-          <View style={styles.actions}>
-            <Pressable onPress={onClose} style={styles.cancelButton}>
-              <Text style={styles.cancelText}>取消</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => onConfirm(combineLocalDateTime(selectedDate, hour, minute))}
-              style={styles.confirmButton}
-            >
-              <Text style={styles.confirmText}>确定时间</Text>
-            </Pressable>
+                  </View>
+                </Pressable>
+              );
+            })}
           </View>
         </View>
+
+        <View style={styles.timeSection}>
+          <View style={styles.timeHeading}>
+            <Text style={styles.timeTitle}>具体时间</Text>
+            <Text style={styles.timeValue}>{pad(hour)}:{pad(minute)}</Text>
+          </View>
+
+          <Text style={styles.timeLabel}>小时</Text>
+          <ScrollView
+            contentContainerStyle={styles.timeRow}
+            horizontal
+            onContentSizeChange={() => scrollToIndex(hourScrollRef, hour, 50)}
+            ref={hourScrollRef}
+            showsHorizontalScrollIndicator={false}
+          >
+            {HOURS.map((item) => (
+              <Pressable
+                key={item}
+                onPress={() => setHour(item)}
+                style={[styles.timePill, hour === item && styles.timePillSelected]}
+              >
+                <Text
+                  style={[
+                    styles.timePillText,
+                    hour === item && styles.timePillTextSelected,
+                  ]}
+                >
+                  {pad(item)}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+
+          <Text style={styles.timeLabel}>分钟</Text>
+          <ScrollView
+            contentContainerStyle={styles.timeRow}
+            horizontal
+            onContentSizeChange={() => scrollToIndex(minuteScrollRef, minute, 50)}
+            ref={minuteScrollRef}
+            showsHorizontalScrollIndicator={false}
+          >
+            {MINUTES.map((item) => (
+              <Pressable
+                key={item}
+                onPress={() => setMinute(item)}
+                style={[styles.timePill, minute === item && styles.timePillSelected]}
+              >
+                <Text
+                  style={[
+                    styles.timePillText,
+                    minute === item && styles.timePillTextSelected,
+                  ]}
+                >
+                  {pad(item)}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
+
+      <View style={styles.actions}>
+        <Pressable onPress={onClose} style={styles.cancelButton}>
+          <Text style={styles.cancelText}>取消</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => onConfirm(combineLocalDateTime(selectedDate, hour, minute))}
+          style={styles.confirmButton}
+        >
+          <Text style={styles.confirmText}>确定时间</Text>
+        </Pressable>
       </View>
-    </Modal>
+    </AnimatedSheetModal>
   );
 }
 
 const styles = StyleSheet.create({
-  modalRoot: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    backgroundColor: 'rgba(29, 26, 24, 0.42)',
-  },
   sheet: {
     maxHeight: '94%',
     paddingHorizontal: spacing.xl,

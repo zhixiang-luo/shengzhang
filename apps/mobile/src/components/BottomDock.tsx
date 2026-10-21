@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/refs -- PanResponder must stay stable while callbacks refresh. */
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -36,15 +37,16 @@ export function BottomDock({
     onVoiceEnd,
     onVoiceManual,
   });
-  callbacksRef.current = {
-    onVoiceStart,
-    onVoiceModeChange,
-    onVoiceEnd,
-    onVoiceManual,
-  };
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
+  useEffect(() => {
+    callbacksRef.current = {
+      onVoiceStart,
+      onVoiceModeChange,
+      onVoiceEnd,
+      onVoiceManual,
+    };
+  }, [onVoiceEnd, onVoiceManual, onVoiceModeChange, onVoiceStart]);
+  const [panResponder] = useState(() =>
+    PanResponder.create({
         onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: () => true,
         onPanResponderTerminationRequest: () => false,
@@ -89,8 +91,7 @@ export function BottomDock({
           callbacksRef.current.onVoiceModeChange('idle');
           callbacksRef.current.onVoiceEnd(true);
         },
-      }),
-    [],
+    }),
   );
 
   return (

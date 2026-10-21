@@ -16,8 +16,17 @@
     },
     "android": {
       "package": "com.shengzhang.ledger",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/monochrome-icon.png",
+        "backgroundColor": "#FAF7F0"
+      },
       "permissions": [
-        "RECORD_AUDIO"
+        "RECORD_AUDIO",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
       "predictiveBackGestureEnabled": false
     },
@@ -29,7 +38,7 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
-          "imageWidth": 200,
+          "imageWidth": 232,
           "resizeMode": "contain",
           "backgroundColor": "#FAF7F0"
         }
@@ -37,7 +46,19 @@
       "expo-sqlite",
       "expo-sharing",
       "expo-localization",
-      "expo-asset"
-    ]
+      "expo-asset",
+      "./plugins/with-cleartext-api"
+    ],
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "04dd154b-655a-4b0e-bd3f-f3fafd76ab3d"
+      }
+    },
+    "owner": "xiaozhuluozhixiang"
   }
 }

@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
   Easing,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -29,7 +30,7 @@ export function VoiceCaptureOverlay({
   manualArmed,
   audioLevel,
 }: VoiceCaptureOverlayProps) {
-  const pulse = useRef(new Animated.Value(1)).current;
+  const [pulse] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     if (phase !== 'recording') {
@@ -72,9 +73,10 @@ export function VoiceCaptureOverlay({
               : '正在听，请说';
 
   return (
-    <View pointerEvents="none" style={styles.root}>
-      <View style={styles.backdrop} />
+    <View accessibilityViewIsModal style={styles.root}>
+      <Pressable accessible={false} onPress={() => {}} style={styles.backdrop} />
       <View
+        pointerEvents="none"
         style={[
           styles.card,
           cancelArmed && styles.cancelCard,

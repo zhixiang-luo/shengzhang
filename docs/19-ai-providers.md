@@ -76,6 +76,14 @@ DEEPSEEK_MODEL=deepseek-chat
 - 设置每日总成本告警，避免单个 Key 被滥用。
 - 用户进入正式账号体系后，限流键从安装 ID 迁移为 `userId + installationId`。
 
+当前可重复运行的 ASR 情景看板：
+
+```bash
+pnpm --filter @shengzhang/api voice:cost
+```
+
+产物为 `services/api/testdata/voice/cost-report.json`。公式、遗漏项和会员定价风险见 [成本与定价模型](./24-cost-model.md)。
+
 ## 4. ASR 调研
 
 数据核对时间：2026-10-20。公开价格和指标可能调整，采购前需要在控制台复核。

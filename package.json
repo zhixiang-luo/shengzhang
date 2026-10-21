@@ -8,6 +8,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
+    "assets:icons": "node design/render-assets.mjs",
     "dev:mobile": "pnpm --filter @shengzhang/mobile start",
     "dev:api": "pnpm --filter @shengzhang/api dev",
     "typecheck": "pnpm -r --if-present typecheck",
@@ -17,6 +18,7 @@
     "doctor": "expo-doctor apps/mobile"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "expo-doctor": "^1.21.5"
   }
 }

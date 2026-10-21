@@ -1,11 +1,23 @@
+import { moveItem } from '@shengzhang/domain';
+import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  NestedReorderableList,
+  ScrollViewContainer,
+  useIsActive,
+  useReorderableDrag,
+} from 'react-native-reorderable-list';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CategoryEditorSheet } from '../components/CategoryEditorSheet';
 import { Icon } from '../components/Icon';
-import { listCategories, type CategoryRow } from '../db/categoryRepository';
+import {
+  listCategories,
+  reorderCategorySiblings,
+  type CategoryRow,
+} from '../db/categoryRepository';
 import { useDatabase } from '../db/DatabaseProvider';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 
@@ -17,12 +29,190 @@ interface EditorState {
   parent: CategoryRow | null;
 }
 
+interface CategoryChildItemProps {
+  child: CategoryRow;
+  parentColor: string;
+  onEdit: (child: CategoryRow) => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}
+
+function CategoryChildItem({
+  child,
+  parentColor,
+  onEdit,
+  onMoveUp,
+  onMoveDown,
+}: CategoryChildItemProps) {
+  const drag = useReorderableDrag();
+  const isActive = useIsActive();
+
+  return (
+    <View style={[styles.childRow, isActive && styles.childRowDragging]}>
+      <Pressable
+        accessibilityActions={[
+          { name: 'moveUp', label: '上移' },
+          { name: 'moveDown', label: '下移' },
+        ]}
+        accessibilityHint="单击编辑，长按后上下拖动排序"
+        accessibilityLabel={`编辑或拖动${child.name}排序`}
+        delayLongPress={400}
+        onAccessibilityAction={(event) => {
+          if (event.nativeEvent.actionName === 'moveUp') onMoveUp();
+          if (event.nativeEvent.actionName === 'moveDown') onMoveDown();
+        }}
+        onLongPress={() => {
+          void Haptics.selectionAsync();
+          drag();
+        }}
+        onPress={() => onEdit(child)}
+        style={styles.childMain}
+      >
+        <View style={styles.childDragAffordance}>
+          <Icon name="drag" size={15} color={colors.inkTertiary} />
+        </View>
+        <View style={[styles.childLine, { backgroundColor: parentColor }]} />
+        <Text style={styles.childName}>{child.name}</Text>
+        <Text style={styles.childEdit}>编辑</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+interface CategoryChildListProps {
+  items: CategoryRow[];
+  parentColor: string;
+  onEdit: (child: CategoryRow) => void;
+  onAdd: () => void;
+  onReorder: (ordered: CategoryRow[]) => void;
+}
+
+function CategoryChildList({
+  items,
+  parentColor,
+  onEdit,
+  onAdd,
+  onReorder,
+}: CategoryChildListProps) {
+  return (
+    <View style={styles.children}>
+      <NestedReorderableList
+        data={items}
+        keyExtractor={(child) => child.id}
+        onReorder={({ from, to }) => onReorder(moveItem(items, from, to))}
+        panActivateAfterLongPress={450}
+        renderItem={({ item: child, index }) => (
+          <CategoryChildItem
+            child={child}
+            onEdit={onEdit}
+            onMoveDown={() => {
+              if (index < items.length - 1) onReorder(moveItem(items, index, index + 1));
+            }}
+            onMoveUp={() => {
+              if (index > 0) onReorder(moveItem(items, index, index - 1));
+            }}
+            parentColor={parentColor}
+          />
+        )}
+        scrollEnabled={false}
+        scrollable={false}
+        shouldUpdateActiveItem
+      />
+      <Pressable onPress={onAdd} style={styles.addChildRow}>
+        <Icon name="plus" size={15} color={colors.blushDeep} />
+        <Text style={styles.addChildText}>新建二级分类</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+interface CategoryRootItemProps {
+  item: CategoryRow;
+  childCategories: CategoryRow[];
+  expanded: boolean;
+  onToggle: () => void;
+  onEdit: () => void;
+  onEditChild: (child: CategoryRow) => void;
+  onAddChild: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onReorderChildren: (ordered: CategoryRow[]) => void;
+}
+
+function CategoryRootItem({
+  item,
+  childCategories,
+  expanded,
+  onToggle,
+  onEdit,
+  onEditChild,
+  onAddChild,
+  onMoveUp,
+  onMoveDown,
+  onReorderChildren,
+}: CategoryRootItemProps) {
+  const drag = useReorderableDrag();
+  const isActive = useIsActive();
+
+  return (
+    <View style={[styles.group, isActive && styles.groupDragging]}>
+      <View style={styles.rootRow}>
+        <Pressable
+          accessibilityActions={[
+            { name: 'moveUp', label: '上移' },
+            { name: 'moveDown', label: '下移' },
+          ]}
+          accessibilityHint="单击展开或收起，长按后上下拖动排序"
+          accessibilityLabel={`展开或拖动${item.name}排序`}
+          delayLongPress={400}
+          onAccessibilityAction={(event) => {
+            if (event.nativeEvent.actionName === 'moveUp') onMoveUp();
+            if (event.nativeEvent.actionName === 'moveDown') onMoveDown();
+          }}
+          onLongPress={() => {
+            void Haptics.selectionAsync();
+            drag();
+          }}
+          onPress={onToggle}
+          style={styles.rootMain}
+        >
+          <View style={styles.dragHandle}>
+            <Icon name="drag" size={18} color={colors.inkTertiary} />
+          </View>
+          <View style={[styles.colorDot, { backgroundColor: item.color }]} />
+          <View style={styles.rootCopy}>
+            <Text style={styles.rootName}>{item.name}</Text>
+            <Text style={styles.rootMeta}>
+              {childCategories.length > 0 ? `${childCategories.length} 个二级分类` : '还没有二级分类'}
+            </Text>
+          </View>
+          <Icon name="chevron-right" size={16} color={colors.inkTertiary} />
+        </Pressable>
+        <Pressable accessibilityLabel={`编辑${item.name}`} onPress={onEdit} style={styles.editButton}>
+          <Icon name="settings" size={17} color={colors.inkTertiary} />
+        </Pressable>
+      </View>
+
+      {expanded ? (
+        <CategoryChildList
+          items={childCategories}
+          onAdd={onAddChild}
+          onEdit={onEditChild}
+          onReorder={onReorderChildren}
+          parentColor={item.color}
+        />
+      ) : null}
+    </View>
+  );
+}
+
 export default function CategoriesScreen() {
   const db = useDatabase();
   const [type, setType] = useState<'expense' | 'income'>('expense');
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editor, setEditor] = useState<EditorState | null>(null);
+  const [orderError, setOrderError] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setCategories(listCategories(db, true));
@@ -59,6 +249,55 @@ export default function CategoriesScreen() {
     setEditor({ type, category: null, parent });
   };
 
+  const persistOrder = useCallback(
+    (ordered: CategoryRow[]) => {
+      const positions = new Map(ordered.map((category, index) => [category.id, index]));
+      setCategories((current) =>
+        current.map((category) =>
+          positions.has(category.id)
+            ? { ...category, sortOrder: positions.get(category.id) ?? category.sortOrder }
+            : category,
+        ),
+      );
+      setOrderError(null);
+      try {
+        if (reorderCategorySiblings(db, ordered.map((category) => category.id))) {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+      } catch (caught) {
+        setOrderError(caught instanceof Error ? caught.message : '调整顺序失败');
+        load();
+      }
+    },
+    [db, load],
+  );
+
+  const reorderWithAccessibility = (
+    category: CategoryRow,
+    siblings: CategoryRow[],
+    direction: -1 | 1,
+  ) => {
+    const index = siblings.findIndex((item) => item.id === category.id);
+    const targetIndex = index + direction;
+    if (index < 0 || targetIndex < 0 || targetIndex >= siblings.length) return;
+    persistOrder(moveItem(siblings, index, targetIndex));
+  };
+
+  const renderRoot = ({ item }: { item: CategoryRow }) => (
+    <CategoryRootItem
+      childCategories={childrenOf(item.id)}
+      expanded={expandedId === item.id}
+      item={item}
+      onAddChild={() => openCreate(item)}
+      onEdit={() => setEditor({ type, category: item, parent: null })}
+      onEditChild={(child) => setEditor({ type, category: child, parent: item })}
+      onMoveDown={() => reorderWithAccessibility(item, roots, 1)}
+      onMoveUp={() => reorderWithAccessibility(item, roots, -1)}
+      onReorderChildren={persistOrder}
+      onToggle={() => setExpandedId(expandedId === item.id ? null : item.id)}
+    />
+  );
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <View style={styles.header}>
@@ -85,63 +324,28 @@ export default function CategoriesScreen() {
             </Pressable>
           ))}
         </View>
+        {roots.length > 1 ? (
+          <Text style={styles.sortHint}>长按分类行约半秒后拖动，可调整同级顺序</Text>
+        ) : null}
 
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          {roots.map((root) => {
-            const expanded = expandedId === root.id;
-            const children = childrenOf(root.id);
-            return (
-              <View key={root.id} style={styles.group}>
-                <View style={styles.rootRow}>
-                  <Pressable
-                    onPress={() => setExpandedId(expanded ? null : root.id)}
-                    style={styles.rootMain}
-                  >
-                    <View style={[styles.colorDot, { backgroundColor: root.color }]} />
-                    <View style={styles.rootCopy}>
-                      <Text style={styles.rootName}>{root.name}</Text>
-                      <Text style={styles.rootMeta}>
-                        {children.length > 0 ? `${children.length} 个二级分类` : '还没有二级分类'}
-                      </Text>
-                    </View>
-                    <Icon
-                      name="chevron-right"
-                      size={16}
-                      color={colors.inkTertiary}
-                    />
-                  </Pressable>
-                  <Pressable
-                    accessibilityLabel={`编辑${root.name}`}
-                    onPress={() => setEditor({ type, category: root, parent: null })}
-                    style={styles.editButton}
-                  >
-                    <Icon name="settings" size={17} color={colors.inkTertiary} />
-                  </Pressable>
-                </View>
-
-                {expanded ? (
-                  <View style={styles.children}>
-                    {children.map((child) => (
-                      <Pressable
-                        key={child.id}
-                        onPress={() => setEditor({ type, category: child, parent: root })}
-                        style={styles.childRow}
-                      >
-                        <View style={[styles.childLine, { backgroundColor: root.color }]} />
-                        <Text style={styles.childName}>{child.name}</Text>
-                        <Text style={styles.childEdit}>编辑</Text>
-                      </Pressable>
-                    ))}
-                    <Pressable onPress={() => openCreate(root)} style={styles.addChildRow}>
-                      <Icon name="plus" size={15} color={colors.blushDeep} />
-                      <Text style={styles.addChildText}>在「{root.name}」下新建二级分类</Text>
-                    </Pressable>
-                  </View>
-                ) : null}
-              </View>
-            );
-          })}
-
+        <ScrollViewContainer
+          contentContainerStyle={styles.scrollContent}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator={false}
+          style={styles.scroll}
+        >
+          {orderError ? <Text style={styles.orderError}>{orderError}</Text> : null}
+          <NestedReorderableList
+            data={roots}
+            keyExtractor={(root) => root.id}
+            onReorder={({ from, to }) => persistOrder(moveItem(roots, from, to))}
+            panActivateAfterLongPress={450}
+            renderItem={renderRoot}
+            scrollEnabled={false}
+            scrollable={false}
+            shouldUpdateActiveItem
+            showsVerticalScrollIndicator={false}
+          />
           {hidden.length > 0 ? (
             <>
               <Text style={styles.sectionLabel}>已隐藏</Text>
@@ -165,7 +369,7 @@ export default function CategoriesScreen() {
               </View>
             </>
           ) : null}
-        </ScrollView>
+        </ScrollViewContainer>
       </View>
 
       {editor ? (
@@ -236,8 +440,25 @@ const styles = StyleSheet.create({
     color: colors.ink,
   },
   scrollContent: {
-    paddingTop: spacing.lg,
+    paddingTop: spacing.md,
     paddingBottom: spacing.huge,
+  },
+  sortHint: {
+    marginTop: spacing.md,
+    color: colors.inkTertiary,
+    fontSize: 10,
+  },
+  scroll: {
+    flex: 1,
+  },
+  orderError: {
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: radii.md,
+    backgroundColor: '#FFF4F2',
+    color: colors.danger,
+    fontSize: 11,
   },
   group: {
     overflow: 'hidden',
@@ -247,16 +468,30 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     backgroundColor: colors.surface,
   },
+  groupDragging: {
+    zIndex: 10,
+    borderColor: colors.blush,
+    shadowColor: colors.ink,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.16,
+    shadowRadius: 18,
+    elevation: 8,
+  },
   rootRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  dragHandle: {
+    width: 38,
+    minHeight: 58,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   rootMain: {
     flex: 1,
     minHeight: 62,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: spacing.lg,
   },
   colorDot: {
     width: 10,
@@ -292,13 +527,34 @@ const styles = StyleSheet.create({
     minHeight: 50,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: 38,
+    paddingLeft: 4,
     paddingRight: spacing.lg,
+  },
+  childRowDragging: {
+    zIndex: 10,
+    backgroundColor: colors.surface,
+    shadowColor: colors.ink,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  childDragAffordance: {
+    width: 34,
+    minHeight: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   childLine: {
     width: 14,
     height: 1,
     marginRight: 9,
+  },
+  childMain: {
+    flex: 1,
+    minHeight: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   childName: {
     flex: 1,

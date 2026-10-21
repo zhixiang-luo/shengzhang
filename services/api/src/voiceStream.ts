@@ -5,6 +5,10 @@ import type { FastifyBaseLogger } from 'fastify';
 import WebSocket, { WebSocketServer } from 'ws';
 
 import type { VoiceQuota } from './security/voice-quota.js';
+import {
+  isSilentVoiceStop,
+  resolveVolcanoCloseAction,
+} from './voiceStreamState.js';
 
 const VOLCANO_WS_URL = 'wss://openspeech.bytedance.com/api/v3/sauc/bigmodel';
 const AUDIO_CHUNK_BYTES = 6400;
@@ -79,15 +83,23 @@ class VolcanoVoiceSession {
     this.upstream.on('open', () => this.handleUpstreamOpen(installationId));
     this.upstream.on('message', (data) => this.handleUpstreamMessage(Buffer.from(data as Buffer)));
     this.upstream.on('error', (error) => {
+      if (isSilentVoiceStop({ stopping: this.stopping, text: this.latestText })) {
+        this.finish();
+        return;
+      }
       this.send({ type: 'error', code: 'VOLCANO_CONNECTION_FAILED', message: error.message });
       this.close();
     });
     this.upstream.on('close', () => {
-      if (!this.finished) {
-        if (this.stopping && this.latestText) {
-          this.finish();
-          return;
-        }
+      const action = resolveVolcanoCloseAction({
+        finished: this.finished,
+        stopping: this.stopping,
+      });
+      if (action === 'finish') {
+        this.finish();
+        return;
+      }
+      if (action === 'error') {
         this.send({
           type: 'error',
           code: 'VOLCANO_CLOSED',
@@ -163,6 +175,10 @@ class VolcanoVoiceSession {
     const frame = parseFrame(buffer);
     if (!frame) return;
     if (frame.messageType === 0x0f) {
+      if (isSilentVoiceStop({ stopping: this.stopping, text: this.latestText })) {
+        this.finish();
+        return;
+      }
       let message = '火山语音识别失败。';
       try {
         const detail = JSON.parse(frame.payload.toString()) as {

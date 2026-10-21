@@ -117,28 +117,51 @@ export function setCategoryArchived(db: AppDatabase, id: string, archived: boole
   });
 }
 
-export function moveCategory(db: AppDatabase, id: string, direction: -1 | 1) {
-  const category = findCategory(db, id);
-  if (!category) throw new Error('分类不存在');
-  const siblings = listCategories(db, true).filter(
+export function reorderCategorySiblings(db: AppDatabase, orderedIds: string[]): boolean {
+  if (orderedIds.length < 2) return false;
+
+  const resolved = orderedIds.map((id) => findCategory(db, id));
+  const first = resolved[0];
+  if (
+    !first ||
+    new Set(orderedIds).size !== orderedIds.length ||
+    resolved.some(
+      (category) =>
+        !category ||
+        category.type !== first.type ||
+        (category.parentId ?? null) !== (first.parentId ?? null),
+    )
+  ) {
+    throw new Error('分类顺序无效');
+  }
+  const ordered = resolved as CategoryRow[];
+
+  const visibleIds = new Set(orderedIds);
+  const archivedSiblings = listCategories(db, true).filter(
     (item) =>
-      item.type === category.type &&
-      (item.parentId ?? null) === (category.parentId ?? null),
+      item.isArchived &&
+      item.type === first.type &&
+      (item.parentId ?? null) === (first.parentId ?? null) &&
+      !visibleIds.has(item.id),
   );
-  const index = siblings.findIndex((item) => item.id === id);
-  const target = siblings[index + direction];
-  if (!target) return false;
+  const finalOrder = [...ordered, ...archivedSiblings];
+  const currentOrder = listCategories(db, true).filter(
+    (item) =>
+      item.type === first.type && (item.parentId ?? null) === (first.parentId ?? null),
+  );
+
+  if (finalOrder.every((category, index) => category.id === currentOrder[index]?.id)) {
+    return false;
+  }
 
   const now = new Date().toISOString();
   db.transaction((tx) => {
-    tx.update(categories)
-      .set({ sortOrder: target.sortOrder, updatedAt: now })
-      .where(eq(categories.id, category.id))
-      .run();
-    tx.update(categories)
-      .set({ sortOrder: category.sortOrder, updatedAt: now })
-      .where(eq(categories.id, target.id))
-      .run();
+    finalOrder.forEach((category, index) => {
+      tx.update(categories)
+        .set({ sortOrder: index, updatedAt: now })
+        .where(eq(categories.id, category.id))
+        .run();
+    });
   });
   return true;
 }

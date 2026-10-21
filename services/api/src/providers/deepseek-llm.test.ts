@@ -71,4 +71,47 @@ describe('DeepSeekStructuredParser', () => {
       parser.parse({ transcript: '午饭', timezone: 'Asia/Shanghai', categories: [] }),
     ).rejects.toThrow('LLM_INVALID_JSON');
   });
+
+  it('uses the current time when the transcript has no temporal expression', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            choices: [
+              {
+                message: {
+                  content: JSON.stringify({
+                    entries: [
+                      {
+                        type: 'income',
+                        amountMinor: 20000,
+                        categoryPath: ['工资'],
+                        occurredAt: '2026-01-01T12:00:00+08:00',
+                        note: '收入',
+                      },
+                    ],
+                    unresolvedFields: [],
+                  }),
+                },
+              },
+            ],
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      ),
+    );
+
+    const before = Date.now();
+    const result = await parser.parse({
+      transcript: '收入200',
+      timezone: 'Asia/Shanghai',
+      categories: [{ name: '工资', type: 'income', children: [] }],
+    });
+    const after = Date.now();
+    const occurredAt = new Date(result.entries[0]?.occurredAt ?? '').getTime();
+
+    expect(occurredAt).toBeGreaterThanOrEqual(before);
+    expect(occurredAt).toBeLessThanOrEqual(after);
+  });
 });

@@ -4,9 +4,12 @@
 
 | 资产 | 当前文件 | 状态 | 后续动作 |
 | --- | --- | --- | --- |
-| 小猪品牌标记 | `assets/piggy-mark.svg` | 可用初稿 | 转出 1×/2×/3× PNG，检查小尺寸可读性 |
-| App 图标 | `assets/app-icon.svg` | 可用初稿 | 导出 iOS/Android 商店与 adaptive icon |
-| 声波装饰 | `assets/sound-wave.svg` | 可用初稿 | 与录音组件真实音量映射 |
+| 小猪品牌标记 | `assets/piggy-mark.svg` | 可用 | 与 App 内 `BrandMark` 保持同一矢量结构 |
+| 横向品牌标志 | `assets/brand-lockup.svg` | 可用 | 用于官网、商店介绍和分享图 |
+| App 图标 | `assets/app-icon.svg` | 可用 | 满版不透明底，由系统负责圆角裁切 |
+| Android 自适应前景 | `assets/adaptive-icon.svg` | 可用 | 安全区内主体，透明底 |
+| Android 单色图标 | `assets/monochrome-icon.svg` | 可用 | 透明底，由系统主题着色 |
+| 声波装饰 | `assets/sound-wave.svg` | 可用 | 9 根圆角音量柱，表达语音输入 |
 | 原型小猪 | `../prototype/assets/pig.svg` | 仅原型 | 不进入正式商店资产 |
 | 设计令牌 | `tokens/design-tokens.json` | 基线 | 与 `apps/mobile/src/theme/tokens.ts` 同步 |
 | CSS 令牌 | `tokens/tokens.css` | 基线 | 仅原型/网页预览使用 |
@@ -70,10 +73,13 @@
 | 平台 | 尺寸 | 要求 |
 | --- | --- | --- |
 | iOS | 1024 × 1024 | 不透明，无圆角遮罩，无文字 |
-| Android foreground | 432 × 432 | 安全区内主体，透明底 |
-| Android background | 432 × 432 | 纯色或简单纹理 |
-| Android monochrome | 432 × 432 | 单色轮廓 |
+| Android foreground | 1024 × 1024 | 安全区内主体，透明底 |
+| Android background | 由 Expo 配置纯色 | `#FAF7F0` |
+| Android monochrome | 1024 × 1024 | 透明底，单色轮廓 |
 | 商店 | 1024 × 1024 | 与 App 图标一致 |
+
+Splash 使用 2048 × 2048 透明 PNG，由应用背景色承载，不使用带圆角方块的 App 图标放大。
+品牌横向组合导出为 2400px 宽透明 PNG，供官网和分享场景使用。
 
 ### 插画与图标
 

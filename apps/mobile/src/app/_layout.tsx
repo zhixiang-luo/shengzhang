@@ -26,8 +26,8 @@ export default function RootLayout() {
                   animation: 'fade',
                 }}
               >
-                <Stack.Screen name="index" />
-                <Stack.Screen name="stats" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="index" options={{ animation: 'fade' }} />
+                <Stack.Screen name="stats" options={{ animation: 'fade' }} />
                 <Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen name="categories" options={{ animation: 'slide_from_right' }} />
                 <Stack.Screen

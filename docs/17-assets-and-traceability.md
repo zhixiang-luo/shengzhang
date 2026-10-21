@@ -7,6 +7,14 @@
 | AI 规则 | `AGENTS.md` | 已建立 | 所有 AI |
 | 产品上下文 | `docs/00-project-context.md` | 已建立 | 产品 |
 | PRD | `docs/01-prd.md` | 已确认 | 产品 |
+| 后期产品战略 | `docs/21-post-mvp-strategy.md` | 已建立 | 产品 |
+| 可信语音与月末回顾 | `docs/22-voice-trust-and-monthly-review.md` | 已建立 | 产品/移动端 |
+| 会员与增长 | `docs/23-membership-and-growth.md` | 实验方案 | 产品/运营 |
+| 成本与定价 | `docs/24-cost-model.md` | 成本基线；完整账单待补 | 产品/后端 |
+| 账号与支付可行性 | `docs/25-account-and-payment-feasibility.md` | 官方规则已核验 | 产品/后端 |
+| 生产基础设施 | `docs/26-production-infrastructure.md` | 精简生产方案已建立 | 后端/运维 |
+| 语音成本看板 | `services/api/scripts/voice-cost-dashboard.ts` | 已可运行 | 后端 |
+| 语音成本产物 | `services/api/testdata/voice/cost-report.json` | ASR 情景已生成 | 后端 |
 | 信息架构 | `docs/02-information-architecture.md` | 已确认 | 产品/设计 |
 | 用户流程 | `docs/03-user-flows.md` | 已确认 | 产品/设计 |
 | 分类种子 | `docs/04-category-system.md` | 已确认，代码待接入 | 产品/工程 |
@@ -29,8 +37,12 @@
 | 设计资产索引 | `design/ASSETS.md` | 已建立 | 设计 |
 | 设计 tokens | `design/tokens/design-tokens.json` | 已建立 | 设计/前端 |
 | 品牌标记 | `design/assets/piggy-mark.svg` | 已完成 | 设计 |
+| 横向品牌标志 | `design/assets/brand-lockup.svg`、`design/exports/brand-lockup.png` | 已完成 SVG 与 2400px 导出 | 设计 |
 | App 图标 SVG | `design/assets/app-icon.svg` | 已完成 | 设计 |
-| App 图标 PNG | `apps/mobile/assets/icon.png` | 已生成 1024px | 移动端 |
+| App 图标 PNG | `apps/mobile/assets/icon.png` | 已生成 1024px，满版不透明底 | 移动端 |
+| Android 自适应图标 | `design/assets/adaptive-icon.svg`、`apps/mobile/assets/adaptive-icon.png` | 已完成透明前景与 1024px 导出 | 移动端 |
+| Android 单色图标 | `design/assets/monochrome-icon.svg`、`apps/mobile/assets/monochrome-icon.png` | 已完成透明前景与 1024px 导出 | 移动端 |
+| Splash 标记 | `apps/mobile/assets/splash-icon.png` | 已生成 2048px 透明 PNG | 移动端 |
 | UI 交接 | `docs/18-ui-handoff.md` | 已建立，高保真稿待补 | 设计/移动端 |
 | 移动端代码 | `apps/mobile/` | Expo 骨架 | 移动端 |
 | API 代码 | `services/api/` | Fastify 骨架 | 后端 |
@@ -47,11 +59,18 @@
 | 手动记账 | 01, 03 | 手动录入页 | SQLite repository 已接入 | 领域测试通过，真机待测 |
 | 两级分类 | 04 | 分类选择与新增已接入 | 种子和自定义一级/二级分类已实现 | seed 校验通过，真机待测 |
 | 语音左右滑入口 | 01, 03, 18 | 语音面板 | 左滑取消、右滑手动已实现 | 真机待测 |
-| 日期时间选择 | 01, 03, 18 | 月历与时间 Sheet | 自绘组件 + 纯函数测试 | 13 项领域测试通过 |
+| 日期时间选择 | 01, 03, 18 | 月历与时间 Sheet | 自绘组件 + 纯函数测试 | 相关领域测试通过 |
+| 金额计算键盘 | 01, 18 | `AmountKeypad` | 自绘键盘 + 精确算式解析 | 19 项领域测试通过 |
 | 分类管理 | 04, 18 | 分类管理页 | 新增/改名/排序/隐藏/恢复 | 真机待测 |
 | 删除撤销 | 01, 03 | 账本撤销条 | 软删除 + 8 秒恢复 | 真机待测 |
+| 列表左滑删除 | 03, 18 | `SwipeableDeleteRow` | 左滑操作 + 复用软删除/撤销 | 双端待真机手势验证 |
+| 语音默认时间 | 05, 19 | 结果时间展示 | 无时间表达时服务端使用当前时间 | API 测试通过 |
 | 月度分析 | 01, 02 | 统计页 | 对比/日均/最高日/日明细/分类下钻 | 真机待测 |
 | 月度统计 | 01, 02 | 统计页 | 基础图表与分类聚合 | 领域测试通过，真机待测 |
+| 自动入账与撤销 | 01, 05, 21, 22 | 已记好结果卡 | `VoiceResultSheet` 自动写入 + 整批撤销 | 已实现，真机待测 |
+| 月末回顾 | 21, 22 | 待设计 | 未实现 | 未开始 |
+| 隐私品牌 | 07, 21, 22 | 隐私中心待设计 | 录音临时处理和隐私页 | 未开始 |
+| 创始会员 | 23, 24 | 未设计 | 未实现 | 实验方案 |
 | 游客本地优先 | 01, 06 | 首页直接使用 | SQLite 本地库 | 真机待测 |
 | 微信一键登录 | 06, 11 | 登录 Sheet | 路由未实现 | 待实现 |
 | 云备份 | 06, 10, 11 | 备份/恢复流程 | PostgreSQL/OSS 未实现 | 待实现 |

@@ -162,6 +162,8 @@ cp .env.example .env
 | 变量 | 用途 | 何时需要 |
 | --- | --- | --- |
 | `DATABASE_URL` | PostgreSQL 连接 | 接入登录和备份时 |
+
+生产部署、对象存储和客服/支付资源的详细取舍见 [生产基础设施与上线清单](./26-production-infrastructure.md)。
 | `JWT_SECRET` | 访问令牌签名 | 接入登录时 |
 | `WECHAT_APP_ID` | 微信移动应用 ID | 微信登录 |
 | `WECHAT_APP_SECRET` | 微信密钥 | 仅服务端 |

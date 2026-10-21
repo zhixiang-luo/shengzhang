@@ -65,6 +65,7 @@
 | 安全存储 | expo-secure-store | 只存访问令牌、刷新令牌和设备标识 |
 | 图表 | react-native-svg 自绘 | 视觉可控，避免引入重量级图表库 |
 | 动画 | react-native-reanimated | 录音、Sheet、结果卡和图表过渡 |
+| 分类排序 | react-native-reorderable-list | 兼容 Fabric、Gesture Handler 与 Reanimated，支持分组内拖拽；辅助功能保留上移/下移语义 |
 | 导出 | expo-file-system + expo-sharing | JSON 备份、CSV 导出 |
 | 触觉 | expo-haptics | 录音开始、成功和错误反馈 |
 
@@ -251,8 +252,8 @@ schema_migrations
 ```text
 idle -> requesting_permission -> recording -> uploading_partial? -> uploading -> parsing
                                       └-> cancelled
-parsing -> draft_confirmation -> saving -> success
-        ├-> needs_amount -> editing -> draft_confirmation -> saving
+parsing -> saving -> success -> undo_window
+        ├-> needs_amount -> editing -> saving
         └-> failed -> retry/uploading | manual
 ```
 
@@ -266,7 +267,9 @@ parsing -> draft_confirmation -> saving -> success
 - 解析结果先通过 Zod 校验，再按分类名称解析为稳定 ID。
 - 分类无法匹配时落到“其他”，但在结果卡提示可修改。
 - 金额缺失时不写任何账单，进入修正面板。
-- 结构化结果只展示一个确认卡；左侧“撤销”丢弃草稿，右侧“确认记账”写入 SQLite 并立即关闭。
+- 完整结果默认在单个事务中自动写入 SQLite，再展示“已记好”结果卡。
+- “撤销”在 8 秒窗口内按 `voiceRequestId` 整批软删除；关闭结果卡后仍可从账本编辑或删除。
+- 只有金额缺失、结构异常或用户主动开启“每次先确认”时才进入确认或修正状态。
 
 ### 5.7 登录与备份
 
@@ -531,11 +534,11 @@ GitHub
 - 理由：视觉与原型高度一致，包体更小，跨端表现可控。
 - 代价：需要维护基础图表组件和可访问性。
 
-### ADR-006：微信仅移动端登录
+### ADR-006：账号只面向移动端，提供方与发布解耦
 
-- 决策：首版只接入微信开放平台移动应用，不做扫码和 Web 登录。
-- 理由：产品首发只有移动端，减少账号体系和攻击面。
-- 代价：需要微信开放平台审核和移动应用资质。
+- 决策：免费首发不要求账号；后续只做移动端账号能力，身份提供方可选 Sign in with Apple、手机号或微信，不做扫码和 Web 登录。
+- 理由：账号、云备份、会员与支付存在不同外部依赖，不能把微信登录作为所有功能的前置条件。
+- 代价：跨设备权益上线前需要先确定内部 `userId`、恢复购买和数据迁移方案；微信登录受开放平台认证、类目和上架审核影响。
 
 ## 12. 实施顺序
 
@@ -545,7 +548,7 @@ GitHub
 4. 分类与统计：分类管理、月聚合、图表、日期明细。
 5. 语音网关：mock provider、契约测试、真实 ASR/LLM 适配、额度与超时。
 6. 移动端语音：录音状态机、上传、结果卡、修正和撤销。
-7. 微信登录与备份：令牌、快照上传、恢复、冲突选择。
+7. 免费首发后的账号与备份：内部身份、令牌、快照上传、恢复、冲突选择。
 8. 质量与发布：200 条评测集、Maestro、EAS 构建、隐私材料和商店审核。
 
 任何阶段都必须保持 `pnpm typecheck` 和 `pnpm test` 通过。

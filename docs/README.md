@@ -16,6 +16,17 @@
 - [数据与隐私](./07-data-privacy.md)
 - [验收标准](./08-acceptance-criteria.md)
 
+## 后期战略与专项
+
+- [后期产品战略](./21-post-mvp-strategy.md)
+- [可信语音与月末回顾](./22-voice-trust-and-monthly-review.md)
+- [会员与增长方案](./23-membership-and-growth.md)
+- [成本与定价模型](./24-cost-model.md)
+- [账号、会员与支付可行性](./25-account-and-payment-feasibility.md)
+- [生产基础设施与上线清单](./26-production-infrastructure.md)
+- [官网首版与发布说明](./27-official-website.md)
+- [开源项目运营边界](./28-open-source-operations.md)
+
 ## 技术与工程
 
 - [技术架构](./09-technical-architecture.md)
@@ -40,6 +51,11 @@
 | --- | --- |
 | AI 协作规则 | 根目录 `AGENTS.md` |
 | 产品范围 | `docs/01-prd.md` |
+| 后期方向与阶段门禁 | `docs/21-post-mvp-strategy.md` |
+| 账号与支付外部依赖 | `docs/25-account-and-payment-feasibility.md` |
+| 生产部署与存储 | `docs/26-production-infrastructure.md` |
+| 官网内容、视觉与下载入口 | `docs/27-official-website.md` |
+| 开源授权、品牌与线上服务边界 | `docs/28-open-source-operations.md` + `TRADEMARK.md` |
 | 技术与目录 | `docs/09`–`docs/12` |
 | 工程与发布流程 | `docs/13`–`docs/15` |
 | 视觉令牌 | `design/tokens/design-tokens.json` |

@@ -15,14 +15,20 @@ import { BottomDock } from '../components/BottomDock';
 import { BrandMark } from '../components/BrandMark';
 import { Icon } from '../components/Icon';
 import { UndoDeleteBanner } from '../components/UndoDeleteBanner';
+import { SwipeableDeleteRow } from '../components/SwipeableDeleteRow';
 import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
 import { VoiceResultSheet } from '../components/VoiceResultSheet';
+import { useDatabase } from '../db/DatabaseProvider';
+import { softDeleteTransaction } from '../db/transactionRepository';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
+import type { LedgerEntryView } from '../features/ledger/useLedgerMonth';
 import { useVoiceCapture } from '../features/voice/useVoiceCapture';
+import { useUndoDeleteStore } from '../stores/undoStore';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatDayHeading, formatMonth, formatTime } from '../utils/date';
 
 export default function LedgerScreen() {
+  const db = useDatabase();
   const voice = useVoiceCapture();
   const {
     month,
@@ -36,6 +42,12 @@ export default function LedgerScreen() {
   } = useLedgerMonth();
 
   const openManualEntry = () => router.push('/entry');
+
+  const deleteFromList = (transaction: LedgerEntryView) => {
+    useUndoDeleteStore.getState().setDeleted(transaction);
+    softDeleteTransaction(db, transaction.id);
+    refresh();
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -65,6 +77,7 @@ export default function LedgerScreen() {
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
+        directionalLockEnabled
         refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} tintColor={colors.blushDeep} />}
         showsVerticalScrollIndicator={false}
       >
@@ -124,41 +137,50 @@ export default function LedgerScreen() {
               </View>
               <View style={styles.transactionList}>
                 {group.transactions.map((transaction, index) => (
-                  <Pressable
+                  <SwipeableDeleteRow
                     key={transaction.id}
-                    accessibilityLabel={`编辑${transaction.note || transaction.categoryName}`}
-                    onPress={() => router.push({ pathname: '/entry', params: { id: transaction.id } })}
-                    style={({ pressed }) => [
-                      styles.transactionRow,
-                      index < group.transactions.length - 1 && styles.transactionDivider,
-                      pressed && styles.rowPressed,
-                    ]}
+                    onDelete={() => deleteFromList(transaction)}
                   >
-                    <View style={[styles.categoryMark, { backgroundColor: `${transaction.categoryColor}22` }]}>
-                      <Text style={[styles.categoryInitial, { color: transaction.categoryColor }]}>
-                        {transaction.categoryName.slice(0, 1)}
-                      </Text>
-                    </View>
-                    <View style={styles.transactionCopy}>
-                      <Text numberOfLines={1} style={styles.transactionTitle}>
-                        {transaction.note || transaction.subcategoryName || transaction.categoryName}
-                      </Text>
-                      <Text style={styles.transactionMeta}>
-                        {transaction.subcategoryName
-                          ? `${transaction.categoryName} · ${transaction.subcategoryName}`
-                          : transaction.categoryName}{' '}
-                        · {formatTime(transaction.occurredAt)}
-                      </Text>
-                    </View>
-                    <Text
-                      style={[
-                        styles.transactionAmount,
-                        transaction.type === 'income' && styles.incomeAmount,
+                    <Pressable
+                      accessibilityActions={[{ name: 'delete', label: '删除账单' }]}
+                      accessibilityHint="向左滑动可以删除"
+                      accessibilityLabel={`编辑${transaction.note || transaction.categoryName}`}
+                      onAccessibilityAction={(event) => {
+                        if (event.nativeEvent.actionName === 'delete') deleteFromList(transaction);
+                      }}
+                      onPress={() => router.push({ pathname: '/entry', params: { id: transaction.id } })}
+                      style={({ pressed }) => [
+                        styles.transactionRow,
+                        index < group.transactions.length - 1 && styles.transactionDivider,
+                        pressed && styles.rowPressed,
                       ]}
                     >
-                      {transaction.type === 'income' ? '+' : '−'}¥{formatCents(transaction.amountMinor)}
-                    </Text>
-                  </Pressable>
+                      <View style={[styles.categoryMark, { backgroundColor: `${transaction.categoryColor}22` }]}>
+                        <Text style={[styles.categoryInitial, { color: transaction.categoryColor }]}>
+                          {transaction.categoryName.slice(0, 1)}
+                        </Text>
+                      </View>
+                      <View style={styles.transactionCopy}>
+                        <Text numberOfLines={1} style={styles.transactionTitle}>
+                          {transaction.note || transaction.subcategoryName || transaction.categoryName}
+                        </Text>
+                        <Text style={styles.transactionMeta}>
+                          {transaction.subcategoryName
+                            ? `${transaction.categoryName} · ${transaction.subcategoryName}`
+                            : transaction.categoryName}{' '}
+                          · {formatTime(transaction.occurredAt)}
+                        </Text>
+                      </View>
+                      <Text
+                        style={[
+                          styles.transactionAmount,
+                          transaction.type === 'income' && styles.incomeAmount,
+                        ]}
+                      >
+                        {transaction.type === 'income' ? '+' : '−'}¥{formatCents(transaction.amountMinor)}
+                      </Text>
+                    </Pressable>
+                  </SwipeableDeleteRow>
                 ))}
               </View>
             </View>

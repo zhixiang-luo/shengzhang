@@ -1,97 +1,243 @@
-# 声账
+<p align="center">
+  <img src="design/exports/brand-lockup.png" alt="声账：说一句，就记好。" width="620" />
+</p>
 
-> 说一句，就记好。
+<p align="center">
+  <a href="https://github.com/zhixiang-luo/shengzhang/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/zhixiang-luo/shengzhang/actions/workflows/ci.yml/badge.svg" /></a>
+  <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-292624?logo=expo&logoColor=white" />
+  <img alt="React Native 0.88" src="https://img.shields.io/badge/React_Native-0.88-61DAFB?logo=react&logoColor=111111" />
+  <img alt="TypeScript 6" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
+  <img alt="Tests 42" src="https://img.shields.io/badge/tests-42_passed-63795E" />
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-E89A96" /></a>
+</p>
 
-声账是一款面向中国内地年轻个人用户的语音优先记账应用。产品以“按住说一句，账单自动生成”为核心体验，只保留完成日常记账所需的最少步骤，并提供清晰、克制的月度统计与分类能力。
+<p align="center">
+  一款面向中国内地年轻个人用户的语音优先记账应用。<br />
+  按住说一句，账单自动生成。
+</p>
 
-## 当前阶段
+## 为什么做声账
 
-项目处于 **M3 语音链路：mock 闭环已完成，真实供应商待接入**。
+我平时会记账，也用过一些记账工具。但每次付款后，仍然需要打开应用、选择分类、输入商品和金额。记账这件事本身不复杂，麻烦的是它总在打断正在发生的生活。
 
-- [x] 产品定位与 MVP 范围
-- [x] 核心业务流程
-- [x] 微信一键登录与云备份策略
-- [x] 可点击产品原型评审
-- [x] 技术方案与仓库结构
-- [x] UI 交付规范与设计令牌
-- [ ] 高保真页面导出
-- [x] 本地 SQLite、分类种子与手动记账
-- [x] 分类新增、改名、排序、隐藏与恢复
-- [x] 删除撤销、完整月度统计和日期时间选择
-- [x] Android Expo Go 真机反馈与修复
-- [x] 真实录音、mock 解析、多笔批量入账与撤销
-- [ ] iOS 真机验收
-- [ ] 真实 ASR/LLM、微信登录与云备份
+我想要的工具更简单：**不用整理句式，不用逐项点击，一句话就能把账记好。**
 
-## 产品原则
+所以有了声账。
 
-- 语音是主路径，手动记账是稳定兜底。
-- 本地优先，游客无需登录即可完成首次记账。
-- 微信登录用于开启云备份，不承诺实时多端同步。
-- 温暖克制，不做游戏化、广告和复杂资产系统。
-- 首版聚焦：语音多笔记账、手动记账、两级分类、月度统计、云备份。
+它不是要成为功能最多的记账软件，而是想成为从付款到记账之间最短的一条路。应用坚持语音优先、本地优先和克制的视觉表达，让记录足够快、界面足够安静、数据边界足够清楚。
 
-## 项目结构
+这个项目也是我作为独立开发者完成的第一个完整应用。从产品定义、交互设计、React Native 客户端、Fastify 语音网关到服务器部署，由我负责整体设计与实现；开发过程中使用 AI 编程工具辅助编码、测试和文档整理。
 
-```text
-声账/
-├── docs/         产品需求、流程、分类与接口约定
-├── prototype/    可点击的中保真产品原型
-├── design/       高保真 UI、设计令牌、图标与导出图
-├── preview/      面向 GitHub 浏览的预览入口
-├── apps/mobile/  Expo + React Native 双端应用
-├── services/api/ 语音、微信登录与云备份网关
-└── packages/     跨端领域模型与接口契约
+## 产品截图
+
+以下截图来自已评审的交互原型，正式 App 截图会随内测版本持续更新。
+
+| 一句话多笔记账 | 月度统计 | 手动记账兜底 |
+| :---: | :---: | :---: |
+| <img src="prototype/screenshots/voice-result.png" alt="语音记账结果" width="250" /> | <img src="prototype/screenshots/stats.png" alt="月度统计" width="250" /> | <img src="prototype/screenshots/manual-entry.png" alt="手动记账" width="250" /> |
+
+## 为谁而做
+
+声账主要面向 **18–35 岁的学生和年轻职场人**：他们有日常消费，也愿意了解自己的钱花在哪里，但不想维护复杂表格，不愿意为了记一笔账经过多层页面。
+
+典型使用场景：
+
+- 午餐后说一句“午饭 25，咖啡 18”；
+- 打车后说一句“打车 32”；
+- 收到工资后说一句“今天工资到账 8000”；
+- 忘记分类或金额时，再通过手动记账补齐。
+
+## 核心体验
+
+1. 按住底部“记账”按钮开始说话。
+2. 火山流式 ASR 实时返回文字。
+3. 松手后由 DeepSeek 提取金额、收支类型、分类、日期和备注。
+4. 多笔账单自动写入本地 SQLite，并展示合并结果。
+5. 保存后 8 秒内可以整批撤销。
+
+语音是主路径，手动记账是稳定兜底。首次启动不要求登录，网络或云服务失败也不会阻塞本地账本。
+
+## 当前能力
+
+| 模块 | 状态 |
+| --- | --- |
+| 语音流式录音与实时字幕 | ✅ 已接入真实火山 ASR |
+| 一句话多笔、自动分类与时间解析 | ✅ 已接入 DeepSeek 结构化 |
+| 语音结果自动入账、8 秒撤销 | ✅ 已完成 |
+| 手动记账、金额计算键盘、备注 | ✅ 已完成 |
+| 两级自定义分类、拖拽排序、归档 | ✅ 已完成 |
+| 月度统计、分类下钻、每日明细 | ✅ 已完成 |
+| 本地 SQLite 与删除撤销 | ✅ 已完成 |
+| Android 内测 APK | ✅ 已通过 EAS Build |
+| 官网首版与移动端下载入口 | ✅ 已完成，等待域名发布 |
+| 30–50 条真人语音与双端真机矩阵 | 🚧 进行中 |
+| 月末回顾、JSON/CSV 导出、隐私中心 | 🚧 规划中 |
+| 微信登录、云备份、会员与支付 | 🧭 外部依赖就绪后再启动 |
+
+项目当前处于 **M5 内测与质量验证阶段**。它已经可以完整跑通真实语音记账，但还没有作为正式商业版本上架。
+
+## 技术亮点
+
+- **语音优先状态机**：录音、实时转写、取消、手动切换、结构化、自动保存和撤销都有明确状态。
+- **本地优先**：账单首先写入 SQLite，网络、登录和云备份不是记账前置条件。
+- **共享领域模型**：金额统一使用整数分，客户端、服务端和测试共用 Zod 契约与领域函数。
+- **流式语音链路**：手机 PCM → Fastify WebSocket → 火山双向流式 ASR → DeepSeek 结构化。
+- **隐私边界明确**：录音仅用于本次识别，服务端不长期保存音频；语音模型不接收历史账单。
+- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 42 项自动化测试。
+
+### 架构概览
+
+```mermaid
+flowchart LR
+  A[Expo / React Native] -->|本地数据| B[(SQLite)]
+  A -->|实时 PCM| C[Fastify 语音网关]
+  C --> D[火山流式 ASR]
+  C --> E[SiliconFlow 备用 ASR]
+  C --> F[DeepSeek 结构化]
+  A -->|云备份：规划中| G[(PostgreSQL)]
+  G --> H[(私有对象存储)]
 ```
 
-## 技术栈
+详细设计见 [技术架构](docs/09-technical-architecture.md)、[语音记账规格](docs/05-voice-accounting.md) 和 [AI 供应商配置](docs/19-ai-providers.md)。
 
-- React Native 0.88 + Expo 58 + TypeScript 6
-- Expo Router、SQLite、Drizzle ORM、Zustand
-- Node.js 22 + Fastify + Zod + PostgreSQL
-- pnpm workspace；EAS Build；GitHub Actions
+## 工程质量
 
-详细架构、目录边界、数据模型和接口契约见 `docs/09-technical-architecture.md`。所有 AI 协作先读根目录 `AGENTS.md` 和 `docs/HANDOFF.md`，完整索引见 `docs/README.md`。
+| 验证项 | 当前结果 |
+| --- | --- |
+| TypeScript 严格检查 | 通过 |
+| ESLint | 通过 |
+| 自动化测试 | 42 / 42 通过 |
+| Expo Doctor | 20 / 20 通过 |
+| 中文 TTS 语音评测 | 200 / 200 通过 |
+| 松手到结构化完成 | P50 1.68s / P95 2.20s |
+| Android EAS 内测构建 | 通过 |
+| iOS / Android Bundle 导出 | 通过 |
 
-## 常用命令
+200 条语音结果来自合成的中文 TTS 基线，不等同于真人噪声、口音和弱网环境。项目仍在补充真人语料与双端真机矩阵。
+
+## 快速开始
+
+环境要求：Node.js 22+、pnpm 11+。
 
 ```bash
 pnpm install
 pnpm typecheck
 pnpm lint
 pnpm test
-pnpm run doctor
+```
+
+启动移动端：
+
+```bash
 pnpm dev:mobile
+```
+
+手机安装 Expo Go，并与电脑保持在同一局域网，然后扫描终端二维码。
+
+启动本地语音网关：
+
+```bash
 pnpm dev:api
 ```
 
-移动端第一阶段可直接使用 Expo Go 真机预览。真实微信 SDK 和商店构建将在外部账号就绪后使用 EAS Build。
+复制 `.env.example` 为 `.env`，按需填写：
 
-## 开启真实 AI
+```text
+DEEPSEEK_API_KEY=your_key
+VOLCENGINE_ASR_API_KEY=your_key
+VOLCENGINE_ASR_RESOURCE_ID=your_resource_id
+SILICONFLOW_API_KEY=your_backup_key
+```
 
-在项目根目录 `.env` 填入 `DEEPSEEK_API_KEY` 和 `SILICONFLOW_API_KEY`，然后把 `VOICE_PROVIDER=mock` 改为 `cloud`，重启 `pnpm dev:api`。密钥只在服务端使用，不能写入移动端。
+真实密钥只允许存在于本地或服务端环境变量中，不要提交到仓库。
 
-详细配置、额度、多用户部署和 ASR 对比见 `docs/19-ai-providers.md`。
+## 可点击原型
 
-## 查看原型
-
-原型不依赖构建工具。进入 `prototype/` 后直接打开 `index.html`，或使用任意静态文件服务器：
+原型不依赖构建工具：
 
 ```bash
 cd prototype
 python3 -m http.server 4173
 ```
 
-随后访问 `http://localhost:4173`。
+打开 `http://localhost:4173`，或直接查看 [原型截图](prototype/screenshots/) 和 [原型预览总览](preview/prototype-contact-sheet.png)。
 
-## 分支与提交约定
+## 项目结构
 
-- `main`：可展示、可运行、通过评审的版本
-- `design/`：原型与 UI 迭代分支
-- `feature/*`：后续功能开发分支
+```text
+声账/
+├── apps/mobile/       Expo + React Native 双端应用
+├── services/api/      语音、账号与备份网关
+├── packages/
+│   ├── contracts/     Zod 接口契约与共享 DTO
+│   └── domain/        金额、分类、排序和统计纯函数
+├── docs/              产品、技术、隐私、评测与部署文档
+├── design/            品牌资产、设计令牌与导出资源
+├── prototype/         可点击交互原型与关键页面截图
+├── deploy/            Nginx、systemd 与服务器初始化配置
+└── preview/           GitHub 浏览用预览资源
+```
 
-提交信息建议使用 `feat:`, `fix:`, `docs:`, `design:`, `chore:` 前缀。
+## 文档导航
 
-## 隐私
+- [项目上下文：5 分钟了解声账](docs/00-project-context.md)
+- [产品需求与 MVP 边界](docs/01-prd.md)
+- [用户流程](docs/03-user-flows.md)
+- [语音记账设计](docs/05-voice-accounting.md)
+- [技术架构](docs/09-technical-architecture.md)
+- [语音评测报告](docs/20-voice-eval-report.md)
+- [后期产品战略](docs/21-post-mvp-strategy.md)
+- [生产基础设施与上线清单](docs/26-production-infrastructure.md)
+- [当前开发交接](docs/HANDOFF.md)
 
-产品原型使用模拟数据，不收集真实账本、录音或微信身份信息。正式应用的数据与隐私方案以 `docs/` 中的设计为准。
+## 路线图
+
+### 正在做
+
+- 扩充真人、口音、噪声和弱网语音测试；
+- 完成 iOS / Android 中低端真机矩阵；
+- 打磨月末回顾、导出和个人数据管理。
+
+### 后续
+
+- 云备份与手动恢复；
+- 可控制的分享卡片与隐私中心；
+- 多平台发布和更完整的无障碍支持。
+
+### 外部依赖就绪后
+
+- 微信登录；
+- 会员权益与支付；
+- 社区推广和邀请机制。
+
+产品范围和技术边界以 [实施路线图](docs/14-implementation-roadmap.md) 为准。
+
+## 下载与发布
+
+Android 内测 APK 将通过 [GitHub Releases](https://github.com/zhixiang-luo/shengzhang/releases) 发布。APK 不直接提交到 Git 仓库，避免仓库体积膨胀并保留版本记录。
+
+当前尚未在 App Store 或国内 Android 应用商店正式上架。
+
+## 开源与隐私
+
+这是一个开放源代码项目。公开代码的目的，是让用户、开发者和面试官能够看到应用如何工作、账单如何处理，以及哪些数据留在本地、哪些请求会发送到服务端。
+
+请不要在 Issue、截图或提交中上传真实账单、录音、密钥、手机号或微信身份信息。
+
+源码依据 [MIT License](LICENSE) 开放，但“声账”名称、Logo、小猪角色和官方视觉不随代码一并授权；发布衍生版本时请使用不同品牌。具体边界见 [TRADEMARK.md](TRADEMARK.md)。
+
+公开源码不包含模型或云服务密钥，也不授予任何人无限调用维护者线上语音服务的权利。自部署者需要在服务端配置自己的供应商账号并承担相应费用。线上 API 应通过安装额度、限流、预算告警和停用开关控制成本，详细规则见 [开源项目运营边界](docs/28-open-source-operations.md)。
+
+## 参与贡献
+
+欢迎提交 Issue、改进建议和 Pull Request。开始前请阅读 [贡献指南](CONTRIBUTING.md) 和 [安全策略](SECURITY.md)。
+
+## English Summary
+
+**Shengzhang** is a voice-first personal bookkeeping app for young users in mainland China. Hold the record button, speak naturally, and the app creates one or more transactions automatically. It combines streaming ASR, LLM-based structured extraction, local-first SQLite storage, manual entry, category management, and monthly statistics in one Expo / React Native application.
+
+This is an independent developer project covering product design, mobile development, backend engineering, AI integration, testing, and deployment.
+
+## License
+
+[MIT](LICENSE) © 2026 zhixiang-luo

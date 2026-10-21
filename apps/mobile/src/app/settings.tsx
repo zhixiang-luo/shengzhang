@@ -49,12 +49,11 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <Text style={styles.sectionLabel}>即将接入</Text>
+        <Text style={styles.sectionLabel}>数据与账号</Text>
         <View style={styles.group}>
-          <SettingRow label="语音记账" value="下一阶段" />
-          <SettingRow label="微信登录" value="未登录" />
-          <SettingRow label="云备份" value="未开启" />
-          <SettingRow label="导出与恢复" value="待接入" last />
+          <SettingRow label="本地导出与恢复" value="下一阶段" />
+          <SettingRow label="账号与云备份" value="后续版本" />
+          <SettingRow label="微信登录" value="暂缓评估" last />
         </View>
 
         <Text style={styles.sectionLabel}>关于</Text>

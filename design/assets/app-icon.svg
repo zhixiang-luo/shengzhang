@@ -1,14 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
   <title id="title">声账 App 图标</title>
-  <rect width="1024" height="1024" rx="220" fill="#E89A96"/>
-  <path d="M234 522c0-184 103-294 278-294s278 110 278 294c0 168-105 264-278 264S234 690 234 522Z" fill="#FFF6EC" stroke="#292624" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M292 263c-52-68-45-137 8-160 54-23 96 19 119 96" fill="#F6C8C0" stroke="#292624" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M732 263c52-68 45-137-8-160-54-23-96 19-119 96" fill="#F6C8C0" stroke="#292624" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="406" cy="474" r="27" fill="#292624"/>
-  <circle cx="618" cy="474" r="27" fill="#292624"/>
-  <rect x="376" y="570" width="272" height="164" rx="82" fill="#F6C8C0" stroke="#292624" stroke-width="30"/>
-  <circle cx="454" cy="652" r="18" fill="#292624"/>
-  <circle cx="570" cy="652" r="18" fill="#292624"/>
-  <path d="M801 404c38 0 58 28 58 64" fill="none" stroke="#FFF6EC" stroke-width="28" stroke-linecap="round"/>
-  <path d="M823 330c70 0 111 54 111 130" fill="none" stroke="#FFF6EC" stroke-width="28" stroke-linecap="round" opacity=".72"/>
+  <rect width="1024" height="1024" fill="#E89A96"/>
+  <g transform="translate(0 32)">
+    <path d="M185 435c-55 55-55 151 0 206" fill="none" stroke="#FFF6EC" stroke-width="28" stroke-linecap="round" opacity=".68"/>
+    <path d="M135 382c-87 87-87 225 0 312" fill="none" stroke="#FFF6EC" stroke-width="28" stroke-linecap="round" opacity=".42"/>
+    <path d="M839 435c55 55 55 151 0 206" fill="none" stroke="#FFF6EC" stroke-width="28" stroke-linecap="round" opacity=".68"/>
+    <path d="M889 382c87 87 87 225 0 312" fill="none" stroke="#FFF6EC" stroke-width="28" stroke-linecap="round" opacity=".42"/>
+
+    <path d="M308 283c-59-65-69-141-14-168 51-24 98 25 125 102" fill="#F6C8C0" stroke="#292624" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M716 283c59-65 69-141 14-168-51-24-98 25-125 102" fill="#F6C8C0" stroke="#292624" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <path d="M228 520c0-181 106-294 284-294s284 113 284 294c0 174-106 276-284 276S228 694 228 520Z" fill="#FFF8EF" stroke="#292624" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <ellipse cx="350" cy="594" rx="38" ry="25" fill="#E89A96" opacity=".58"/>
+    <ellipse cx="674" cy="594" rx="38" ry="25" fill="#E89A96" opacity=".58"/>
+
+    <circle cx="416" cy="490" r="31" fill="#292624"/>
+    <circle cx="407" cy="480" r="8" fill="#FFF8EF"/>
+    <circle cx="608" cy="490" r="31" fill="#292624"/>
+    <circle cx="599" cy="480" r="8" fill="#FFF8EF"/>
+
+    <rect x="396" y="582" width="232" height="146" rx="73" fill="#F6C8C0" stroke="#292624" stroke-width="34"/>
+    <circle cx="466" cy="655" r="19" fill="#292624"/>
+    <circle cx="558" cy="655" r="19" fill="#292624"/>
+  </g>
 </svg>

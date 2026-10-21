@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-10-20T13:07:21.999Z",
+  "sourceReport": {
+    "generatedAt": "2026-10-20T10:51:54.877Z",
+    "totalCases": 200,
+    "executedCases": 200,
+    "metrics": {
+      "entryCount": 100,
+      "amount": 100,
+      "type": 100,
+      "primaryCategory": 100,
+      "secondaryCategory": 100,
+      "date": 100,
+      "unresolved": 100,
+      "exact": 100
+    },
+    "latency": {
+      "firstPartialP50": 1284,
+      "firstPartialP95": 1534,
+      "finalTextP50": 3249,
+      "finalTextP95": 8398,
+      "parseP50": 857,
+      "parseP95": 1230,
+      "totalP50": 4094,
+      "totalP95": 9444
+    }
+  },
+  "assumptions": {
+    "averageAudioSeconds": 5,
+    "asrCnyPerHour": 0.79,
+    "nonAsrCnyPerRequest": 0,
+    "daysPerMonth": 30
+  },
+  "disclaimer": "ASR scenario estimate only. DeepSeek tokens, gateway compute, storage, payment fees, tax and support are not complete until replaced by supplier invoices.",
+  "asrCostPerRequestYuan": 0.0010972222222222223,
+  "scenarios": [
+    {
+      "requestsPerDay": 3,
+      "monthlyActiveUsers": 1000,
+      "monthlyCostYuan": 98.75
+    },
+    {
+      "requestsPerDay": 3,
+      "monthlyActiveUsers": 10000,
+      "monthlyCostYuan": 987.5
+    },
+    {
+      "requestsPerDay": 10,
+      "monthlyActiveUsers": 1000,
+      "monthlyCostYuan": 329.16666666666674
+    },
+    {
+      "requestsPerDay": 10,
+      "monthlyActiveUsers": 10000,
+      "monthlyCostYuan": 3291.666666666667
+    },
+    {
+      "requestsPerDay": 20,
+      "monthlyActiveUsers": 1000,
+      "monthlyCostYuan": 658.3333333333335
+    },
+    {
+      "requestsPerDay": 20,
+      "monthlyActiveUsers": 10000,
+      "monthlyCostYuan": 6583.333333333334
+    }
+  ]
+}

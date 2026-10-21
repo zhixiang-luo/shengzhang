@@ -34,3 +34,11 @@ pnpm --filter @shengzhang/api exec tsx scripts/evaluate-voice.ts --ids=single-02
 ```
 
 脚本使用 macOS `say` 生成测试音频，通过本地火山 WebSocket 网关转写，再调用 DeepSeek 结构化。报告写入 `last-report.json`，不会提交音频文件。
+
+生成 ASR 成本情景看板：
+
+```bash
+pnpm --filter @shengzhang/api voice:cost
+```
+
+结果写入 `cost-report.json`。默认按 5 秒音频和 ¥0.79/小时估算，只包含 ASR；DeepSeek、网关、存储、支付和客服需在拿到真实账单后补齐。

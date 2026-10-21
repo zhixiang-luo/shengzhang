@@ -9,7 +9,14 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "ALLOW_CLEARTEXT_API": "1",
+        "EXPO_PUBLIC_API_BASE_URL": "http://8.152.201.57"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
       "autoIncrement": true

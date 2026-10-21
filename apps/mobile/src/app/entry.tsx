@@ -1,20 +1,30 @@
-import { parseYuanToCents, type TransactionType } from '@shengzhang/domain';
+import {
+  appendAmountKey,
+  deleteAmountKey,
+  evaluateAmountExpressionToCents,
+  formatAmountExpression,
+  type AmountKey,
+  type TransactionType,
+} from '@shengzhang/domain';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  type ScrollViewInstance,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AmountKeypad } from '../components/AmountKeypad';
+import { AnimatedSheetModal } from '../components/AnimatedSheetModal';
 import { DateTimePickerSheet } from '../components/DateTimePickerSheet';
 import { Icon } from '../components/Icon';
 import { createCategory, listCategories, type CategoryRow } from '../db/categoryRepository';
@@ -135,6 +145,13 @@ export default function EntryScreen() {
   const [newCategoryLevel, setNewCategoryLevel] = useState<'root' | 'sub'>('root');
   const [categoryError, setCategoryError] = useState<string | null>(null);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [amountKeypadVisible, setAmountKeypadVisible] = useState(false);
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const noteOffsetRef = useRef(0);
+  const noteFocusedRef = useRef(false);
+  const categorySheetScrollRef = useRef<ScrollViewInstance>(null);
+  const categoryNameOffsetRef = useRef(0);
+  const categoryInputFocusedRef = useRef(false);
 
   const rootCategories = useMemo(
     () => allCategories.filter((category) => category.type === type && category.parentId === null),
@@ -146,7 +163,9 @@ export default function EntryScreen() {
     () => allCategories.filter((category) => category.parentId === categoryId),
     [allCategories, categoryId],
   );
-  const amountFontSize = amount.length >= 10 ? 34 : amount.length >= 7 ? 42 : 52;
+  const displayedAmount = amount ? formatAmountExpression(amount) : '0.00';
+  const amountFontSize =
+    amount.length >= 18 ? 20 : amount.length >= 14 ? 24 : amount.length >= 10 ? 28 : 36;
 
   const changeType = (nextType: TransactionType) => {
     const nextRoots = allCategories.filter(
@@ -171,7 +190,13 @@ export default function EntryScreen() {
     setNewCategoryName('');
     setNewCategoryLevel(categoryId ? 'sub' : 'root');
     setCategoryError(null);
+    categoryInputFocusedRef.current = false;
     setCategoryModalVisible(true);
+  };
+
+  const closeCategoryModal = () => {
+    categoryInputFocusedRef.current = false;
+    setCategoryModalVisible(false);
   };
 
   const saveNewCategory = () => {
@@ -197,7 +222,7 @@ export default function EntryScreen() {
         setCategoryId(created.id);
         setSubcategoryId(null);
       }
-      setCategoryModalVisible(false);
+      closeCategoryModal();
       setCategoryError(null);
     } catch (caught) {
       setCategoryError(caught instanceof Error ? caught.message : '分类创建失败');
@@ -212,9 +237,9 @@ export default function EntryScreen() {
   };
 
   const save = () => {
-    const amountMinor = parseYuanToCents(amount);
+    const amountMinor = evaluateAmountExpressionToCents(amount);
     if (!amountMinor) {
-      setError('请输入大于 0 的金额');
+      setError('请输入有效金额或算式');
       return;
     }
     if (!categoryId) {
@@ -236,6 +261,70 @@ export default function EntryScreen() {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : '保存失败');
     }
+  };
+
+  const appendAmount = (key: AmountKey) => {
+    setAmount((current) => appendAmountKey(current, key));
+    setError(null);
+  };
+
+  const focusAmount = () => {
+    noteFocusedRef.current = false;
+    categoryInputFocusedRef.current = false;
+    Keyboard.dismiss();
+    setAmountKeypadVisible(true);
+  };
+
+  const focusNote = () => {
+    noteFocusedRef.current = true;
+    categoryInputFocusedRef.current = false;
+    setAmountKeypadVisible(false);
+  };
+
+  const focusCategoryName = () => {
+    noteFocusedRef.current = false;
+    categoryInputFocusedRef.current = true;
+    setAmountKeypadVisible(false);
+    setTimeout(() => {
+      categorySheetScrollRef.current?.scrollTo({
+        y: Math.max(0, categoryNameOffsetRef.current - 16),
+        animated: true,
+      });
+    }, Platform.OS === 'ios' ? 60 : 120);
+  };
+
+  useEffect(() => {
+    const eventName = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const subscription = Keyboard.addListener(eventName, () => {
+      if (noteFocusedRef.current) {
+        setTimeout(() => {
+          scrollRef.current?.scrollTo({
+            y: Math.max(0, noteOffsetRef.current - 84),
+            animated: true,
+          });
+        }, Platform.OS === 'ios' ? 60 : 0);
+      }
+      if (categoryInputFocusedRef.current) {
+        setTimeout(() => {
+          categorySheetScrollRef.current?.scrollTo({
+            y: Math.max(0, categoryNameOffsetRef.current - 16),
+            animated: true,
+          });
+        }, Platform.OS === 'ios' ? 60 : 0);
+      }
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      noteFocusedRef.current = false;
+      categoryInputFocusedRef.current = false;
+    });
+    return () => {
+      subscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  const blurNote = () => {
+    noteFocusedRef.current = false;
   };
 
   const confirmDelete = () => {
@@ -270,7 +359,7 @@ export default function EntryScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.headerButton} accessibilityLabel="关闭">
@@ -287,9 +376,14 @@ export default function EntryScreen() {
         </View>
 
         <ScrollView
+          ref={scrollRef}
           contentContainerStyle={styles.content}
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
           keyboardShouldPersistTaps="handled"
+          onScrollBeginDrag={() => setAmountKeypadVisible(false)}
+          onTouchStart={() => setAmountKeypadVisible(false)}
           showsVerticalScrollIndicator={false}
+          style={styles.scroll}
         >
           <View style={styles.segment}>
             {(['expense', 'income'] as const).map((value) => (
@@ -306,31 +400,40 @@ export default function EntryScreen() {
           </View>
 
           <View style={styles.amountSection}>
-            <Text style={styles.amountLabel}>{type === 'expense' ? '花了多少' : '收到多少'}</Text>
-            <View style={styles.amountCard}>
+            <Pressable
+              accessibilityLabel={type === 'expense' ? '输入支出金额' : '输入收入金额'}
+              hitSlop={12}
+              onPress={focusAmount}
+              style={styles.amountLabelButton}
+            >
+              <Text style={styles.amountLabel}>{type === 'expense' ? '花了多少' : '收到多少'}</Text>
+            </Pressable>
+            <Pressable
+              accessibilityLabel={`金额${displayedAmount}`}
+              accessibilityRole="button"
+              onPress={focusAmount}
+              style={({ pressed }) => [
+                styles.amountCard,
+                amountKeypadVisible && styles.amountCardActive,
+                pressed && styles.amountCardPressed,
+              ]}
+            >
               <View style={styles.amountInputRow}>
                 <Text style={styles.amountCurrency}>¥</Text>
-                <TextInput
-                  accessibilityLabel="金额"
-                  autoFocus={!editingId}
-                  keyboardType="decimal-pad"
-                  maxLength={12}
-                  multiline={false}
+                <Text
+                  maxFontSizeMultiplier={1}
                   numberOfLines={1}
-                  onChangeText={(value) => {
-                    setAmount(value.replace(/[^\d.]/g, ''));
-                    setError(null);
-                  }}
-                  placeholder="0.00"
-                  placeholderTextColor={colors.inkTertiary}
-                  scrollEnabled={false}
-                  selectionColor={colors.blushDeep}
-                  style={[styles.amountInput, { fontSize: amountFontSize }]}
-                  value={amount}
-                />
+                  style={[
+                    styles.amountExpression,
+                    !amount && styles.amountExpressionPlaceholder,
+                    { fontSize: amountFontSize, lineHeight: amountFontSize + 6 },
+                  ]}
+                >
+                  {displayedAmount}
+                </Text>
               </View>
-              <Text style={styles.amountHint}>输入金额，保存后会立即进入本月账本</Text>
-            </View>
+              <Text style={styles.amountHint}>支持 + − × ÷ 计算，保存时自动得出金额</Text>
+            </Pressable>
           </View>
 
           <View style={styles.sectionHeading}>
@@ -422,16 +525,30 @@ export default function EntryScreen() {
             <Icon name="chevron-right" size={16} color={colors.inkTertiary} />
           </Pressable>
 
-          <Text style={styles.sectionLabel}>备注</Text>
-          <TextInput
-            accessibilityLabel="备注"
-            maxLength={40}
-            onChangeText={setNote}
-            placeholder={`例如：${selectedRoot?.name ?? '午饭'}`}
-            placeholderTextColor={colors.inkTertiary}
-            style={styles.noteInput}
-            value={note}
-          />
+          <View
+            style={styles.noteField}
+            onLayout={(event) => {
+              noteOffsetRef.current = event.nativeEvent.layout.y;
+            }}
+          >
+            <View style={styles.noteHeading}>
+              <Text style={styles.noteLabel}>备注</Text>
+              <Text style={styles.noteOptional}>选填</Text>
+            </View>
+            <TextInput
+              accessibilityLabel="备注"
+              blurOnSubmit
+              maxLength={40}
+              onBlur={blurNote}
+              onChangeText={setNote}
+              onFocus={focusNote}
+              placeholder="写点备注，例如：和朋友聚餐"
+              placeholderTextColor={colors.inkTertiary}
+              returnKeyType="done"
+              style={styles.noteInput}
+              value={note}
+            />
+          </View>
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -444,108 +561,114 @@ export default function EntryScreen() {
 
           <Text style={styles.privacy}>账单保存在本机。语音和云备份将在后续阶段接入。</Text>
         </ScrollView>
+        {amountKeypadVisible ? (
+          <AmountKeypad onKey={appendAmount} onDelete={() => setAmount(deleteAmountKey)} />
+        ) : null}
       </KeyboardAvoidingView>
 
-      {datePickerVisible ? (
-        <DateTimePickerSheet
-          value={occurredAt}
-          onClose={() => setDatePickerVisible(false)}
-          onConfirm={(date) => {
-            setOccurredAt(date);
-            setDatePickerVisible(false);
-          }}
-        />
-      ) : null}
+      <DateTimePickerSheet
+        onClose={() => setDatePickerVisible(false)}
+        onConfirm={(date) => {
+          setOccurredAt(date);
+          setDatePickerVisible(false);
+        }}
+        value={occurredAt}
+        visible={datePickerVisible}
+      />
 
-      <Modal
-        animationType="slide"
-        onRequestClose={() => setCategoryModalVisible(false)}
-        presentationStyle="overFullScreen"
-        transparent
+      <AnimatedSheetModal
+        closeAccessibilityLabel="关闭新建分类"
+        onRequestClose={closeCategoryModal}
+        sheetStyle={styles.categorySheet}
         visible={categoryModalVisible}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.modalRoot}
+        <View style={styles.sheetHandle} />
+        <ScrollView
+          ref={categorySheetScrollRef}
+          automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+          contentContainerStyle={styles.categorySheetContent}
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          style={styles.categorySheetScroll}
         >
-          <Pressable
-            accessibilityLabel="关闭新建分类"
-            onPress={() => setCategoryModalVisible(false)}
-            style={styles.modalBackdrop}
-          />
-          <View style={styles.categorySheet}>
-            <View style={styles.sheetHandle} />
-            <Text style={styles.sheetTitle}>新建分类</Text>
-            <Text style={styles.sheetCaption}>新分类会保存在本机，并立即出现在分类选择中。</Text>
+              <Text style={styles.sheetTitle}>新建分类</Text>
+              <Text style={styles.sheetCaption}>新分类会保存在本机，并立即出现在分类选择中。</Text>
 
-            <View style={styles.sheetSegment}>
-              <Pressable
-                onPress={() => setNewCategoryLevel('root')}
-                style={[
-                  styles.sheetSegmentItem,
-                  newCategoryLevel === 'root' && styles.sheetSegmentActive,
-                ]}
-              >
-                <Text
+              <View style={styles.sheetSegment}>
+                <Pressable
+                  onPress={() => setNewCategoryLevel('root')}
                   style={[
-                    styles.sheetSegmentText,
-                    newCategoryLevel === 'root' && styles.sheetSegmentTextActive,
+                    styles.sheetSegmentItem,
+                    newCategoryLevel === 'root' && styles.sheetSegmentActive,
                   ]}
                 >
-                  一级分类
-                </Text>
-              </Pressable>
-              <Pressable
-                disabled={!selectedRoot}
-                onPress={() => setNewCategoryLevel('sub')}
-                style={[
-                  styles.sheetSegmentItem,
-                  newCategoryLevel === 'sub' && styles.sheetSegmentActive,
-                  !selectedRoot && styles.sheetSegmentDisabled,
-                ]}
-              >
-                <Text
+                  <Text
+                    style={[
+                      styles.sheetSegmentText,
+                      newCategoryLevel === 'root' && styles.sheetSegmentTextActive,
+                    ]}
+                  >
+                    一级分类
+                  </Text>
+                </Pressable>
+                <Pressable
+                  disabled={!selectedRoot}
+                  onPress={() => setNewCategoryLevel('sub')}
                   style={[
-                    styles.sheetSegmentText,
-                    newCategoryLevel === 'sub' && styles.sheetSegmentTextActive,
+                    styles.sheetSegmentItem,
+                    newCategoryLevel === 'sub' && styles.sheetSegmentActive,
+                    !selectedRoot && styles.sheetSegmentDisabled,
                   ]}
                 >
-                  {selectedRoot ? `在「${selectedRoot.name}」下` : '二级分类'}
-                </Text>
-              </Pressable>
-            </View>
+                  <Text
+                    style={[
+                      styles.sheetSegmentText,
+                      newCategoryLevel === 'sub' && styles.sheetSegmentTextActive,
+                    ]}
+                  >
+                    {selectedRoot ? `在「${selectedRoot.name}」下` : '二级分类'}
+                  </Text>
+                </Pressable>
+              </View>
 
-            <TextInput
-              accessibilityLabel="新分类名称"
-              autoFocus
-              maxLength={12}
-              onChangeText={(value) => {
-                setNewCategoryName(value);
-                setCategoryError(null);
-              }}
-              placeholder="例如：夜宵、通勤、宠物零食"
-              placeholderTextColor={colors.inkTertiary}
-              selectionColor={colors.blushDeep}
-              style={styles.categoryNameInput}
-              value={newCategoryName}
-            />
-            {categoryError ? <Text style={styles.categoryModalError}>{categoryError}</Text> : null}
-
-            <View style={styles.sheetActions}>
-              <Pressable
-                onPress={() => setCategoryModalVisible(false)}
-                style={styles.sheetCancel}
+              <View
+                onLayout={(event) => {
+                  categoryNameOffsetRef.current = event.nativeEvent.layout.y;
+                }}
               >
-                <Text style={styles.sheetCancelText}>取消</Text>
-              </Pressable>
-              <Pressable onPress={saveNewCategory} style={styles.sheetSave}>
-                <Icon name="plus" size={16} color={colors.surface} />
-                <Text style={styles.sheetSaveText}>添加分类</Text>
-              </Pressable>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+                <TextInput
+                  accessibilityLabel="新分类名称"
+                  autoFocus
+                  maxLength={12}
+                  onBlur={() => {
+                    categoryInputFocusedRef.current = false;
+                  }}
+                  onChangeText={(value) => {
+                    setNewCategoryName(value);
+                    setCategoryError(null);
+                  }}
+                  onFocus={focusCategoryName}
+                  placeholder="例如：夜宵、通勤、宠物零食"
+                  placeholderTextColor={colors.inkTertiary}
+                  selectionColor={colors.blushDeep}
+                  style={styles.categoryNameInput}
+                  value={newCategoryName}
+                />
+              </View>
+              {categoryError ? <Text style={styles.categoryModalError}>{categoryError}</Text> : null}
+
+              <View style={styles.sheetActions}>
+                <Pressable onPress={closeCategoryModal} style={styles.sheetCancel}>
+                  <Text style={styles.sheetCancelText}>取消</Text>
+                </Pressable>
+                <Pressable onPress={saveNewCategory} style={styles.sheetSave}>
+                  <Icon name="plus" size={16} color={colors.surface} />
+                  <Text style={styles.sheetSaveText}>添加分类</Text>
+                </Pressable>
+              </View>
+        </ScrollView>
+      </AnimatedSheetModal>
     </SafeAreaView>
   );
 }
@@ -556,6 +679,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.canvas,
   },
   flex: {
+    flex: 1,
+  },
+  scroll: {
     flex: 1,
   },
   header: {
@@ -641,6 +767,9 @@ const styles = StyleSheet.create({
     color: colors.inkSecondary,
     fontSize: 12,
   },
+  amountLabelButton: {
+    alignSelf: 'flex-start',
+  },
   amountInputRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -655,22 +784,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  amountCardPressed: {
+    opacity: 0.82,
+  },
+  amountCardActive: {
+    borderColor: colors.blushDeep,
+  },
   amountCurrency: {
     color: colors.blushDeep,
     fontFamily: typography.number,
     fontSize: 28,
   },
-  amountInput: {
+  amountExpression: {
     flex: 1,
     marginLeft: 8,
-    padding: 0,
-    height: 66,
+    overflow: 'hidden',
     color: colors.ink,
     fontFamily: typography.number,
     fontWeight: '500',
     fontVariant: ['tabular-nums'],
-    letterSpacing: -2,
-    textAlignVertical: 'center',
+    letterSpacing: -1.5,
+    includeFontPadding: false,
+  },
+  amountExpressionPlaceholder: {
+    color: colors.inkTertiary,
   },
   amountHint: {
     marginTop: 3,
@@ -828,15 +965,38 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontVariant: ['tabular-nums'],
   },
+  noteField: {
+    marginTop: spacing.xxl,
+  },
+  noteHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  noteLabel: {
+    color: colors.inkTertiary,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  noteOptional: {
+    color: colors.inkTertiary,
+    fontSize: 10,
+  },
   noteInput: {
-    minHeight: 48,
+    height: 50,
     paddingHorizontal: 14,
+    paddingVertical: 0,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 14,
     backgroundColor: colors.surface,
     color: colors.ink,
     fontSize: 14,
+    lineHeight: 20,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   error: {
     marginTop: spacing.lg,
@@ -865,25 +1025,20 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     textAlign: 'center',
   },
-  modalRoot: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalBackdrop: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    backgroundColor: 'rgba(29, 26, 24, 0.46)',
-  },
   categorySheet: {
+    maxHeight: '92%',
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.md,
-    paddingBottom: 34,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     backgroundColor: colors.canvas,
+  },
+  categorySheetContent: {
+    flexGrow: 0,
+    paddingBottom: 34,
+  },
+  categorySheetScroll: {
+    flexShrink: 1,
   },
   sheetHandle: {
     width: 38,

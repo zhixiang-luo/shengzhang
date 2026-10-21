@@ -1,0 +1,22 @@
+[Unit]
+Description=Shengzhang API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=shengzhang
+Group=shengzhang
+WorkingDirectory=/opt/shengzhang/current
+EnvironmentFile=/opt/shengzhang/shared/.env
+ExecStart=/usr/bin/node services/api/dist/server.js
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/shengzhang
+
+[Install]
+WantedBy=multi-user.target

@@ -55,7 +55,7 @@ export function useVoiceCapture() {
   const [error, setError] = useState<string | null>(null);
   const [cancelArmed, setCancelArmed] = useState(false);
   const [manualArmed, setManualArmed] = useState(false);
-  const audioLevel = useRef(new Animated.Value(0)).current;
+  const [audioLevel] = useState(() => new Animated.Value(0));
 
   const phaseRef = useRef<VoiceCapturePhase>('idle');
   const mountedRef = useRef(true);
@@ -198,7 +198,8 @@ export function useVoiceCapture() {
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         closeSocket();
         resetCaptureState();
-        showError('语音连接已断开，请重试。');
+        if (transcriptRef.current.trim()) showError('语音连接已断开，请重试。');
+        else updatePhase('idle');
         return;
       }
       await wait(150);
@@ -230,7 +231,11 @@ export function useVoiceCapture() {
       } catch (caught) {
         closeSocket();
         resetCaptureState();
-        showError(caught instanceof Error ? caught.message : '语音识别失败');
+        if (transcriptRef.current.trim()) {
+          showError(caught instanceof Error ? caught.message : '语音识别失败');
+        } else {
+          updatePhase('idle');
+        }
       }
     },
     [
@@ -294,6 +299,11 @@ export function useVoiceCapture() {
           return;
         }
         if (message.type === 'error') {
+          if (phaseRef.current === 'processing' && !transcriptRef.current.trim()) {
+            finalWaiterRef.current?.resolve('');
+            finalWaiterRef.current = null;
+            return;
+          }
           const streamError = new Error(message.message || '火山语音识别失败。');
           readyWaiterRef.current?.reject(streamError);
           readyWaiterRef.current = null;
@@ -309,6 +319,12 @@ export function useVoiceCapture() {
         finalWaiterRef.current = null;
       };
       socket.onclose = () => {
+        if (phaseRef.current === 'processing' && !transcriptRef.current.trim()) {
+          finalWaiterRef.current?.resolve('');
+          finalWaiterRef.current = null;
+          socketRef.current = null;
+          return;
+        }
         const streamError = new Error('火山语音连接提前关闭。');
         readyWaiterRef.current?.reject(streamError);
         readyWaiterRef.current = null;

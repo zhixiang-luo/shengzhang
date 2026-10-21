@@ -22,8 +22,13 @@
 | `tokens/design-tokens.json` | 跨平台设计令牌源文件 |
 | `tokens/tokens.css` | 原型与网页预览使用 |
 | `assets/piggy-mark.svg` | 小猪品牌标记 |
+| `assets/brand-lockup.svg` | 横向品牌标志与主张 |
 | `assets/app-icon.svg` | 1024 方形 App 图标 |
+| `assets/adaptive-icon.svg` | Android 自适应图标透明前景 |
+| `assets/monochrome-icon.svg` | Android 单色主题图标 |
 | `assets/sound-wave.svg` | 语音状态与空状态装饰 |
+| `exports/brand-mark.png` | 1024px 品牌标记导出 |
+| `exports/brand-lockup.png` | 2400px 横向品牌组合导出 |
 | `moodboard/README.md` | 视觉方向与参考判断 |
 | `screens/` | 原型评审通过后的高保真页面导图 |
 

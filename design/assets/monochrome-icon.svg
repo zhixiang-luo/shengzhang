@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
+  <title id="title">声账 Android 单色图标</title>
+  <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M190 436c-58 58-58 152 0 210" stroke-width="30" opacity=".72"/>
+    <path d="M834 436c58 58 58 152 0 210" stroke-width="30" opacity=".72"/>
+    <path d="M310 286c-62-69-72-146-15-174 54-25 103 26 131 106" fill="#000" stroke-width="42"/>
+    <path d="M714 286c62-69 72-146 15-174-54-25-103 26-131 106" fill="#000" stroke-width="42"/>
+    <path d="M226 522c0-184 108-298 286-298s286 114 286 298c0 176-108 280-286 280S226 698 226 522Z" stroke-width="42"/>
+    <circle cx="416" cy="490" r="31" fill="#000" stroke="none"/>
+    <circle cx="608" cy="490" r="31" fill="#000" stroke="none"/>
+    <rect x="396" y="582" width="232" height="146" rx="73" stroke-width="36"/>
+    <circle cx="466" cy="655" r="19" fill="#000" stroke="none"/>
+    <circle cx="558" cy="655" r="19" fill="#000" stroke="none"/>
+  </g>
+</svg>
