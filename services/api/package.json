@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
-    "@fastify/multipart": "^9.2.1",
+    "@fastify/multipart": "^10.1.4",
     "@shengzhang/contracts": "workspace:*",
     "@shengzhang/domain": "workspace:*",
     "dotenv": "^18.0.8",
