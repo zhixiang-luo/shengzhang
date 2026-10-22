@@ -3,7 +3,16 @@
     "name": "声账",
     "slug": "shengzhang",
     "scheme": "shengzhang",
-    "version": "0.1.2",
+    "version": "0.1.3",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/04dd154b-655a-4b0e-bd3f-f3fafd76ab3d",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -47,7 +56,8 @@
       "expo-sharing",
       "expo-localization",
       "expo-asset",
-      "./plugins/with-cleartext-api"
+      "./plugins/with-cleartext-api",
+      "expo-status-bar"
     ],
     "extra": {
       "router": {

@@ -69,6 +69,7 @@
 | 月度统计、分类下钻、每日明细 | ✅ 已完成 |
 | 本地 SQLite 与删除撤销 | ✅ 已完成 |
 | Android 内测 APK | ✅ 已通过 EAS Build |
+| OTA 增量更新 | ✅ 已接入 EAS Update，需安装 0.1.3+ |
 | 官网首版与移动端下载入口 | ✅ 已完成，等待域名发布 |
 | 匿名产品统计与用户开关 | ✅ 已完成 |
 | 30–50 条真人语音与双端真机矩阵 | 🚧 进行中 |
@@ -83,6 +84,7 @@
 - **本地优先**：账单首先写入 SQLite，网络、登录和云备份不是记账前置条件。
 - **共享领域模型**：金额统一使用整数分，客户端、服务端和测试共用 Zod 契约与领域函数。
 - **流式语音链路**：手机 PCM → Fastify WebSocket → 火山双向流式 ASR → DeepSeek 结构化。
+- **持续更新**：JS/TS 修复通过 EAS Update OTA 发布，原生变化再走 APK、TestFlight 或商店版本。
 - **隐私边界明确**：录音仅用于本次识别，服务端不长期保存音频；语音模型不接收历史账单。
 - **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 53 项自动化测试。
 
@@ -99,7 +101,7 @@ flowchart LR
   G --> H[(私有对象存储)]
 ```
 
-详细设计见 [技术架构](docs/09-technical-architecture.md)、[语音记账规格](docs/05-voice-accounting.md) 和 [AI 供应商配置](docs/19-ai-providers.md)。
+详细设计见 [技术架构](docs/09-technical-architecture.md)、[语音记账规格](docs/05-voice-accounting.md)、[AI 供应商配置](docs/19-ai-providers.md) 和 [App 更新与发布](docs/30-app-updates.md)。
 
 ## 工程质量
 

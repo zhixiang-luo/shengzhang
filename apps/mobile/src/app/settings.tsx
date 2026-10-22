@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-nat
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '../components/Icon';
+import { useAppUpdates } from '../components/UpdateProvider';
 import { listCategories } from '../db/categoryRepository';
 import { useDatabase } from '../db/DatabaseProvider';
 import { countTransactions } from '../db/transactionRepository';
@@ -20,6 +21,7 @@ export default function SettingsScreen() {
   const [transactionCount, setTransactionCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
   const [analyticsEnabled, setAnalyticsEnabledState] = useState(true);
+  const updates = useAppUpdates();
 
   useEffect(() => {
     trackAnalyticsEvent('settings_opened');
@@ -88,17 +90,65 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <Text style={styles.sectionLabel}>应用更新</Text>
+        <View style={styles.group}>
+          <SettingRow
+            label="检查更新"
+            value={updateStatusLabel(updates.status)}
+            onPress={
+              updates.status === 'unsupported'
+                ? undefined
+                : () => void updates.check(true)
+            }
+            last={updates.status !== 'ready'}
+          />
+          {updates.status === 'ready' ? (
+            <SettingRow
+              label="安装并重启"
+              value="新版本已下载"
+              onPress={() => void updates.apply()}
+              last
+            />
+          ) : null}
+        </View>
+        <Text style={styles.note}>
+          {updates.error ??
+            (updates.info.enabled
+              ? `更新通道：${updates.info.channel ?? '未配置'}`
+              : 'Expo Go 会直接加载开发服务器；独立安装包支持 OTA 更新。')}
+        </Text>
+
         <Text style={styles.sectionLabel}>关于</Text>
         <View style={styles.aboutCard}>
           <Text style={styles.aboutName}>声账</Text>
           <Text style={styles.aboutTagline}>说一句，就记好。</Text>
           <Text style={styles.aboutVersion}>
-            MVP {Constants.expoConfig?.version ?? '0.1.1'} · Expo 58
+            MVP {Constants.expoConfig?.version ?? '0.1.3'} · Expo 58
+            {updates.info.channel ? ` · ${updates.info.channel}` : ''}
           </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+function updateStatusLabel(status: ReturnType<typeof useAppUpdates>['status']) {
+  switch (status) {
+    case 'checking':
+      return '正在检查…';
+    case 'downloading':
+      return '正在下载…';
+    case 'ready':
+      return '有新版本';
+    case 'up-to-date':
+      return '已是最新';
+    case 'unsupported':
+      return 'Expo Go 预览';
+    case 'error':
+      return '检查失败';
+    default:
+      return '点击检查';
+  }
 }
 
 function SettingRow({

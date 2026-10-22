@@ -40,6 +40,7 @@
 - [UI 交接](./18-ui-handoff.md)
 - [AI 供应商配置与 ASR 调研](./19-ai-providers.md)
 - [语音评测报告](./20-voice-eval-report.md)
+- [App 更新与发布](./30-app-updates.md)
 
 ## 决策与交接
 

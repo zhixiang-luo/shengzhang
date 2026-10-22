@@ -88,6 +88,7 @@
 - 官网已在 `1440×1000`、`768×1024`、`390×844` 和 `375×812` 四种视口完成布局验收；均无横向滚动，移动端导航、三个产品界面标签和方向键切换通过，页面自身无控制台错误。详细规格见 `docs/27-official-website.md`。
 - 官网已部署到现有阿里云 ECS 的 `/opt/shengzhang/site`，临时入口 `http://8.152.201.57/` 已从公网验证；首页、样式、脚本、产品截图和原有语音 `/health` 均返回 `200`。正式域名仍等待 ICP 备案与 HTTPS。
 - Android 内测 APK 已上传到官网 `/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；服务器端 SHA-256 与内测构建一致。
+- App 已升级到 `0.1.3` 并接入 `expo-updates` + EAS Update：启动自动检查、回到前台限频检查、下载完成提示、立即重启和设置页手动检查均已实现；preview/production 使用独立 channel，runtimeVersion 跟随 appVersion。
 - 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。面向千级注册用户，生产值已调整为 IP 每分钟 30、每日 600、全局每分钟 120、每日 5000；内部连续 31 次无效请求验证为前 30 次 `400`、第 31 次 `429`。
 - GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Release `v0.1.0-preview.2`。
 - GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
@@ -125,13 +126,14 @@
 
 ## 下一步最小任务
 
-1. 评审官网首版视觉、文案与下载入口；确认后用真实设备截图替换原型素材。
-2. 从官网直接下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
-3. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
-4. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
-5. 用真实供应商账单补齐成本看板的 DeepSeek、网关和存储成本。
-6. 修复真人评测暴露的 P0/P1 问题，冻结内测候选版本。
-7. 微信登录、云备份和支付继续留在外部依赖 backlog；Apple 账号就绪后先评估 iOS 内购，不用等待微信。
+1. 重新构建并安装 `0.1.3` Android APK；旧 `0.1.2` 不包含更新客户端，无法事后补上 OTA。
+2. 评审官网首版视觉、文案与下载入口；确认后用真实设备截图替换原型素材。
+3. 从官网直接下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
+4. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
+5. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
+6. 用真实供应商账单补齐成本看板的 DeepSeek、网关和存储成本。
+7. 修复真人评测暴露的 P0/P1 问题，冻结内测候选版本。
+8. 微信登录、云备份和支付继续留在外部依赖 backlog；Apple 账号就绪后先评估 iOS 内购，不用等待微信。
 
 ## 已知风险
 
@@ -159,6 +161,8 @@ pnpm lint: passed
 pnpm test: passed
 expo export --platform ios: passed
 expo export --platform android: passed
+expo-updates config: passed
+expo-doctor: 20/20 passed
 domain tests: 23 passed
 api tests: 30 passed
 voice eval: 200/200 exact, amount/type/category/date 100%
