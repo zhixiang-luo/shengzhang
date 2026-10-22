@@ -69,7 +69,7 @@
 
 官网直接下载不要求 Expo 账户，适合把测试包发给没有 Expo 账号的用户。正式发布后，首屏主按钮应优先指向 GitHub Release 的稳定 APK 或已上架商店；每次替换 APK 都要同步版本号、文件大小和 SHA-256。iOS 未上架前不得展示可点击的 App Store 下载按钮。
 
-2026-10-22 已从匿名请求复验 GitHub 仓库与 Releases 可访问。`v0.1.3-preview.1` Release 尚未创建，当前官网下载是唯一公开发布的 `0.1.3` 入口。
+2026-10-22 已从匿名请求复验 GitHub 仓库与 Releases 可访问。`v0.1.3-preview.1` 已创建为 Pre-release，并附带完整 `0.1.3` APK；官网和 GitHub Release 两个入口均指向同一构建。
 
 ## 6. 部署
 

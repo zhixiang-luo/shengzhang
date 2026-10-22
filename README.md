@@ -218,7 +218,7 @@ python3 -m http.server 4173
 
 ## 下载与发布
 
-Android 内测版 `0.1.3` 可从[声账官网下载](http://8.152.201.57/#download)，无需 Expo 或 GitHub 账户。该版本首次支持 EAS OTA；已安装 `0.1.2` 的设备需要覆盖安装一次。版本说明和 SHA-256 记录在 [App 更新与发布文档](docs/30-app-updates.md)，历史版本索引见 [GitHub Releases](https://github.com/zhixiang-luo/shengzhang/releases)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀并保留版本记录。
+Android 内测版 `0.1.3` 可从[声账官网下载](http://8.152.201.57/#download)，无需 Expo 或 GitHub 账户。该版本首次支持 EAS OTA；已安装 `0.1.2` 的设备需要覆盖安装一次。GitHub 提供 [v0.1.3 Release 与 APK 附件](https://github.com/zhixiang-luo/shengzhang/releases/tag/v0.1.3-preview.1)，版本说明和 SHA-256 见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀并保留版本记录。
 
 当前尚未在 App Store 或国内 Android 应用商店正式上架。
 
