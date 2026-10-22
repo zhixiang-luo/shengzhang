@@ -87,7 +87,7 @@
 - 官网使用无外部依赖的 `index.html`、`styles.css`、`app.js`，并纳入品牌 SVG、分享图和原型截图；支持滚动揭示、鼠标光晕、设备倾斜、声波和转写循环，并对 `prefers-reduced-motion` 做完整降级。
 - 官网已在 `1440×1000`、`768×1024`、`390×844` 和 `375×812` 四种视口完成布局验收；均无横向滚动，移动端导航、三个产品界面标签和方向键切换通过，页面自身无控制台错误。详细规格见 `docs/27-official-website.md`。
 - 官网已部署到现有阿里云 ECS 的 `/opt/shengzhang/site`，临时入口 `http://8.152.201.57/` 已从公网验证；首页、样式、脚本、产品截图和原有语音 `/health` 均返回 `200`。正式域名仍等待 ICP 备案与 HTTPS。
-- Android 内测 APK 已上传到官网 `/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；服务器端 SHA-256 与内测构建一致。
+- Android 内测 APK 已上传到官网 `/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；当前为 `0.1.3`，服务器端 SHA-256 与内测构建一致。
 - App 已升级到 `0.1.3` 并接入 `expo-updates` + EAS Update：启动自动检查、回到前台限频检查、下载完成提示、立即重启和设置页手动检查均已实现；preview/production 使用独立 channel，runtimeVersion 跟随 appVersion。
 - 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。面向千级注册用户，生产值已调整为 IP 每分钟 30、每日 600、全局每分钟 120、每日 5000；内部连续 31 次无效请求验证为前 30 次 `400`、第 31 次 `429`。
 - GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Release `v0.1.0-preview.2`。
@@ -98,6 +98,12 @@
 - 已增加 `pnpm --filter @shengzhang/api analytics:report` 报告脚本，可查看独立下载访客、活跃安装、启动频率、语音成功率、累计新增账单和每日趋势。
 - 服务器已安装 `/opt/shengzhang/bin/daily-ops-report.sh`，可生成北京时间前一日的 `server + analytics` Markdown 简报，并写入 `/opt/shengzhang/shared/reports/`。
 - Codex 心跳自动化 `声账每日运营简报` 已启用，每天北京时间 01:00 运行只读检查；异常时提示服务状态、磁盘/内存、错误日志和产品数据趋势。
+- 已制作 27 秒竖屏宣传片《一句话，长出三笔账》：围绕“按住说一句，松手自动入账”，用声波折成三笔真实账单，随后展示 8 秒整批撤销、本地优先与月度统计。当前旁白使用 Edge TTS `zh-CN-XiaoxiaoNeural`（晓晓普通话女声），原 Tingting 女声保留在 `assets/audio/vo-tingting/`。
+- 宣传片工程位于 `design/video/shengzhang-promo/`，包含分镜脚本、视觉规范、五段场景、中文旁白、原创配乐与可复现音频脚本；界面素材复用已评审原型截图。
+- 宣传片已通过 HyperFrames lint、runtime、motion 和逐帧布局检查；69 项文字对比度检查全部达到 WCAG AA，成片无黑帧或 1.2 秒以上静态段。
+- 竖版成片为 `design/exports/video/声账-宣传片-说一句就记好.mp4`，1080×1920、30fps、27 秒、810 帧，约 -16.0 LUFS / -4.7 dBTP，SHA-256 为 `998e5a5a12760841684740d1a4501aaa8e60ccbd722ecc5814a95ac986ad4e9d`。
+- 已用 `video-shotcraft` 镜头卡与 Remotion 制作 1920×1080 横屏宣传片《一句话，两笔账》，工程位于 `design/video/shengzhang-shotcraft/`；当前为 6 段晓晓普通话女声旁白、原创程序化配乐、转场拟音、镜头卡工作台和帧级分镜。旁白通过 `edge-tts` 生成，文案固定于 `scripts/voice_lines.json`，按画面窗口校准语速；Yunyang 男声和原 Tingting 女声保留用于回退对比。
+- shotcraft 主版为 `design/exports/video/声账-shotcraft-宣传片.mp4`，无 BGM 版为 `design/exports/video/声账-shotcraft-宣传片-无BGM.mp4`；两版均为 25.23 秒、757 帧、30fps、H.264 + AAC 48kHz stereo，且复用完全相同的视频流（MD5 `c6c2b9b05b4ac5e68d3543e5b96cb6bd`）。完整解码与无黑帧检查通过；带 BGM 版约 -16.0 LUFS / -1.8 dBTP，无 BGM 版约 -16.0 LUFS / -2.7 dBTP。主版 SHA-256 为 `5cd3f07f908b9e58537067e95accb03795c30fe60507236689d00e8f81c371ef`，无 BGM 版 SHA-256 为 `65b06e42606d9152cd214bfe7e63960730a81c1442352291e7fb9e6a3ed0a3ab`。
 
 ## 测试发布状态（2026-10-21）
 
@@ -108,9 +114,9 @@
 - 分类拖拽、Sheet 动画、录音浮层触摸拦截和滚动删除阈值修复后的第二个 Android 内测 APK 已构建完成：构建 ID `7567289d-de66-4472-8df8-8d88c38243b7`，构建耗时 15 分 38 秒。
 - 第二个 APK 下载页：`https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/7567289d-de66-4472-8df8-8d88c38243b7`；文件大小 108,028,872 字节，SHA-256 为 `fbff3118433caf01565581de7bff3ce68dbb2e4f6f626db85fd42a7a89a68f98`。
 - Android `0.1.1` 匿名统计内测包已构建完成：EAS Build `f7643fc9-7eeb-48af-9272-15dc099b9809`，源码提交 `531c128`；文件大小 108,035,320 字节，SHA-256 为 `7d25239c7ed9429362b1cbbccc1df78a1d9063a366c7bfcf4c076f1a643b5d3a`。
-- Android `0.1.2` 完整统计内测包已构建并替换官网下载：EAS Build `cdddc769-589f-4143-a6dd-ae7f83a0b6e2`，源码提交 `0f331db`；文件大小 108,035,800 字节，SHA-256 为 `5f0cb8a736f0d3e36275fa7d6ab072b6db7fb378e10790f292fa49799f8eb0c6`，GitHub Pre-release 为 `v0.1.2-preview.1`。
+- Android `0.1.2` 完整统计内测包历史记录：EAS Build `cdddc769-589f-4143-a6dd-ae7f83a0b6e2`，源码提交 `0f331db`；文件大小 108,035,800 字节，SHA-256 为 `5f0cb8a736f0d3e36275fa7d6ab072b6db7fb378e10790f292fa49799f8eb0c6`，GitHub Pre-release 为 `v0.1.2-preview.1`。
 - Android `0.1.3` OTA 内测包已通过 EAS Build 完成：构建 ID `fb5ac32c-d8ca-40a3-bf98-5750b4aec28d`，源码提交 `65cfb1f`，profile/channel 为 `preview`，版本 `0.1.3 (13)`，runtime `0.1.3`，构建耗时约 23 分 5 秒；APK 文件大小 109,854,465 字节，SHA-256 为 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`，ZIP 完整性检查通过。
-- 官网 `/downloads/shengzhang-android-preview.apk` 已原子替换为 `0.1.1`，GitHub Pre-release `v0.1.1-preview.1` 提供无需 Expo 账户的下载入口。
+- 2026-10-22 21:10（Asia/Shanghai）官网 `/downloads/shengzhang-android-preview.apk` 已通过临时文件校验后原子替换为 `0.1.3`；首页版本参数、OTA 提示和下载按钮同步更新。服务器端文件大小 109,854,465 字节、SHA-256 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`，旧 `0.1.2` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.2-preview.apk`。
 - 两次 build 均使用同一 Android 签名证书，证书 MD5 为 `440A483CAFA42B8CE655EBC15DBAA2F2`；第二个 APK 的 ZIP 完整性和签名证书解析均通过。
 - 该 APK 使用 `preview` 配置中的临时测试 API `http://8.152.201.57` 和本地明文 HTTP 插件；本地手记账、统计和设置不依赖该接口。2026-10-21 08:46（Asia/Shanghai）复测 `/health` 返回正常，ECS 与 `shengzhang-api` 已恢复运行，可以开始语音真机测试。
 - 阿里云 ECS 已完成系统盘快照与格式化，部署环境为 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 和 systemd；`bigai.xin` 的公开 HTTP 入口仍受中国内地 ICP 备案阻断。
@@ -119,6 +125,8 @@
 ## 当前未实现
 
 - 真人噪声/口音语料、iPhone/Android 中低端矩阵和 7 天封闭试用。
+- GitHub Release 尚未创建 `v0.1.3-preview.1` 或上传 APK 资产；当前官网下载已是最新版本。
+- 宣传片仍使用原型截图，尚未替换为正式内测 APK 的真机录屏或设备截图。
 - 微信移动端登录：外部依赖 backlog，等 Apple/Android 发布路径和开放平台实际主体能力确认。
 - PostgreSQL、对象存储、云备份与恢复：不阻塞免费本地首发。
 - 高保真 UI 页面。
@@ -174,5 +182,12 @@ SQLite schema: sqlite3 语法与 foreign_key_check 通过
 official website: desktop/tablet/mobile viewport checks passed, 0 local console errors
 analytics ingestion: public POST 202, hashed install id, report aggregation passed
 analytics test data: cleared after verification
-android bundle export: passed
+android bundle export: passed for 0.1.3
+android preview site: 0.1.3 APK atomically deployed, Content-Length 109854465
+android preview sha256: 89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf
+promo video lint: 0 errors / 0 warnings
+promo video runtime: 0 errors
+promo video contrast: 69/69 passed WCAG AA
+promo video encode: 1080x1920, 30fps, 27.0s, H.264 + AAC
+promo video integrity: full decode passed, no black frames, no freeze >= 1.2s
 ```

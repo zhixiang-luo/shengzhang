@@ -85,7 +85,9 @@ python3 -m http.server 4174 -d deploy/site
 
 该 IP 入口只用于备案完成前的临时访问，不配置表单、登录或支付，也不应作为长期推广地址。中国大陆服务器绑定正式域名前，必须完成 ICP 备案；备案通过并配置 HTTPS 后，再替换当前测试入口。
 
-Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-android-preview.apk`，官网直接提供下载，不依赖 Expo 登录。当前文件大小为 108,028,872 字节，SHA-256 为 `fbff3118433caf01565581de7bff3ce68dbb2e4f6f626db85fd42a7a89a68f98`。
+Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-android-preview.apk`，官网直接提供下载，不依赖 Expo 登录。当前版本为 `0.1.3`，文件大小 109,854,465 字节，SHA-256 为 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`。该版本首次包含 EAS OTA 客户端；已安装 `0.1.2` 的设备需要覆盖安装一次。
+
+2026-10-22 21:10（Asia/Shanghai）已完成官网替换。首页下载链接使用 `?v=0.1.3`，公网响应 `200` 且 `Content-Length` 为 109,854,465 字节；服务器端 SHA-256 与构建产物一致。旧 `0.1.2` 保留在 `/opt/shengzhang/releases/shengzhang-0.1.2-preview.apk`。
 
 ## 7. 验收基线
 
@@ -108,3 +110,11 @@ Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-a
 4. 增加可单独分享的社交预览图与产品演示视频；
 5. 在不引入追踪的前提下，评估是否需要匿名下载来源统计；
 6. 月末回顾和分享卡上线后，再扩展对应官网章节。
+
+## 9. 首支宣传片
+
+2026-10-21 已产出 27 秒、1080 × 1920、30fps 的竖屏宣传片《一句话，长出三笔账》。成片位于 `design/exports/video/声账-宣传片-说一句就记好.mp4`，可复现工程位于 `design/video/shengzhang-promo/`。
+
+内容只陈述当前已实现能力：按住即录、松手自动入账、一句话多笔、8 秒整批撤销、本地账本、手动兜底和月度统计。短片使用已评审原型截图，不使用虚拟用户量、虚构商店状态或尚未上线的微信登录与云备份。正式真机截图产出后，应替换片中三处界面素材并重新渲染。
+
+另以 `video-shotcraft` 镜头卡制作了 25.23 秒、1920 × 1080 横屏版《一句话，两笔账》，适合官网首屏、产品发布和演示场景。当前横版和 27 秒竖版均使用晓晓普通话女声旁白。横版主版位于 `design/exports/video/声账-shotcraft-宣传片.mp4`；不含配乐、保留旁白与拟音的无 BGM 版位于 `design/exports/video/声账-shotcraft-宣传片-无BGM.mp4`；竖版位于 `design/exports/video/声账-宣传片-说一句就记好.mp4`。可复现工程分别位于 `design/video/shengzhang-shotcraft/` 与 `design/video/shengzhang-promo/`。两版横版画面逐帧一致，界面仍使用已评审原型截图，正式真机素材可用后应替换并重新渲染。

@@ -127,3 +127,5 @@ https://expo.dev/artifacts/eas/sYrly_C992T0uG5i4CZT0BuwLcThK7v-i2g1otTQ_c4.apk
 - APK 内已确认包含 `0.1.3` 版本标记。
 
 这是首个带 OTA 客户端的 Android 安装包。已安装 `0.1.2` 的用户无法通过 OTA 获得这项原生能力，必须覆盖安装本次 `0.1.3` APK；安装后本地账本会保留。
+
+2026-10-22 21:10（Asia/Shanghai）官网下载入口已由 `0.1.2` 原子替换为 `0.1.3`。服务器文件大小和 SHA-256 与上方构建记录一致；旧包备份在 `/opt/shengzhang/releases/shengzhang-0.1.2-preview.apk`。GitHub Release `v0.1.3-preview.1` 尚未创建，当前官网是主下载入口。

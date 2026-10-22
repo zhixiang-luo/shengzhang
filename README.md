@@ -86,6 +86,7 @@
 - **流式语音链路**：手机 PCM → Fastify WebSocket → 火山双向流式 ASR → DeepSeek 结构化。
 - **持续更新**：JS/TS 修复通过 EAS Update OTA 发布，原生变化再走 APK、TestFlight 或商店版本。
 - **隐私边界明确**：录音仅用于本次识别，服务端不长期保存音频；语音模型不接收历史账单。
+- **隐私优先产品观测**：匿名统计激活、留存、功能渗透、语音时延与失败原因，不含金额、分类、备注、录音和转写正文。
 - **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 53 项自动化测试。
 
 ### 架构概览
@@ -217,7 +218,7 @@ python3 -m http.server 4173
 
 ## 下载与发布
 
-Android 内测 APK 可从[声账官网下载](http://8.152.201.57/#download)，无需 Expo 或 GitHub 账户。版本说明和 SHA-256 记录在 [GitHub Releases](https://github.com/zhixiang-luo/shengzhang/releases)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀并保留版本记录。
+Android 内测版 `0.1.3` 可从[声账官网下载](http://8.152.201.57/#download)，无需 Expo 或 GitHub 账户。该版本首次支持 EAS OTA；已安装 `0.1.2` 的设备需要覆盖安装一次。版本说明和 SHA-256 记录在 [App 更新与发布文档](docs/30-app-updates.md)，历史版本索引见 [GitHub Releases](https://github.com/zhixiang-luo/shengzhang/releases)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀并保留版本记录。
 
 当前尚未在 App Store 或国内 Android 应用商店正式上架。
 
