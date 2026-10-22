@@ -40,3 +40,7 @@ prototype/.local/
 
 # Local analytics event files
 .analytics/
+
+# Generated marketing exports
+design/exports/profile/
+deploy/site/downloads/*.apk

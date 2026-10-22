@@ -1,0 +1,8 @@
+node_modules/
+.hyperframes/
+renders/
+AGENTS.md
+CLAUDE.md
+assets/audio/vo/
+assets/audio/vo-tingting/
+

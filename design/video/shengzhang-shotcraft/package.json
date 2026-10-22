@@ -1,0 +1,24 @@
+{
+  "name": "shengzhang-shotcraft-promo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "voice:prepare": "node scripts/prepare_voice.mjs",
+    "audio": "zsh scripts/make_audio.zsh",
+    "dev": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts ShengzhangPromo out/promo.mp4",
+    "render:nobgm": "remotion render src/index.ts ShengzhangPromo out/promo-nobgm.mp4 --props=props-nobgm.json",
+    "still": "remotion still src/index.ts ShengzhangPromo",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.484",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "remotion": "4.0.484"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "typescript": "6.0.3"
+  }
+}

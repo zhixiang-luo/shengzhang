@@ -1,0 +1,402 @@
+<template id="stats-template">
+  <div
+    data-composition-id="04-stats"
+    data-width="1080"
+    data-height="1920"
+    data-duration="4.15"
+  >
+    <div class="scene-content" data-layout-allow-overlap>
+      <div class="stats-halo" data-layout-ignore></div>
+      <div class="ghost-month" data-layout-ignore>10</div>
+
+      <div class="masthead">
+        <span class="index">03 / 月末答案</span>
+        <span class="month">本月 · 10月</span>
+      </div>
+
+      <div class="copy-block">
+        <h1>
+          <span class="line-one">钱花在哪儿，</span>
+          <span class="line-two">一屏就懂。</span>
+        </h1>
+        <p>每日趋势、分类占比和月度变化，不翻表格。</p>
+      </div>
+
+      <div class="stats-stage">
+        <div class="screen-shadow"></div>
+        <div class="stats-phone">
+          <div class="stats-island"></div>
+          <img src="../assets/screens/stats.png" alt="声账月度统计界面" />
+        </div>
+
+        <div class="data-note note-trend">
+          <span class="note-icon bars"><i></i><i></i><i></i></span>
+          <span><small>每日趋势</small><strong>哪天花得多</strong></span>
+        </div>
+        <div class="data-note note-category">
+          <span class="note-icon ring"></span>
+          <span><small>分类占比</small><strong>钱花在哪里</strong></span>
+        </div>
+        <div class="data-note note-compare">
+          <span class="note-icon arrow">↗</span>
+          <span><small>较上月</small><strong>变化一眼看清</strong></span>
+        </div>
+        <div class="data-note note-peak">
+          <span class="note-icon dot"></span>
+          <span><small>最高支出日</small><strong>直接点进明细</strong></span>
+        </div>
+      </div>
+
+      <div class="closing-line">统计不是报表，是月底的答案。</div>
+    </div>
+
+    <style>
+      @font-face {
+        font-family: "PingFang SC";
+        src: local("PingFang SC");
+      }
+
+      @font-face {
+        font-family: "Hiragino Sans GB";
+        src: local("Hiragino Sans GB");
+      }
+
+      @font-face {
+        font-family: "Songti SC";
+        src: local("Songti SC");
+      }
+
+      @font-face {
+        font-family: "STSong";
+        src: local("STSong");
+      }
+
+      @font-face {
+        font-family: "Noto Serif CJK SC";
+        src: local("Noto Serif CJK SC");
+      }
+
+      [data-composition-id="04-stats"] {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        color: #292624;
+        background:
+          radial-gradient(circle at 12% 11%, rgba(232, 154, 150, 0.21), rgba(250, 247, 240, 0) 27%),
+          radial-gradient(circle at 90% 66%, rgba(225, 189, 123, 0.21), rgba(250, 247, 240, 0) 27%),
+          #faf7f0;
+        font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+      }
+
+      [data-composition-id="04-stats"] .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        padding: 72px 70px 56px;
+        overflow: hidden;
+      }
+
+      [data-composition-id="04-stats"] .stats-halo {
+        position: absolute;
+        top: 410px;
+        left: 50%;
+        width: 900px;
+        height: 900px;
+        margin-left: -450px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(232, 154, 150, 0.2),
+          rgba(232, 154, 150, 0.03) 42%,
+          rgba(250, 247, 240, 0) 70%
+        );
+      }
+
+      [data-composition-id="04-stats"] .ghost-month {
+        position: absolute;
+        top: 70px;
+        right: 18px;
+        color: rgba(157, 86, 87, 0.055);
+        font-family: "Avenir Next", "DIN Alternate", sans-serif;
+        font-size: 430px;
+        font-weight: 700;
+        letter-spacing: -0.08em;
+        line-height: 0.8;
+      }
+
+      [data-composition-id="04-stats"] .masthead {
+        position: relative;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      [data-composition-id="04-stats"] .index {
+        color: #9d5657;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+      }
+
+      [data-composition-id="04-stats"] .month {
+        padding: 10px 18px;
+        border: 1px solid rgba(41, 38, 36, 0.13);
+        border-radius: 999px;
+        color: #726b64;
+        font-size: 20px;
+      }
+
+      [data-composition-id="04-stats"] .copy-block {
+        position: relative;
+        z-index: 5;
+        margin-top: 54px;
+      }
+
+      [data-composition-id="04-stats"] h1 {
+        margin: 0;
+        font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+        font-size: 82px;
+        font-weight: 600;
+        letter-spacing: -0.065em;
+        line-height: 1.08;
+      }
+
+      [data-composition-id="04-stats"] h1 span {
+        display: block;
+      }
+
+      [data-composition-id="04-stats"] .line-two {
+        color: #9d5657;
+      }
+
+      [data-composition-id="04-stats"] .copy-block p {
+        margin: 24px 0 0;
+        color: #726b64;
+        font-size: 27px;
+        line-height: 1.55;
+      }
+
+      [data-composition-id="04-stats"] .stats-stage {
+        position: relative;
+        z-index: 4;
+        flex: 1;
+        min-height: 0;
+      }
+
+      [data-composition-id="04-stats"] .screen-shadow {
+        position: absolute;
+        top: 178px;
+        left: 50%;
+        width: 560px;
+        height: 1030px;
+        margin-left: -280px;
+        border-radius: 96px;
+        background: rgba(91, 66, 50, 0.2);
+        filter: blur(52px);
+        transform: rotate(3deg);
+      }
+
+      [data-composition-id="04-stats"] .stats-phone {
+        position: absolute;
+        top: 24px;
+        left: 50%;
+        width: 558px;
+        height: 1194px;
+        margin-left: -279px;
+        padding: 13px;
+        border: 2px solid rgba(41, 38, 36, 0.17);
+        border-radius: 72px;
+        background: #272421;
+        box-shadow: 0 38px 90px rgba(55, 43, 35, 0.23);
+        transform: rotate(2.4deg);
+        transform-origin: 50% 100%;
+      }
+
+      [data-composition-id="04-stats"] .stats-island {
+        position: absolute;
+        z-index: 3;
+        top: 24px;
+        left: 50%;
+        width: 140px;
+        height: 31px;
+        margin-left: -70px;
+        border-radius: 999px;
+        background: #1d1b19;
+      }
+
+      [data-composition-id="04-stats"] .stats-phone img {
+        width: 528px;
+        height: 1164px;
+        border-radius: 58px;
+        object-fit: cover;
+      }
+
+      [data-composition-id="04-stats"] .data-note {
+        position: absolute;
+        z-index: 8;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 268px;
+        min-height: 94px;
+        padding: 14px 20px 14px 15px;
+        border: 1px solid rgba(41, 38, 36, 0.11);
+        border-radius: 25px;
+        background: rgba(255, 253, 248, 0.96);
+        box-shadow: 0 18px 46px rgba(55, 43, 35, 0.12);
+      }
+
+      [data-composition-id="04-stats"] .data-note > span:last-child {
+        display: flex;
+        flex-direction: column;
+      }
+
+      [data-composition-id="04-stats"] .data-note small {
+        color: #9d5657;
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+      }
+
+      [data-composition-id="04-stats"] .data-note strong {
+        margin-top: 4px;
+        color: #292624;
+        font-size: 23px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      [data-composition-id="04-stats"] .note-icon {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+        border-radius: 18px;
+        background: #f7ddd8;
+      }
+
+      [data-composition-id="04-stats"] .bars {
+        gap: 4px;
+        padding: 14px 12px;
+      }
+
+      [data-composition-id="04-stats"] .bars i {
+        width: 7px;
+        border-radius: 999px 999px 2px 2px;
+        background: #9d5657;
+      }
+
+      [data-composition-id="04-stats"] .bars i:nth-child(1) {
+        height: 14px;
+      }
+
+      [data-composition-id="04-stats"] .bars i:nth-child(2) {
+        height: 30px;
+      }
+
+      [data-composition-id="04-stats"] .bars i:nth-child(3) {
+        height: 22px;
+      }
+
+      [data-composition-id="04-stats"] .ring::after {
+        width: 27px;
+        height: 27px;
+        content: "";
+        border: 7px solid #9d5657;
+        border-top-color: #e1bd7b;
+        border-radius: 50%;
+      }
+
+      [data-composition-id="04-stats"] .arrow {
+        align-items: center;
+        color: #63795e;
+        font-family: "Avenir Next", sans-serif;
+        font-size: 31px;
+        font-weight: 600;
+      }
+
+      [data-composition-id="04-stats"] .dot::after {
+        width: 24px;
+        height: 24px;
+        content: "";
+        border-radius: 50%;
+        background: #9d5657;
+        box-shadow:
+          0 0 0 8px rgba(232, 154, 150, 0.22),
+          0 0 0 15px rgba(232, 154, 150, 0.08);
+      }
+
+      [data-composition-id="04-stats"] .note-trend {
+        top: 168px;
+        left: -6px;
+        transform: rotate(-4deg);
+      }
+
+      [data-composition-id="04-stats"] .note-category {
+        top: 338px;
+        right: -4px;
+        transform: rotate(3.5deg);
+      }
+
+      [data-composition-id="04-stats"] .note-compare {
+        top: 578px;
+        left: 0;
+        transform: rotate(2.6deg);
+      }
+
+      [data-composition-id="04-stats"] .note-peak {
+        top: 770px;
+        right: 10px;
+        transform: rotate(-3deg);
+      }
+
+      [data-composition-id="04-stats"] .closing-line {
+        position: relative;
+        z-index: 5;
+        margin: 18px auto 0;
+        color: #726b64;
+        font-family: "Songti SC", "STSong", serif;
+        font-size: 25px;
+        letter-spacing: 0.03em;
+        text-align: center;
+      }
+    </style>
+
+    <script src="../assets/vendor/gsap.min.js"></script>
+    <script>
+      (function () {
+        const root = '[data-composition-id="04-stats"]';
+        const tl = gsap.timeline({ paused: true });
+
+        tl.from(`${root} .masthead`, { y: -24, opacity: 0, duration: 0.4, ease: "power3.out" }, 0.1);
+        tl.from(`${root} .line-one`, { x: -42, opacity: 0, duration: 0.5, ease: "expo.out" }, 0.2);
+        tl.from(`${root} .line-two`, { y: 44, opacity: 0, duration: 0.54, ease: "power4.out" }, 0.36);
+        tl.from(`${root} .copy-block p`, { y: 22, opacity: 0, duration: 0.34, ease: "power2.out" }, 0.56);
+        tl.from(`${root} .stats-phone`, { y: 150, opacity: 0, rotation: 5, duration: 0.76, ease: "expo.out" }, 0.48);
+        tl.from(`${root} .screen-shadow`, { y: 60, opacity: 0, duration: 0.7, ease: "sine.out" }, 0.54);
+        tl.from(`${root} .note-trend`, { x: -88, opacity: 0, rotation: -8, duration: 0.44, ease: "back.out(1.5)" }, 1.04);
+        tl.from(`${root} .note-category`, { x: 88, opacity: 0, rotation: 8, duration: 0.44, ease: "back.out(1.5)" }, 1.24);
+        tl.from(`${root} .note-compare`, { x: -68, opacity: 0, rotation: -5, duration: 0.42, ease: "power3.out" }, 1.46);
+        tl.from(`${root} .note-peak`, { x: 72, opacity: 0, rotation: 6, duration: 0.42, ease: "power3.out" }, 1.64);
+        tl.from(`${root} .closing-line`, { y: 18, opacity: 0, duration: 0.34, ease: "sine.out" }, 1.94);
+        tl.from(`${root} .ghost-month`, { x: 70, opacity: 0, duration: 0.72, ease: "sine.out" }, 0.18);
+
+        tl.to(`${root} .stats-phone`, { y: -18, duration: 2.1, ease: "sine.inOut" }, 1.3);
+        tl.to(`${root} .stats-halo`, { scale: 1.05, duration: 2.3, ease: "sine.inOut" }, 1.2);
+        tl.to(`${root} .note-trend`, { y: -10, duration: 1.8, ease: "sine.inOut" }, 1.7);
+        tl.to(`${root} .note-category`, { y: 9, duration: 2, ease: "sine.inOut" }, 1.8);
+        tl.to(`${root} .note-compare`, { y: -8, duration: 1.7, ease: "sine.inOut" }, 1.9);
+        tl.to(`${root} .note-peak`, { y: 8, duration: 1.9, ease: "sine.inOut" }, 2);
+        tl.to(`${root} .ghost-month`, { x: -30, duration: 2.5, ease: "sine.inOut" }, 1.2);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["04-stats"] = tl;
+      })();
+    </script>
+  </div>
+</template>

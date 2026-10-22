@@ -1,0 +1,10 @@
+node_modules/
+out/
+*.log
+public/audio/vo/
+public/audio/vo-tingting/
+public/audio/vo-yunyang/
+public/audio/music-source.wav
+public/audio/score.wav
+public/audio/sfx-source.wav
+public/audio/soundtrack.wav

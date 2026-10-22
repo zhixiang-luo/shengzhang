@@ -1,0 +1,436 @@
+<template id="trust-template">
+  <div
+    data-composition-id="03-trust"
+    data-width="1080"
+    data-height="1920"
+    data-duration="5.1"
+  >
+    <div class="scene-content" data-layout-allow-overlap>
+      <div class="trust-aura" data-layout-ignore></div>
+      <div class="ghost-local" aria-hidden="true" data-layout-ignore></div>
+      <div class="grid-lines" data-layout-ignore></div>
+
+      <div class="masthead">
+        <span class="index">02 / 本地优先</span>
+        <span class="trust-state"><i></i>账本在本机</span>
+      </div>
+
+      <div class="copy-block">
+        <h1>
+          <span class="line-one">账本，</span>
+          <span class="line-two">先写进这台手机。</span>
+        </h1>
+        <p>登录、网络和云备份，都不挡住你记下眼前这笔钱。</p>
+      </div>
+
+      <div class="local-device">
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="orbit orbit-three"></div>
+        <div class="phone-outline">
+          <div class="mini-island"></div>
+          <div class="mini-wave"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="ledger-line line-a"><span></span><b>−¥25</b></div>
+          <div class="ledger-line line-b"><span></span><b>−¥18</b></div>
+          <div class="ledger-line line-c"><span></span><b>−¥16</b></div>
+          <div class="local-check">✓</div>
+        </div>
+        <div class="local-label">本地账本 · SQLite</div>
+      </div>
+
+      <div class="trust-points">
+        <div class="trust-point"><span>01</span><strong>不用登录</strong></div>
+        <div class="trust-point"><span>02</span><strong>离线也能记</strong></div>
+        <div class="trust-point"><span>03</span><strong>录音不留存</strong></div>
+      </div>
+
+      <div class="privacy-note">录音只用于本次识别</div>
+    </div>
+
+    <style>
+      @font-face {
+        font-family: "PingFang SC";
+        src: local("PingFang SC");
+      }
+
+      @font-face {
+        font-family: "Hiragino Sans GB";
+        src: local("Hiragino Sans GB");
+      }
+
+      @font-face {
+        font-family: "Songti SC";
+        src: local("Songti SC");
+      }
+
+      @font-face {
+        font-family: "STSong";
+        src: local("STSong");
+      }
+
+      @font-face {
+        font-family: "Noto Serif CJK SC";
+        src: local("Noto Serif CJK SC");
+      }
+
+      [data-composition-id="03-trust"] {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        color: #fffdf8;
+        background:
+          radial-gradient(circle at 88% 15%, rgba(232, 154, 150, 0.17), rgba(41, 38, 36, 0) 28%),
+          radial-gradient(circle at 5% 76%, rgba(158, 173, 152, 0.17), rgba(41, 38, 36, 0) 28%),
+          #292624;
+        font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+      }
+
+      [data-composition-id="03-trust"] .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        padding: 76px 74px 74px;
+        overflow: hidden;
+      }
+
+      [data-composition-id="03-trust"] .trust-aura {
+        position: absolute;
+        top: 700px;
+        left: 50%;
+        width: 920px;
+        height: 920px;
+        margin-left: -460px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(158, 173, 152, 0.2),
+          rgba(158, 173, 152, 0.03) 42%,
+          rgba(41, 38, 36, 0) 68%
+        );
+      }
+
+      [data-composition-id="03-trust"] .ghost-local {
+        position: absolute;
+        top: 1020px;
+        left: -130px;
+        color: rgba(255, 253, 248, 0.035);
+        font-family: "Avenir Next", "DIN Alternate", sans-serif;
+        font-size: 240px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+      }
+
+      [data-composition-id="03-trust"] .ghost-local::before {
+        content: "LOCAL";
+      }
+
+      [data-composition-id="03-trust"] .grid-lines {
+        position: absolute;
+        top: 90px;
+        right: -110px;
+        width: 620px;
+        height: 900px;
+        opacity: 0.08;
+        background-image:
+          linear-gradient(rgba(255, 253, 248, 0.7) 1px, rgba(41, 38, 36, 0) 1px),
+          linear-gradient(90deg, rgba(255, 253, 248, 0.7) 1px, rgba(41, 38, 36, 0) 1px);
+        background-size: 48px 48px;
+        mask-image: radial-gradient(ellipse at center, #292624 14%, rgba(41, 38, 36, 0) 73%);
+      }
+
+      [data-composition-id="03-trust"] .masthead {
+        position: relative;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      [data-composition-id="03-trust"] .index {
+        color: #b7c5b1;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+      }
+
+      [data-composition-id="03-trust"] .trust-state {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        color: rgba(255, 253, 248, 0.68);
+        font-size: 21px;
+      }
+
+      [data-composition-id="03-trust"] .trust-state i {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #9ead98;
+        box-shadow: 0 0 0 8px rgba(158, 173, 152, 0.12);
+      }
+
+      [data-composition-id="03-trust"] .copy-block {
+        position: relative;
+        z-index: 4;
+        margin-top: 178px;
+      }
+
+      [data-composition-id="03-trust"] h1 {
+        margin: 0;
+        font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+        font-size: 92px;
+        font-weight: 500;
+        letter-spacing: -0.065em;
+        line-height: 1.08;
+      }
+
+      [data-composition-id="03-trust"] h1 span {
+        display: block;
+      }
+
+      [data-composition-id="03-trust"] .line-one {
+        color: #fffdf8;
+      }
+
+      [data-composition-id="03-trust"] .line-two {
+        color: #b7c5b1;
+      }
+
+      [data-composition-id="03-trust"] .copy-block p {
+        max-width: 790px;
+        margin: 38px 0 0;
+        color: rgba(255, 253, 248, 0.64);
+        font-size: 29px;
+        line-height: 1.65;
+      }
+
+      [data-composition-id="03-trust"] .local-device {
+        position: relative;
+        z-index: 3;
+        width: 520px;
+        height: 520px;
+        margin: 70px auto 0;
+      }
+
+      [data-composition-id="03-trust"] .orbit {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        border: 1px solid rgba(158, 173, 152, 0.25);
+        border-radius: 50%;
+      }
+
+      [data-composition-id="03-trust"] .orbit-one {
+        width: 420px;
+        height: 420px;
+        margin: -210px 0 0 -210px;
+      }
+
+      [data-composition-id="03-trust"] .orbit-two {
+        width: 500px;
+        height: 500px;
+        margin: -250px 0 0 -250px;
+        border-color: rgba(158, 173, 152, 0.12);
+      }
+
+      [data-composition-id="03-trust"] .orbit-three {
+        width: 338px;
+        height: 338px;
+        margin: -169px 0 0 -169px;
+        border-color: rgba(232, 154, 150, 0.2);
+      }
+
+      [data-composition-id="03-trust"] .phone-outline {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 248px;
+        height: 432px;
+        margin: -216px 0 0 -124px;
+        padding: 40px 24px 26px;
+        border: 2px solid rgba(255, 253, 248, 0.68);
+        border-radius: 48px;
+        background: rgba(36, 34, 32, 0.78);
+        box-shadow:
+          0 24px 70px rgba(18, 17, 16, 0.34),
+          inset 0 0 0 8px rgba(255, 253, 248, 0.025);
+      }
+
+      [data-composition-id="03-trust"] .mini-island {
+        position: absolute;
+        top: 17px;
+        left: 50%;
+        width: 68px;
+        height: 15px;
+        margin-left: -34px;
+        border-radius: 999px;
+        background: rgba(255, 253, 248, 0.22);
+      }
+
+      [data-composition-id="03-trust"] .mini-wave {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        height: 70px;
+        margin-bottom: 22px;
+      }
+
+      [data-composition-id="03-trust"] .mini-wave i {
+        width: 5px;
+        border-radius: 999px;
+        background: #e89a96;
+      }
+
+      [data-composition-id="03-trust"] .mini-wave i:nth-child(1),
+      [data-composition-id="03-trust"] .mini-wave i:nth-child(5) {
+        height: 20px;
+      }
+
+      [data-composition-id="03-trust"] .mini-wave i:nth-child(2),
+      [data-composition-id="03-trust"] .mini-wave i:nth-child(4) {
+        height: 38px;
+      }
+
+      [data-composition-id="03-trust"] .mini-wave i:nth-child(3) {
+        height: 58px;
+      }
+
+      [data-composition-id="03-trust"] .ledger-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 70px;
+        border-top: 1px solid rgba(255, 253, 248, 0.11);
+        font-family: "Avenir Next", "DIN Alternate", sans-serif;
+      }
+
+      [data-composition-id="03-trust"] .ledger-line span {
+        width: 92px;
+        height: 9px;
+        border-radius: 999px;
+        background: rgba(255, 253, 248, 0.3);
+      }
+
+      [data-composition-id="03-trust"] .ledger-line b {
+        color: rgba(255, 253, 248, 0.78);
+        font-size: 22px;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+      }
+
+      [data-composition-id="03-trust"] .local-check {
+        position: absolute;
+        right: -28px;
+        top: -30px;
+        bottom: auto;
+        display: grid;
+        place-items: center;
+        width: 72px;
+        height: 72px;
+        border: 4px solid #292624;
+        border-radius: 50%;
+        color: #292624;
+        background: #9ead98;
+        box-shadow: 0 0 0 2px rgba(158, 173, 152, 0.55);
+        font-size: 34px;
+        font-weight: 700;
+      }
+
+      [data-composition-id="03-trust"] .local-label {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        padding: 11px 20px;
+        border: 1px solid rgba(158, 173, 152, 0.24);
+        border-radius: 999px;
+        color: #b7c5b1;
+        background: rgba(41, 38, 36, 0.82);
+        font-size: 19px;
+        letter-spacing: 0.07em;
+        transform: translateX(-50%);
+      }
+
+      [data-composition-id="03-trust"] .trust-points {
+        position: relative;
+        z-index: 4;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 28px;
+      }
+
+      [data-composition-id="03-trust"] .trust-point {
+        display: flex;
+        flex-direction: column;
+        min-height: 126px;
+        padding: 22px 20px;
+        border: 1px solid rgba(255, 253, 248, 0.1);
+        border-radius: 25px;
+        background: rgba(255, 253, 248, 0.04);
+      }
+
+      [data-composition-id="03-trust"] .trust-point span {
+        color: rgba(255, 253, 248, 0.68);
+        font-family: "Avenir Next", "DIN Alternate", sans-serif;
+        font-size: 17px;
+        letter-spacing: 0.1em;
+      }
+
+      [data-composition-id="03-trust"] .trust-point strong {
+        margin-top: auto;
+        color: #fffdf8;
+        font-size: 26px;
+        font-weight: 600;
+      }
+
+      [data-composition-id="03-trust"] .privacy-note {
+        position: relative;
+        z-index: 4;
+        margin-top: auto;
+        color: rgba(255, 253, 248, 0.69);
+        font-size: 19px;
+        letter-spacing: 0.1em;
+        text-align: center;
+      }
+    </style>
+
+    <script src="../assets/vendor/gsap.min.js"></script>
+    <script>
+      (function () {
+        const root = '[data-composition-id="03-trust"]';
+        const tl = gsap.timeline({ paused: true });
+
+        tl.from(`${root} .masthead`, { y: -24, opacity: 0, duration: 0.42, ease: "power3.out" }, 0.12);
+        tl.from(`${root} .line-one`, { y: 64, opacity: 0, duration: 0.58, ease: "power4.out" }, 0.22);
+        tl.from(`${root} .line-two`, { y: 64, opacity: 0, duration: 0.58, ease: "power4.out" }, 0.38);
+        tl.from(`${root} .copy-block p`, { y: 24, opacity: 0, duration: 0.36, ease: "power2.out" }, 0.58);
+        tl.from(`${root} .phone-outline`, { y: 54, opacity: 0, scale: 0.92, duration: 0.64, ease: "back.out(1.35)" }, 0.68);
+        tl.from(`${root} .orbit`, { scale: 0.54, opacity: 0, duration: 0.72, ease: "expo.out", stagger: 0.1 }, 0.74);
+        tl.from(`${root} .mini-wave i`, { scaleY: 0.2, duration: 0.36, ease: "sine.inOut", stagger: 0.035 }, 0.96);
+        tl.from(`${root} .ledger-line`, { x: 28, opacity: 0, duration: 0.34, ease: "power2.out", stagger: 0.08 }, 1.04);
+        tl.from(`${root} .local-check`, { scale: 0, opacity: 0, rotation: -24, duration: 0.38, ease: "back.out(2.4)" }, 1.36);
+        tl.from(`${root} .local-label`, { y: 18, opacity: 0, duration: 0.3, ease: "power2.out" }, 1.52);
+        tl.from(`${root} .trust-point`, { y: 38, opacity: 0, duration: 0.36, ease: "power3.out", stagger: 0.09 }, 1.62);
+        tl.from(`${root} .privacy-note`, { opacity: 0, duration: 0.34, ease: "sine.out" }, 2.12);
+        tl.from(`${root} .ghost-local`, { x: 100, opacity: 0, duration: 0.86, ease: "sine.out" }, 0.4);
+
+        tl.to(`${root} .orbit-one`, { rotation: 42, duration: 3.2, ease: "sine.inOut" }, 0.9);
+        tl.to(`${root} .orbit-two`, { rotation: -30, duration: 3.6, ease: "sine.inOut" }, 0.9);
+        tl.to(`${root} .trust-aura`, { scale: 1.07, y: -14, duration: 2.7, ease: "sine.inOut" }, 1.1);
+        tl.to(`${root} .ghost-local`, { x: -36, duration: 3.1, ease: "sine.inOut" }, 1.2);
+        tl.to(
+          `${root} .phone-outline`,
+          { y: -8, scale: 1.018, duration: 1.45, ease: "sine.inOut", yoyo: true, repeat: 1 },
+          1.5,
+        );
+        tl.to(`${root} .grid-lines`, { opacity: 0.12, duration: 1.7, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.45);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["03-trust"] = tl;
+      })();
+    </script>
+  </div>
+</template>
