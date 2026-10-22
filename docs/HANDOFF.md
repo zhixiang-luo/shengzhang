@@ -159,7 +159,7 @@
 - GitHub 仓库和 Releases 已从匿名请求复验可访问；最新 `v0.1.3-preview.1` Release 尚未创建，待完成 APK 资产上传后再切换 README 的版本索引文案。
 - 临时 IP 入口使用明文 HTTP，只适合当前静态官网预览；备案和域名就绪后应尽快切换 HTTPS，不把临时 IP 作为长期推广地址。
 - 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
-- `pnpm audit` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 高危项，以及 `uuid` 中危项；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。
+- `pnpm audit --prod` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 两项高危告警；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。宣传片工程自身 `npm audit` 为 0。
 
 ## 最近验证
 
@@ -190,4 +190,6 @@ promo video runtime: 0 errors
 promo video contrast: 69/69 passed WCAG AA
 promo video encode: 1080x1920, 30fps, 27.0s, H.264 + AAC
 promo video integrity: full decode passed, no black frames, no freeze >= 1.2s
+promo dependency audit: 0 vulnerabilities
+promo still render: 1920x1080 passed after dependency update
 ```
