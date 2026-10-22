@@ -87,3 +87,43 @@ npx eas-cli@latest build --platform android --profile preview
 - JS 紧急回滚：重新发布上一个稳定提交到同一 channel。
 - 原生回滚：发布包含修复的新二进制，不依赖 OTA 降级原生代码。
 - `minimumVersion` API 强制升级将在公网 API 域名确定后接入。
+
+## 8. Android `0.1.3` 预览构建
+
+2026-10-22 已完成 `0.1.3` 的 Android 预览 APK 构建：
+
+| 项目 | 记录 |
+| --- | --- |
+| EAS Build | `fb5ac32c-d8ca-40a3-bf98-5750b4aec28d` |
+| 源码提交 | `65cfb1fa8279d2bf7b22cf43d93e52bf8bb7e520` |
+| Profile / Channel | `preview` / `preview` |
+| App Version / Version Code | `0.1.3` / `13` |
+| Runtime Version | `0.1.3` |
+| 包名 | `com.shengzhang.ledger` |
+| 构建完成时间 | 2026-10-22 20:27:09（Asia/Shanghai） |
+| 构建耗时 | 约 23 分 5 秒 |
+| APK 大小 | 109,854,465 字节（约 105 MiB） |
+| APK SHA-256 | `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf` |
+
+构建页：
+
+```text
+https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/fb5ac32c-d8ca-40a3-bf98-5750b4aec28d
+```
+
+下载地址：
+
+```text
+https://expo.dev/artifacts/eas/sYrly_C992T0uG5i4CZT0BuwLcThK7v-i2g1otTQ_c4.apk
+```
+
+发布前验证：
+
+- `pnpm typecheck` 通过。
+- `pnpm lint` 通过。
+- `pnpm test` 通过，共 53 项。
+- Expo Doctor `20/20` 通过。
+- APK `unzip -t` 完整性检查通过，无压缩包错误。
+- APK 内已确认包含 `0.1.3` 版本标记。
+
+这是首个带 OTA 客户端的 Android 安装包。已安装 `0.1.2` 的用户无法通过 OTA 获得这项原生能力，必须覆盖安装本次 `0.1.3` APK；安装后本地账本会保留。

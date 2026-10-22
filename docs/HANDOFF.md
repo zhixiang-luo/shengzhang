@@ -108,6 +108,8 @@
 - 分类拖拽、Sheet 动画、录音浮层触摸拦截和滚动删除阈值修复后的第二个 Android 内测 APK 已构建完成：构建 ID `7567289d-de66-4472-8df8-8d88c38243b7`，构建耗时 15 分 38 秒。
 - 第二个 APK 下载页：`https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/7567289d-de66-4472-8df8-8d88c38243b7`；文件大小 108,028,872 字节，SHA-256 为 `fbff3118433caf01565581de7bff3ce68dbb2e4f6f626db85fd42a7a89a68f98`。
 - Android `0.1.1` 匿名统计内测包已构建完成：EAS Build `f7643fc9-7eeb-48af-9272-15dc099b9809`，源码提交 `531c128`；文件大小 108,035,320 字节，SHA-256 为 `7d25239c7ed9429362b1cbbccc1df78a1d9063a366c7bfcf4c076f1a643b5d3a`。
+- Android `0.1.2` 完整统计内测包已构建并替换官网下载：EAS Build `cdddc769-589f-4143-a6dd-ae7f83a0b6e2`，源码提交 `0f331db`；文件大小 108,035,800 字节，SHA-256 为 `5f0cb8a736f0d3e36275fa7d6ab072b6db7fb378e10790f292fa49799f8eb0c6`，GitHub Pre-release 为 `v0.1.2-preview.1`。
+- Android `0.1.3` OTA 内测包已通过 EAS Build 完成：构建 ID `fb5ac32c-d8ca-40a3-bf98-5750b4aec28d`，源码提交 `65cfb1f`，profile/channel 为 `preview`，版本 `0.1.3 (13)`，runtime `0.1.3`，构建耗时约 23 分 5 秒；APK 文件大小 109,854,465 字节，SHA-256 为 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`，ZIP 完整性检查通过。
 - 官网 `/downloads/shengzhang-android-preview.apk` 已原子替换为 `0.1.1`，GitHub Pre-release `v0.1.1-preview.1` 提供无需 Expo 账户的下载入口。
 - 两次 build 均使用同一 Android 签名证书，证书 MD5 为 `440A483CAFA42B8CE655EBC15DBAA2F2`；第二个 APK 的 ZIP 完整性和签名证书解析均通过。
 - 该 APK 使用 `preview` 配置中的临时测试 API `http://8.152.201.57` 和本地明文 HTTP 插件；本地手记账、统计和设置不依赖该接口。2026-10-21 08:46（Asia/Shanghai）复测 `/health` 返回正常，ECS 与 `shengzhang-api` 已恢复运行，可以开始语音真机测试。
@@ -126,7 +128,7 @@
 
 ## 下一步最小任务
 
-1. 重新构建并安装 `0.1.3` Android APK；旧 `0.1.2` 不包含更新客户端，无法事后补上 OTA。
+1. 安装已完成的 `0.1.3` Android APK 并验证设置页更新通道；旧 `0.1.2` 不包含更新客户端，无法事后补上 OTA。
 2. 评审官网首版视觉、文案与下载入口；确认后用真实设备截图替换原型素材。
 3. 从官网直接下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
 4. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
