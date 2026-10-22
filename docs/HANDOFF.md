@@ -90,7 +90,7 @@
 - Android 内测 APK 已上传到官网 `/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；当前为 `0.1.3`，服务器端 SHA-256 与内测构建一致。
 - App 已升级到 `0.1.3` 并接入 `expo-updates` + EAS Update：启动自动检查、回到前台限频检查、下载完成提示、立即重启和设置页手动检查均已实现；preview/production 使用独立 channel，runtimeVersion 跟随 appVersion。
 - 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。面向千级注册用户，生产值已调整为 IP 每分钟 30、每日 600、全局每分钟 120、每日 5000；内部连续 31 次无效请求验证为前 30 次 `400`、第 31 次 `429`。
-- GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Release `v0.1.0-preview.2`。
+- GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和历史 Android 内测 Releases。最新 `v0.1.3-preview.1` Release 尚未创建，当前通过官网分发 `0.1.3` APK。
 - GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
 - Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；53 项测试全部通过。
 - 已接入隐私优先的第一方匿名统计：官网访问/下载、App 启动、语音开始/完成/保存/撤销/取消/失败、手动新增/编辑/删除、统计、分类和设置事件。事件只包含固定名称、平台、版本、条数、耗时和错误原因；金额、分类名、备注、转写和录音不上报。
@@ -105,7 +105,7 @@
 - 已用 `video-shotcraft` 镜头卡与 Remotion 制作 1920×1080 横屏宣传片《一句话，两笔账》，工程位于 `design/video/shengzhang-shotcraft/`；当前为 6 段晓晓普通话女声旁白、原创程序化配乐、转场拟音、镜头卡工作台和帧级分镜。旁白通过 `edge-tts` 生成，文案固定于 `scripts/voice_lines.json`，按画面窗口校准语速；Yunyang 男声和原 Tingting 女声保留用于回退对比。
 - shotcraft 主版为 `design/exports/video/声账-shotcraft-宣传片.mp4`，无 BGM 版为 `design/exports/video/声账-shotcraft-宣传片-无BGM.mp4`；两版均为 25.23 秒、757 帧、30fps、H.264 + AAC 48kHz stereo，且复用完全相同的视频流（MD5 `c6c2b9b05b4ac5e68d3543e5b96cb6bd`）。完整解码与无黑帧检查通过；带 BGM 版约 -16.0 LUFS / -1.8 dBTP，无 BGM 版约 -16.0 LUFS / -2.7 dBTP。主版 SHA-256 为 `5cd3f07f908b9e58537067e95accb03795c30fe60507236689d00e8f81c371ef`，无 BGM 版 SHA-256 为 `65b06e42606d9152cd214bfe7e63960730a81c1442352291e7fb9e6a3ed0a3ab`。
 
-## 测试发布状态（2026-10-21）
+## 测试发布状态（2026-10-22）
 
 - Expo/EAS 项目已关联为 `@xiaozhuluozhixiang/shengzhang`，项目 ID 为 `04dd154b-655a-4b0e-bd3f-f3fafd76ab3d`。
 - 首个 Android 内测 APK 已通过 EAS Build 完成：构建 ID `d0e1f1f3-41c6-4bf3-8c3b-7eb6fd4f1585`，profile `preview`，版本 `0.1.0 (1)`，构建耗时 21 分 12 秒。
@@ -156,7 +156,7 @@
 - 微信登录单靠 SDK 不能上线；还需要已审核应用、能力审核和上架状态，未上架认证应用默认限制 100 次登录/天。
 - 当前机器没有完整 Xcode、Android Studio 和 Java；短期使用 Expo Go/EAS，原生微信 SDK 联调前再补齐。
 - App 图标 PNG 已由品牌 SVG 生成，但 Android 自适应前景和启动页仍需高保真阶段复核。
-- GitHub 仓库匿名访问当前返回 404，而 SSH 推送正常；正式官网上线前必须确认仓库已设为 Public，否则访客无法打开源码与 Releases。
+- GitHub 仓库和 Releases 已从匿名请求复验可访问；最新 `v0.1.3-preview.1` Release 尚未创建，待完成 APK 资产上传后再切换 README 的版本索引文案。
 - 临时 IP 入口使用明文 HTTP，只适合当前静态官网预览；备案和域名就绪后应尽快切换 HTTPS，不把临时 IP 作为长期推广地址。
 - 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
 - `pnpm audit` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 高危项，以及 `uuid` 中危项；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。
