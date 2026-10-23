@@ -169,5 +169,5 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/b623433e
 - APK 已下载并通过 `unzip -t` 完整性检查。
 - 官网稳定下载文件已原子替换为 `0.1.4`，公网 `Content-Length` 与构建产物一致。
 - 官网首页已改为无版本号文案和 `?download=latest` 固定链接。
-- GitHub Pre-release `v0.1.4-preview.1` 已发布，包含完整更新说明、EAS 构建页和官网下载入口。
-- 当前机器的 GitHub 网页端连续在大于 100 MiB 的附件 policy/finalization 阶段失败；APK 附件需要通过已认证的 GitHub API/CLI 补传，官网已提供可用下载。
+- GitHub Pre-release `v0.1.4-preview.1` 已发布，包含完整更新说明、EAS 构建页、官网下载入口和 APK 附件。
+- GitHub 公开 API 已确认附件 `shengzhang-0.1.4-preview.apk` 状态为 `uploaded`，大小 109,914,393 字节，digest 与本地 SHA-256 一致；公开下载响应 `200` 且 `Content-Length` 相同。

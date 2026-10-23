@@ -94,7 +94,7 @@
 - App 已升级到 `0.1.3` 并接入 `expo-updates` + EAS Update：启动自动检查、回到前台限频检查、下载完成提示、立即重启和设置页手动检查均已实现；preview/production 使用独立 channel，runtimeVersion 跟随 appVersion。
 - 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。面向千级注册用户，生产值已调整为 IP 每分钟 30、每日 600、全局每分钟 120、每日 5000；内部连续 31 次无效请求验证为前 30 次 `400`、第 31 次 `429`。
 - GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Releases。`v0.1.3-preview.1` Pre-release 已附带完整 APK 附件，官网与 Release 均可分发同一构建。
-- GitHub 已发布 `v0.1.4-preview.1` Pre-release，标题采用用户可读的更新说明，Tag 保留技术版本；官网主下载入口与链接已移除版本号，改为稳定的 `?download=latest`。
+- GitHub 已发布 `v0.1.4-preview.1` Pre-release 并附完整 APK，标题采用用户可读的更新说明，Tag 保留技术版本；官网主下载入口与链接已移除版本号，改为稳定的 `?download=latest`。
 - Android `0.1.4` 原生构建已完成：构建 ID `b623433e-835c-4e80-9c51-adcb74bb61a7`，版本 `0.1.4 (14)`，APK 109,914,393 字节，SHA-256 `6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b`；官网已原子替换并从公网验证。
 - GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
 - Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；58 项测试全部通过，其中移动端新增首次授权和金额键盘回归测试 5 项。
@@ -163,7 +163,7 @@
 - 当前机器没有完整 Xcode、Android Studio 和 Java；短期使用 Expo Go/EAS，原生微信 SDK 联调前再补齐。
 - App 图标 PNG 已由品牌 SVG 生成，但 Android 自适应前景和启动页仍需高保真阶段复核。
 - GitHub 仓库和 Releases 已从匿名请求复验可访问；`v0.1.3-preview.1` 的 APK 附件 API 状态为 `uploaded`，公开下载响应大小为 109,854,465 字节。
-- `v0.1.4-preview.1` 已发布；GitHub 网页端在大文件附件 policy/finalization 阶段连续失败，公开 API 当前没有 APK asset。官网下载已可用，GitHub 附件需用已认证 API/CLI 补传。
+- GitHub 网页端上传大于 100 MiB 的 Release 附件可能在 policy/finalization 阶段失败；本项目已改用已认证的 GitHub CLI/API 上传。`v0.1.4-preview.1` 的 APK 附件已通过公开 API 和下载响应复验。
 - 临时 IP 入口使用明文 HTTP，只适合当前静态官网预览；备案和域名就绪后应尽快切换 HTTPS，不把临时 IP 作为长期推广地址。
 - 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
 - `pnpm audit --prod` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 两项高危告警；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。宣传片工程自身 `npm audit` 为 0。
@@ -194,6 +194,9 @@ android bundle export: passed for 0.1.4
 android preview build: b623433e-835c-4e80-9c51-adcb74bb61a7 finished
 android preview site: 0.1.4 APK atomically deployed, Content-Length 109914393
 android preview sha256: 6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b
+github release asset: shengzhang-0.1.4-preview.apk uploaded, size 109914393
+github release digest: sha256:6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b
+github release public download: HTTP 200, Content-Length 109914393
 promo video lint: 0 errors / 0 warnings
 promo video runtime: 0 errors
 promo video contrast: 69/69 passed WCAG AA
