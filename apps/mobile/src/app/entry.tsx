@@ -35,6 +35,7 @@ import {
   softDeleteTransaction,
   updateTransaction,
 } from '../db/transactionRepository';
+import { shouldAutoOpenAmountKeypad } from '../features/entry/entryInteraction';
 import { trackAnalyticsEvent } from '../services/analytics';
 import { useUndoDeleteStore } from '../stores/undoStore';
 import { colors, radii, spacing, typography } from '../theme/tokens';
@@ -146,7 +147,9 @@ export default function EntryScreen() {
   const [newCategoryLevel, setNewCategoryLevel] = useState<'root' | 'sub'>('root');
   const [categoryError, setCategoryError] = useState<string | null>(null);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
-  const [amountKeypadVisible, setAmountKeypadVisible] = useState(false);
+  const [amountKeypadVisible, setAmountKeypadVisible] = useState(() =>
+    shouldAutoOpenAmountKeypad(editingId),
+  );
   const scrollRef = useRef<ScrollViewInstance>(null);
   const noteOffsetRef = useRef(0);
   const noteFocusedRef = useRef(false);
@@ -431,17 +434,29 @@ export default function EntryScreen() {
             >
               <View style={styles.amountInputRow}>
                 <Text style={styles.amountCurrency}>¥</Text>
-                <Text
-                  maxFontSizeMultiplier={1}
-                  numberOfLines={1}
-                  style={[
-                    styles.amountExpression,
-                    !amount && styles.amountExpressionPlaceholder,
-                    { fontSize: amountFontSize, lineHeight: amountFontSize + 6 },
-                  ]}
-                >
-                  {displayedAmount}
-                </Text>
+                <View style={styles.amountValueRow}>
+                  <Text
+                    maxFontSizeMultiplier={1}
+                    numberOfLines={1}
+                    style={[
+                      styles.amountExpression,
+                      !amount && styles.amountExpressionPlaceholder,
+                      { fontSize: amountFontSize, lineHeight: amountFontSize + 6 },
+                    ]}
+                  >
+                    {displayedAmount}
+                  </Text>
+                  {amountKeypadVisible ? (
+                    <View
+                      accessibilityElementsHidden
+                      importantForAccessibility="no-hide-descendants"
+                      style={[
+                        styles.amountCaret,
+                        { height: Math.max(24, amountFontSize * 0.82) },
+                      ]}
+                    />
+                  ) : null}
+                </View>
               </View>
               <Text style={styles.amountHint}>支持 + − × ÷ 计算，保存时自动得出金额</Text>
             </Pressable>
@@ -785,6 +800,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  amountValueRow: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   amountCard: {
     marginTop: spacing.md,
     paddingHorizontal: spacing.xl,
@@ -807,7 +828,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
   },
   amountExpression: {
-    flex: 1,
+    flexShrink: 1,
     marginLeft: 8,
     overflow: 'hidden',
     color: colors.ink,
@@ -819,6 +840,12 @@ const styles = StyleSheet.create({
   },
   amountExpressionPlaceholder: {
     color: colors.inkTertiary,
+  },
+  amountCaret: {
+    width: 2,
+    marginLeft: 3,
+    borderRadius: 2,
+    backgroundColor: colors.blushDeep,
   },
   amountHint: {
     marginTop: 3,

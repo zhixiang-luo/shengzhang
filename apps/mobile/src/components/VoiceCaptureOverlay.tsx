@@ -20,6 +20,7 @@ type VoiceCaptureOverlayProps = {
   cancelArmed: boolean;
   manualArmed: boolean;
   audioLevel: Animated.Value;
+  onDismiss: () => void;
 };
 
 export function VoiceCaptureOverlay({
@@ -29,6 +30,7 @@ export function VoiceCaptureOverlay({
   cancelArmed,
   manualArmed,
   audioLevel,
+  onDismiss,
 }: VoiceCaptureOverlayProps) {
   const [pulse] = useState(() => new Animated.Value(1));
 
@@ -58,6 +60,30 @@ export function VoiceCaptureOverlay({
   }, [phase, pulse]);
 
   if (phase === 'idle') return null;
+
+  if (phase === 'permission-ready') {
+    return (
+      <View pointerEvents="box-none" style={styles.noticeRoot}>
+        <View style={styles.noticeCard}>
+          <View style={styles.noticeIcon}>
+            <Icon name="mic" size={18} color={colors.surface} strokeWidth={2} />
+          </View>
+          <View style={styles.noticeCopy}>
+            <Text style={styles.noticeTitle}>麦克风已经准备好</Text>
+            <Text style={styles.noticeDescription}>再按住底部按钮说一句，就可以开始记账。</Text>
+          </View>
+          <Pressable
+            accessibilityLabel="关闭麦克风提示"
+            hitSlop={10}
+            onPress={onDismiss}
+            style={styles.noticeClose}
+          >
+            <Icon name="close" size={16} color={colors.inkTertiary} />
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
 
   const title =
     phase === 'requesting'
@@ -188,6 +214,64 @@ function VoiceWaveBar({ level, weight }: { level: Animated.Value; weight: number
 }
 
 const styles = StyleSheet.create({
+  noticeRoot: {
+    position: 'absolute',
+    right: 0,
+    bottom: 108,
+    left: 0,
+    zIndex: 40,
+    alignItems: 'center',
+    paddingHorizontal: spacing.xl,
+  },
+  noticeCard: {
+    width: '100%',
+    maxWidth: 390,
+    minHeight: 74,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radii.lg,
+    backgroundColor: 'rgba(255, 253, 248, 0.98)',
+    shadowColor: '#3f3329',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.14,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  noticeIcon: {
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 19,
+    backgroundColor: colors.blushDeep,
+  },
+  noticeCopy: {
+    flex: 1,
+  },
+  noticeTitle: {
+    color: colors.ink,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  noticeDescription: {
+    marginTop: 3,
+    color: colors.inkSecondary,
+    fontSize: 11,
+    lineHeight: 17,
+  },
+  noticeClose: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    backgroundColor: colors.surfaceSunken,
+  },
   root: {
     position: 'absolute',
     top: 0,

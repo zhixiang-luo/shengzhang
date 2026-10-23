@@ -42,7 +42,7 @@
 | App 图标 PNG | `apps/mobile/assets/icon.png` | 已生成 1024px，满版不透明底 | 移动端 |
 | Android 自适应图标 | `design/assets/adaptive-icon.svg`、`apps/mobile/assets/adaptive-icon.png` | 已完成透明前景与 1024px 导出 | 移动端 |
 | Android 单色图标 | `design/assets/monochrome-icon.svg`、`apps/mobile/assets/monochrome-icon.png` | 已完成透明前景与 1024px 导出 | 移动端 |
-| Splash 标记 | `apps/mobile/assets/splash-icon.png` | 已生成 2048px 透明 PNG | 移动端 |
+| Splash 标记 | `design/assets/splash-mark.svg`、`apps/mobile/assets/splash-icon.png` | 已生成 2048px 透明 PNG；圆形底盘，不用菱形遮罩 | 设计/移动端 |
 | UI 交接 | `docs/18-ui-handoff.md` | 已建立，高保真稿待补 | 设计/移动端 |
 | 移动端代码 | `apps/mobile/` | Expo 骨架 | 移动端 |
 | API 代码 | `services/api/` | Fastify 骨架 | 后端 |

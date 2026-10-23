@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
+  <title id="title">声账圆形启动标记</title>
+  <circle cx="512" cy="512" r="430" fill="#F7DDD8"/>
+  <circle cx="512" cy="512" r="458" fill="none" stroke="#E89A96" stroke-width="12" opacity=".32"/>
+  <circle cx="512" cy="512" r="374" fill="#FFFDF8" opacity=".72"/>
+  <g transform="translate(256 248) scale(4)">
+    <path d="M24 55c-7 7-7 19 0 26" fill="none" stroke="#A35D5F" stroke-width="3.2" stroke-linecap="round" opacity=".65"/>
+    <path d="M104 55c7 7 7 19 0 26" fill="none" stroke="#A35D5F" stroke-width="3.2" stroke-linecap="round" opacity=".65"/>
+    <path d="M39 37c-7.4-8.2-8.6-17.8-1.8-21.2 6.4-3 12.3 3.2 15.7 12.9" fill="#E89A96" stroke="#292624" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M89 37c7.4-8.2 8.6-17.8 1.8-21.2-6.4-3-12.3 3.2-15.7 12.9" fill="#E89A96" stroke="#292624" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M28 66c0-23 14-37 36-37s36 14 36 37c0 22-14 35-36 35S28 88 28 66Z" fill="#FFFDF8" stroke="#292624" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <ellipse cx="43.5" cy="75" rx="4.8" ry="3.2" fill="#E89A96" opacity=".58"/>
+    <ellipse cx="84.5" cy="75" rx="4.8" ry="3.2" fill="#E89A96" opacity=".58"/>
+    <circle cx="52" cy="62" r="3.8" fill="#292624"/>
+    <circle cx="51" cy="60.8" r="1" fill="#FFFDF8"/>
+    <circle cx="76" cy="62" r="3.8" fill="#292624"/>
+    <circle cx="75" cy="60.8" r="1" fill="#FFFDF8"/>
+    <rect x="49.5" y="73" width="29" height="18" rx="9" fill="#E89A96" stroke="#292624" stroke-width="3"/>
+    <circle cx="58.5" cy="82" r="2.4" fill="#292624"/>
+    <circle cx="69.5" cy="82" r="2.4" fill="#292624"/>
+  </g>
+</svg>

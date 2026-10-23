@@ -14,9 +14,16 @@ import { getVoiceStreamUrl, parseVoiceTranscript } from '../../services/voiceApi
 import { useVoiceResultStore } from '../../stores/voiceResultStore';
 import { pcm16Level } from './audioChunks';
 import type { VoiceGestureMode } from './gesture';
+import { resolveVoicePermissionAction } from './permissionFlow';
 import { resolveVoiceEntries } from './voiceMapping';
 
-export type VoiceCapturePhase = 'idle' | 'requesting' | 'recording' | 'processing' | 'error';
+export type VoiceCapturePhase =
+  | 'idle'
+  | 'requesting'
+  | 'permission-ready'
+  | 'recording'
+  | 'processing'
+  | 'error';
 
 const MIN_RECORDING_MS = 300;
 const MAX_RECORDING_MS = 30_000;
@@ -82,6 +89,7 @@ export function useVoiceCapture() {
   const lastLevelUpdateAtRef = useRef(0);
   const maxDurationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const updatePhase = useCallback((next: VoiceCapturePhase) => {
     phaseRef.current = next;
@@ -104,6 +112,10 @@ export function useVoiceCapture() {
       clearTimeout(maxDurationTimerRef.current);
       maxDurationTimerRef.current = null;
     }
+    if (noticeTimerRef.current) {
+      clearTimeout(noticeTimerRef.current);
+      noticeTimerRef.current = null;
+    }
     if (mountedRef.current) {
       setTranscript('');
       setCancelArmed(false);
@@ -118,6 +130,10 @@ export function useVoiceCapture() {
       updatePhase('error');
       setError(message);
       audioLevel.setValue(0);
+      if (noticeTimerRef.current) {
+        clearTimeout(noticeTimerRef.current);
+        noticeTimerRef.current = null;
+      }
       if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
       errorTimerRef.current = setTimeout(() => {
         if (phaseRef.current === 'error') updatePhase('idle');
@@ -272,6 +288,7 @@ export function useVoiceCapture() {
     if (phaseRef.current === 'requesting' || phaseRef.current === 'recording') return;
     if (phaseRef.current === 'processing') return;
     if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
     releaseRef.current = null;
     finishingRef.current = false;
     transcriptRef.current = '';
@@ -285,8 +302,19 @@ export function useVoiceCapture() {
     try {
       const existing = await getRecordingPermissionsAsync();
       const permission = existing.granted ? existing : await requestRecordingPermissionsAsync();
-      if (!permission.granted) {
+      const permissionAction = resolveVoicePermissionAction({
+        hadPermissionBeforeRequest: existing.granted,
+        permissionGranted: permission.granted,
+      });
+      if (permissionAction === 'permission-denied') {
         showError('请允许声账使用麦克风，或改用手动记账。');
+        return;
+      }
+      if (permissionAction === 'show-ready-notice') {
+        updatePhase('permission-ready');
+        noticeTimerRef.current = setTimeout(() => {
+          if (phaseRef.current === 'permission-ready') updatePhase('idle');
+        }, 3200);
         return;
       }
 
@@ -407,6 +435,12 @@ export function useVoiceCapture() {
     [finishRecording, setGestureMode],
   );
 
+  const dismissOverlay = useCallback(() => {
+    closeSocket();
+    resetCaptureState();
+    updatePhase('idle');
+  }, [closeSocket, resetCaptureState, updatePhase]);
+
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -415,6 +449,7 @@ export function useVoiceCapture() {
       closeSocket();
       if (maxDurationTimerRef.current) clearTimeout(maxDurationTimerRef.current);
       if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+      if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
     };
   }, [closeSocket, stream]);
 
@@ -428,5 +463,6 @@ export function useVoiceCapture() {
     startHold,
     setGestureMode,
     endHold,
+    dismissOverlay,
   };
 }

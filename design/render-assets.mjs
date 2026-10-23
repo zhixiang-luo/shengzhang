@@ -18,7 +18,7 @@ const render = (sourcePath, size) => {
 const outputs = [
   ['design/assets/app-icon.svg', 'apps/mobile/assets/icon.png', 1024],
   ['design/assets/monochrome-icon.svg', 'apps/mobile/assets/monochrome-icon.png', 1024],
-  ['apps/mobile/assets/brand/piggy-mark.svg', 'apps/mobile/assets/splash-icon.png', 2048],
+  ['design/assets/splash-mark.svg', 'apps/mobile/assets/splash-icon.png', 2048],
   ['design/assets/adaptive-icon.svg', 'apps/mobile/assets/adaptive-icon.png', 1024],
   ['design/assets/piggy-mark.svg', 'design/exports/brand-mark.png', 1024],
   ['design/assets/brand-lockup.svg', 'design/exports/brand-lockup.png', 2400],

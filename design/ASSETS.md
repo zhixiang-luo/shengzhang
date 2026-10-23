@@ -9,6 +9,7 @@
 | App 图标 | `assets/app-icon.svg` | 可用 | 满版不透明底，由系统负责圆角裁切 |
 | Android 自适应前景 | `assets/adaptive-icon.svg` | 可用 | 安全区内主体，透明底 |
 | Android 单色图标 | `assets/monochrome-icon.svg` | 可用 | 透明底，由系统主题着色 |
+| 原生启动图 | `assets/splash-mark.svg` | 可用 | 1024 圆形底盘，2048 PNG 用于 iOS/Android 原生启动 |
 | 声波装饰 | `assets/sound-wave.svg` | 可用 | 9 根圆角音量柱，表达语音输入 |
 | 原型小猪 | `../prototype/assets/pig.svg` | 仅原型 | 不进入正式商店资产 |
 | 设计令牌 | `tokens/design-tokens.json` | 基线 | 与 `apps/mobile/src/theme/tokens.ts` 同步 |
@@ -78,7 +79,7 @@
 | Android monochrome | 1024 × 1024 | 透明底，单色轮廓 |
 | 商店 | 1024 × 1024 | 与 App 图标一致 |
 
-Splash 使用 2048 × 2048 透明 PNG，由应用背景色承载，不使用带圆角方块的 App 图标放大。
+Splash 使用 `splash-mark.svg` 导出 2048 × 2048 透明 PNG。主体必须是完整圆形底盘，不旋转、不使用菱形遮罩，也不把带圆角方块的 App 图标直接放大。
 品牌横向组合导出为 2400px 宽透明 PNG，供官网和分享场景使用。
 
 ### 插画与图标

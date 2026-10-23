@@ -276,6 +276,7 @@ export default function StatsScreen() {
         cancelArmed={voice.cancelArmed}
         manualArmed={voice.manualArmed}
         audioLevel={voice.audioLevel}
+        onDismiss={voice.dismissOverlay}
       />
       <VoiceResultSheet onSaved={refresh} />
     </SafeAreaView>
