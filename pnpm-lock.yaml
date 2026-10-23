@@ -149,8 +149,8 @@ importers:
         specifier: ^11.1.0
         version: 11.3.1
       '@fastify/multipart':
-        specifier: ^9.2.1
-        version: 9.4.0
+        specifier: ^10.1.4
+        version: 10.1.4
       '@shengzhang/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -1009,8 +1009,8 @@ packages:
   '@fastify/merge-json-schemas@0.2.2':
     resolution: {integrity: sha512-d/gx9sRbUCVgGRGzma46wLcwiY8noTqO2Nmjg/vbTARxHRE5bdh5PIL8s97Lt1X7ScRWRW52eVYxwIoPwIdVUA==}
 
-  '@fastify/multipart@9.4.0':
-    resolution: {integrity: sha512-Z404bzZeLSXTBmp/trCBuoVFX28pM7rhv849Q5TsbTFZHuk1lc4QjQITTPK92DKVpXmNtJXeHSSc7GYvqFpxAQ==}
+  '@fastify/multipart@10.1.4':
+    resolution: {integrity: sha512-J510g4fSp3bXh0DEezcPyMXkQzhn2K3blpSESaOGhqQfzNHR4vhiBBHkdisSM2FU4ltTK/jqObUWs0WmHYNYYg==}
 
   '@fastify/proxy-addr@5.1.2':
     resolution: {integrity: sha512-uqB4QsgVoro0XDC+DIftIMGXHdBPn+lK6Ek3xXAIxPMCJfqxnbtyEoMCm2KPUVOuIosd7Cyw9HawEqMFM/UA+g==}
@@ -2920,9 +2920,6 @@ packages:
 
   fast-uri@4.2.2:
     resolution: {integrity: sha512-EwVpUMzLVNOmcWW0zi5G3JJwkopB6XXjnVvNBGfqrMMsVew2hkQWl5e/pe/CfYUeS6jt4cIO2MnamEW7v/7wPw==}
-
-  fastify-plugin@5.1.0:
-    resolution: {integrity: sha512-FAIDA8eovSt5qcDgcBvDuX/v0Cjz0ohGhENZ/wpc3y+oZCY2afZ9Baqql3g/lC+OHRnciQol4ww7tuthOb9idw==}
 
   fastify-plugin@6.0.1:
     resolution: {integrity: sha512-4wW4RxSmvPXLrh5mgQEiu43qU3bw44N2ss4FTkTkQIbprUhE+/s43QX0j/ttcztdWK7PEkHqVthdc5GdEGDvjA==}
@@ -5737,12 +5734,12 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  '@fastify/multipart@9.4.0':
+  '@fastify/multipart@10.1.4':
     dependencies:
       '@fastify/busboy': 3.2.3
       '@fastify/deepmerge': 3.2.2
       '@fastify/error': 4.2.1
-      fastify-plugin: 5.1.0
+      fastify-plugin: 6.0.1
       secure-json-parse: 4.1.1
 
   '@fastify/proxy-addr@5.1.2':
@@ -7724,8 +7721,6 @@ snapshots:
   fast-uri@3.1.8: {}
 
   fast-uri@4.2.2: {}
-
-  fastify-plugin@5.1.0: {}
 
   fastify-plugin@6.0.1: {}
 
