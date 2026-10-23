@@ -90,10 +90,12 @@
 - 官网使用无外部依赖的 `index.html`、`styles.css`、`app.js`，并纳入品牌 SVG、分享图和原型截图；支持滚动揭示、鼠标光晕、设备倾斜、声波和转写循环，并对 `prefers-reduced-motion` 做完整降级。
 - 官网已在 `1440×1000`、`768×1024`、`390×844` 和 `375×812` 四种视口完成布局验收；均无横向滚动，移动端导航、三个产品界面标签和方向键切换通过，页面自身无控制台错误。详细规格见 `docs/27-official-website.md`。
 - 官网已部署到现有阿里云 ECS 的 `/opt/shengzhang/site`，临时入口 `http://8.152.201.57/` 已从公网验证；首页、样式、脚本、产品截图和原有语音 `/health` 均返回 `200`。正式域名仍等待 ICP 备案与 HTTPS。
-- Android 内测 APK 已上传到官网 `/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；当前为 `0.1.3`，服务器端 SHA-256 与内测构建一致。
+- Android 内测 APK 已上传到官网稳定路径 `/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；当前为 `0.1.4 (14)`，服务器端 SHA-256 与内测构建一致。
 - App 已升级到 `0.1.3` 并接入 `expo-updates` + EAS Update：启动自动检查、回到前台限频检查、下载完成提示、立即重启和设置页手动检查均已实现；preview/production 使用独立 channel，runtimeVersion 跟随 appVersion。
 - 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。面向千级注册用户，生产值已调整为 IP 每分钟 30、每日 600、全局每分钟 120、每日 5000；内部连续 31 次无效请求验证为前 30 次 `400`、第 31 次 `429`。
-- GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Releases。最新 `v0.1.3-preview.1` Pre-release 已附带完整 APK 附件，官网与 Release 均可分发同一构建。
+- GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Releases。`v0.1.3-preview.1` Pre-release 已附带完整 APK 附件，官网与 Release 均可分发同一构建。
+- GitHub 已发布 `v0.1.4-preview.1` Pre-release，标题采用用户可读的更新说明，Tag 保留技术版本；官网主下载入口与链接已移除版本号，改为稳定的 `?download=latest`。
+- Android `0.1.4` 原生构建已完成：构建 ID `b623433e-835c-4e80-9c51-adcb74bb61a7`，版本 `0.1.4 (14)`，APK 109,914,393 字节，SHA-256 `6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b`；官网已原子替换并从公网验证。
 - GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
 - Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；58 项测试全部通过，其中移动端新增首次授权和金额键盘回归测试 5 项。
 - 已接入隐私优先的第一方匿名统计：官网访问/下载、App 启动、语音开始/完成/保存/撤销/取消/失败、手动新增/编辑/删除、统计、分类和设置事件。事件只包含固定名称、平台、版本、条数、耗时和错误原因；金额、分类名、备注、转写和录音不上报。
@@ -108,7 +110,7 @@
 - 已用 `video-shotcraft` 镜头卡与 Remotion 制作 1920×1080 横屏宣传片《一句话，两笔账》，工程位于 `design/video/shengzhang-shotcraft/`；当前为 6 段晓晓普通话女声旁白、原创程序化配乐、转场拟音、镜头卡工作台和帧级分镜。旁白通过 `edge-tts` 生成，文案固定于 `scripts/voice_lines.json`，按画面窗口校准语速；Yunyang 男声和原 Tingting 女声保留用于回退对比。
 - shotcraft 主版为 `design/exports/video/声账-shotcraft-宣传片.mp4`，无 BGM 版为 `design/exports/video/声账-shotcraft-宣传片-无BGM.mp4`；两版均为 25.23 秒、757 帧、30fps、H.264 + AAC 48kHz stereo，且复用完全相同的视频流（MD5 `c6c2b9b05b4ac5e68d3543e5b96cb6bd`）。完整解码与无黑帧检查通过；带 BGM 版约 -16.0 LUFS / -1.8 dBTP，无 BGM 版约 -16.0 LUFS / -2.7 dBTP。主版 SHA-256 为 `5cd3f07f908b9e58537067e95accb03795c30fe60507236689d00e8f81c371ef`，无 BGM 版 SHA-256 为 `65b06e42606d9152cd214bfe7e63960730a81c1442352291e7fb9e6a3ed0a3ab`。
 
-## 测试发布状态（2026-10-22）
+## 测试发布状态（2026-10-23）
 
 - Expo/EAS 项目已关联为 `@xiaozhuluozhixiang/shengzhang`，项目 ID 为 `04dd154b-655a-4b0e-bd3f-f3fafd76ab3d`。
 - 首个 Android 内测 APK 已通过 EAS Build 完成：构建 ID `d0e1f1f3-41c6-4bf3-8c3b-7eb6fd4f1585`，profile `preview`，版本 `0.1.0 (1)`，构建耗时 21 分 12 秒。
@@ -119,7 +121,9 @@
 - Android `0.1.1` 匿名统计内测包已构建完成：EAS Build `f7643fc9-7eeb-48af-9272-15dc099b9809`，源码提交 `531c128`；文件大小 108,035,320 字节，SHA-256 为 `7d25239c7ed9429362b1cbbccc1df78a1d9063a366c7bfcf4c076f1a643b5d3a`。
 - Android `0.1.2` 完整统计内测包历史记录：EAS Build `cdddc769-589f-4143-a6dd-ae7f83a0b6e2`，源码提交 `0f331db`；文件大小 108,035,800 字节，SHA-256 为 `5f0cb8a736f0d3e36275fa7d6ab072b6db7fb378e10790f292fa49799f8eb0c6`，GitHub Pre-release 为 `v0.1.2-preview.1`。
 - Android `0.1.3` OTA 内测包已通过 EAS Build 完成：构建 ID `fb5ac32c-d8ca-40a3-bf98-5750b4aec28d`，源码提交 `65cfb1f`，profile/channel 为 `preview`，版本 `0.1.3 (13)`，runtime `0.1.3`，构建耗时约 23 分 5 秒；APK 文件大小 109,854,465 字节，SHA-256 为 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`，ZIP 完整性检查通过。
+- Android `0.1.4` 原生预览包已通过 EAS Build 完成：构建 ID `b623433e-835c-4e80-9c51-adcb74bb61a7`，源码提交 `a04bbb6`，profile/channel 为 `preview`，版本 `0.1.4 (14)`，runtime `0.1.4`，构建耗时约 18 分 11 秒；APK 文件大小 109,914,393 字节，SHA-256 为 `6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b`，ZIP 完整性检查通过。
 - 2026-10-22 21:10（Asia/Shanghai）官网 `/downloads/shengzhang-android-preview.apk` 已通过临时文件校验后原子替换为 `0.1.3`；首页版本参数、OTA 提示和下载按钮同步更新。服务器端文件大小 109,854,465 字节、SHA-256 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`，旧 `0.1.2` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.2-preview.apk`。
+- 2026-10-23 10:36（Asia/Shanghai）官网已原子替换为 `0.1.4`，首页不再展示版本号，下载链接固定为 `?download=latest`；公网响应 `200` 且 `Content-Length` 为 109,914,393 字节。旧 `0.1.3` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.3-preview.apk`。
 - 两次 build 均使用同一 Android 签名证书，证书 MD5 为 `440A483CAFA42B8CE655EBC15DBAA2F2`；第二个 APK 的 ZIP 完整性和签名证书解析均通过。
 - 该 APK 使用 `preview` 配置中的临时测试 API `http://8.152.201.57` 和本地明文 HTTP 插件；本地手记账、统计和设置不依赖该接口。2026-10-21 08:46（Asia/Shanghai）复测 `/health` 返回正常，ECS 与 `shengzhang-api` 已恢复运行，可以开始语音真机测试。
 - 阿里云 ECS 已完成系统盘快照与格式化，部署环境为 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 和 systemd；`bigai.xin` 的公开 HTTP 入口仍受中国内地 ICP 备案阻断。
@@ -138,7 +142,7 @@
 
 ## 下一步最小任务
 
-1. 安装已完成的 `0.1.3` Android APK 并验证设置页更新通道；旧 `0.1.2` 不包含更新客户端，无法事后补上 OTA。
+1. 安装已完成的 `0.1.4` Android APK，验证首次麦克风授权、手动记账自动键盘和圆形启动图。
 2. 评审官网首版视觉、文案与下载入口；确认后用真实设备截图替换原型素材。
 3. 从官网直接下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
 4. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
@@ -159,6 +163,7 @@
 - 当前机器没有完整 Xcode、Android Studio 和 Java；短期使用 Expo Go/EAS，原生微信 SDK 联调前再补齐。
 - App 图标 PNG 已由品牌 SVG 生成，但 Android 自适应前景和启动页仍需高保真阶段复核。
 - GitHub 仓库和 Releases 已从匿名请求复验可访问；`v0.1.3-preview.1` 的 APK 附件 API 状态为 `uploaded`，公开下载响应大小为 109,854,465 字节。
+- `v0.1.4-preview.1` 已发布；GitHub 网页端在大文件附件 policy/finalization 阶段连续失败，公开 API 当前没有 APK asset。官网下载已可用，GitHub 附件需用已认证 API/CLI 补传。
 - 临时 IP 入口使用明文 HTTP，只适合当前静态官网预览；备案和域名就绪后应尽快切换 HTTPS，不把临时 IP 作为长期推广地址。
 - 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
 - `pnpm audit --prod` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 两项高危告警；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。宣传片工程自身 `npm audit` 为 0。
@@ -186,8 +191,9 @@ official website: desktop/tablet/mobile viewport checks passed, 0 local console 
 analytics ingestion: public POST 202, hashed install id, report aggregation passed
 analytics test data: cleared after verification
 android bundle export: passed for 0.1.4
-android preview site: 0.1.3 APK atomically deployed, Content-Length 109854465
-android preview sha256: 89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf
+android preview build: b623433e-835c-4e80-9c51-adcb74bb61a7 finished
+android preview site: 0.1.4 APK atomically deployed, Content-Length 109914393
+android preview sha256: 6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b
 promo video lint: 0 errors / 0 warnings
 promo video runtime: 0 errors
 promo video contrast: 69/69 passed WCAG AA

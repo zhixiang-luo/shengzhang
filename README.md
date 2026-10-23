@@ -69,7 +69,7 @@
 | 月度统计、分类下钻、每日明细 | ✅ 已完成 |
 | 本地 SQLite 与删除撤销 | ✅ 已完成 |
 | Android 内测 APK | ✅ 已通过 EAS Build |
-| OTA 增量更新 | ✅ 已接入 EAS Update，需安装 0.1.3+ |
+| OTA 增量更新 | ✅ 已接入 EAS Update，需安装含更新客户端的版本 |
 | 官网首版与移动端下载入口 | ✅ 已完成，等待域名发布 |
 | 匿名产品统计与用户开关 | ✅ 已完成 |
 | 30–50 条真人语音与双端真机矩阵 | 🚧 进行中 |
@@ -218,7 +218,9 @@ python3 -m http.server 4173
 
 ## 下载与发布
 
-Android 内测版 `0.1.3` 可从[声账官网下载](http://8.152.201.57/#download)，无需 Expo 或 GitHub 账户。该版本首次支持 EAS OTA；已安装 `0.1.2` 的设备需要覆盖安装一次。GitHub 提供 [v0.1.3 Release 与 APK 附件](https://github.com/zhixiang-luo/shengzhang/releases/tag/v0.1.3-preview.1)，版本说明和 SHA-256 见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀并保留版本记录。
+最新 Android 内测版可从[声账官网稳定入口下载](http://8.152.201.57/#download)，无需 Expo 或 GitHub 账户。官网不把版本号写进标题或下载链接，日常纯 JS 更新通过 EAS OTA 推送；只有原生依赖、权限、启动图或 runtime 变化时才要求重新下载安装包。
+
+GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。当前原生安装包为 `0.1.4 (14)`，文件大小、SHA-256 和构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
 
 当前尚未在 App Store 或国内 Android 应用商店正式上架。
 

@@ -63,13 +63,13 @@
 
 当前下载入口：
 
-- Android 内测：官网直接下载 `/downloads/shengzhang-android-preview.apk`；
+- Android 内测：官网稳定入口 `/downloads/shengzhang-android-preview.apk?download=latest`；
 - 全量版本索引：GitHub Releases；
 - 源码：`https://github.com/zhixiang-luo/shengzhang`。
 
-官网直接下载不要求 Expo 账户，适合把测试包发给没有 Expo 账号的用户。正式发布后，首屏主按钮应优先指向 GitHub Release 的稳定 APK 或已上架商店；每次替换 APK 都要同步版本号、文件大小和 SHA-256。iOS 未上架前不得展示可点击的 App Store 下载按钮。
+官网直接下载不要求 Expo 账户，适合把测试包发给没有 Expo 账号的用户。官网主文案和下载链接不展示版本号，服务器稳定路径始终指向最近一次需要重新安装的原生安装包；纯 JS 更新通过 EAS OTA 完成时，不改官网版本文案。GitHub Releases 继续使用 Tag 记录完整版本历史，但只有原生版本才必须附 APK。
 
-2026-10-22 已从匿名请求复验 GitHub 仓库与 Releases 可访问。`v0.1.3-preview.1` 已创建为 Pre-release，并附带完整 `0.1.3` APK；官网和 GitHub Release 两个入口均指向同一构建。
+2026-10-23 已发布 GitHub Pre-release `v0.1.4-preview.1`，对应源码提交 `a04bbb6`。Release 使用面向用户的更新标题，Tag、版本号和安装包校验值保留在发布说明中，便于追溯而不把版本号扩散到官网主界面。
 
 ## 6. 部署
 
@@ -85,9 +85,9 @@ python3 -m http.server 4174 -d deploy/site
 
 该 IP 入口只用于备案完成前的临时访问，不配置表单、登录或支付，也不应作为长期推广地址。中国大陆服务器绑定正式域名前，必须完成 ICP 备案；备案通过并配置 HTTPS 后，再替换当前测试入口。
 
-Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-android-preview.apk`，官网直接提供下载，不依赖 Expo 登录。当前版本为 `0.1.3`，文件大小 109,854,465 字节，SHA-256 为 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`。该版本首次包含 EAS OTA 客户端；已安装 `0.1.2` 的设备需要覆盖安装一次。
+Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-android-preview.apk`，官网直接提供下载，不依赖 Expo 登录。当前稳定安装包为 `0.1.4 (14)`，文件大小 109,914,393 字节，SHA-256 为 `6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b`。旧版可直接覆盖安装并保留本地账本。
 
-2026-10-22 21:10（Asia/Shanghai）已完成官网替换。首页下载链接使用 `?v=0.1.3`，公网响应 `200` 且 `Content-Length` 为 109,854,465 字节；服务器端 SHA-256 与构建产物一致。旧 `0.1.2` 保留在 `/opt/shengzhang/releases/shengzhang-0.1.2-preview.apk`。
+2026-10-23 10:36（Asia/Shanghai）已完成官网原子替换。首页主文案不再展示版本号，下载链接改为稳定的 `?download=latest`；公网响应 `200` 且 `Content-Length` 为 109,914,393 字节，服务器端 SHA-256 与构建产物一致。上一版 `0.1.3` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.3-preview.apk`。
 
 ## 7. 验收基线
 
@@ -105,7 +105,7 @@ Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-a
 ## 8. 后续迭代
 
 1. 用真实 Android 与 iPhone 设备截图替换原型截图；
-2. 发布首个 GitHub Release，并把主下载链接切换到稳定 APK；
+2. 后续原生版本按需把 APK 附加到对应 GitHub Release，OTA-only 版本只保留更新说明；
 3. 备案和 HTTPS 就绪后部署到 `bigai.xin`；
 4. 增加可单独分享的社交预览图与产品演示视频；
 5. 在不引入追踪的前提下，评估是否需要匿名下载来源统计；

@@ -2,7 +2,7 @@
 
 ## 1. 当前能力
 
-App `0.1.3` 已接入 EAS Update：
+App `0.1.4` 已接入 EAS Update：
 
 - `expo-updates` 原生更新客户端
 - 启动自动检查
@@ -54,7 +54,7 @@ Preview：
 
 ```bash
 cd apps/mobile
-EXPO_PUBLIC_API_BASE_URL=http://8.152.201.57 \
+EXPO_NO_DOTENV=1 EXPO_PUBLIC_API_BASE_URL=http://8.152.201.57 \
   npx eas-cli@latest update --channel preview --message "修复：更新说明"
 ```
 
@@ -62,11 +62,12 @@ Production：
 
 ```bash
 cd apps/mobile
-EXPO_PUBLIC_API_BASE_URL=https://正式域名 \
+EXPO_NO_DOTENV=1 EXPO_PUBLIC_API_BASE_URL=https://正式域名 \
   npx eas-cli@latest update --channel production --message "版本说明"
 ```
 
 首次发布前需要登录 EAS，并确认项目 `04dd154b-655a-4b0e-bd3f-f3fafd76ab3d` 已创建对应分支和 channel。
+构建 profile 已在 `apps/mobile/eas.json` 提供预览变量。若本机 Node/Expo 环境在 `.env` 解析时报 `parseEnv`，使用 `EXPO_NO_DOTENV=1` 跳过 dotenv，不要把真实密钥写进仓库。
 
 ## 6. 原生新版
 
@@ -88,7 +89,16 @@ npx eas-cli@latest build --platform android --profile preview
 - 原生回滚：发布包含修复的新二进制，不依赖 OTA 降级原生代码。
 - `minimumVersion` API 强制升级将在公网 API 域名确定后接入。
 
-## 8. Android `0.1.3` 预览构建
+## 8. 版本展示与分发策略
+
+- 官网主文案与下载链接不展示版本号，固定使用 `/downloads/shengzhang-android-preview.apk?download=latest`。
+- GitHub Releases 继续使用语义化 Tag，作为版本历史和回滚依据；面向用户的 Release 标题优先描述这次更新，不把版本号当作主标题。
+- 纯 JS/TS 更新通过 EAS Update 推送，GitHub Release 只需记录更新内容，不必每次附 APK。
+- 原生依赖、权限、桌面图标、原生启动图或 runtimeVersion 变化时，必须构建新 APK，并同步更新官网稳定下载文件与 GitHub Release 附件。
+- 发布说明必须写清本版是“仅 OTA”还是“需要重新安装”，避免用户误以为所有 GitHub Release 都有安装包。
+- GitHub 网页端上传大于 100 MiB 的安装包可能不稳定；失败时应改用已认证的 GitHub API/CLI 上传，不要把 APK 提交进 Git 历史。
+
+## 9. Android `0.1.3` 预览构建
 
 2026-10-22 已完成 `0.1.3` 的 Android 预览 APK 构建：
 
@@ -131,3 +141,33 @@ https://expo.dev/artifacts/eas/sYrly_C992T0uG5i4CZT0BuwLcThK7v-i2g1otTQ_c4.apk
 2026-10-22 21:10（Asia/Shanghai）官网下载入口已由 `0.1.2` 原子替换为 `0.1.3`。服务器文件大小和 SHA-256 与上方构建记录一致；旧包备份在 `/opt/shengzhang/releases/shengzhang-0.1.2-preview.apk`。
 
 2026-10-22 21:29（Asia/Shanghai）已创建 GitHub Pre-release `v0.1.3-preview.1`，上传 APK 附件 `shengzhang-0.1.3-preview.apk`。GitHub API 与公开下载响应均确认附件大小为 109,854,465 字节，状态为 `uploaded`。
+
+## 10. Android `0.1.4` 预览构建
+
+2026-10-23 已完成 `0.1.4` 的 Android 原生预览构建。本版包含原生启动图与 runtimeVersion 更新，不能只靠 `0.1.3` OTA。
+
+| 项目 | 记录 |
+| --- | --- |
+| EAS Build | `b623433e-835c-4e80-9c51-adcb74bb61a7` |
+| 源码提交 | `a04bbb62c294f12ac1ca9b31961a16117a44f45b` |
+| Profile / Channel | `preview` / `preview` |
+| App Version / Version Code | `0.1.4` / `14` |
+| Runtime Version | `0.1.4` |
+| 包名 | `com.shengzhang.ledger` |
+| 构建完成时间 | 2026-10-23 10:34:04（Asia/Shanghai） |
+| APK 大小 | 109,914,393 字节（约 105 MiB） |
+| APK SHA-256 | `6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b` |
+
+构建页：
+
+```text
+https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/b623433e-835c-4e80-9c51-adcb74bb61a7
+```
+
+发布状态：
+
+- APK 已下载并通过 `unzip -t` 完整性检查。
+- 官网稳定下载文件已原子替换为 `0.1.4`，公网 `Content-Length` 与构建产物一致。
+- 官网首页已改为无版本号文案和 `?download=latest` 固定链接。
+- GitHub Pre-release `v0.1.4-preview.1` 已发布，包含完整更新说明、EAS 构建页和官网下载入口。
+- 当前机器的 GitHub 网页端连续在大于 100 MiB 的附件 policy/finalization 阶段失败；APK 附件需要通过已认证的 GitHub API/CLI 补传，官网已提供可用下载。
