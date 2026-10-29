@@ -1,7 +1,7 @@
 import { DEFAULT_CATEGORY_SEEDS } from '@shengzhang/domain';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 
 const INITIAL_SCHEMA = `
   CREATE TABLE IF NOT EXISTS categories (
@@ -103,6 +103,20 @@ async function seedDefaultCategories(db: SQLiteDatabase) {
   });
 }
 
+async function updatePresetCategoryIcons(db: SQLiteDatabase) {
+  const now = new Date().toISOString();
+  await db.withTransactionAsync(async () => {
+    for (const category of DEFAULT_CATEGORY_SEEDS) {
+      await db.runAsync(
+        'UPDATE categories SET icon = ?, updated_at = ? WHERE id = ? AND is_preset = 1',
+        category.icon,
+        now,
+        category.id,
+      );
+    }
+  });
+}
+
 export async function migrateDatabase(db: SQLiteDatabase) {
   await db.execAsync('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
   const row = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
@@ -115,5 +129,14 @@ export async function migrateDatabase(db: SQLiteDatabase) {
     await seedDefaultCategories(db);
     await db.runAsync('INSERT OR IGNORE INTO schema_migrations (version, applied_at) VALUES (1, ?)', new Date().toISOString());
     await db.execAsync('PRAGMA user_version = 1');
+  }
+
+  if (currentVersion < 2) {
+    await updatePresetCategoryIcons(db);
+    await db.runAsync(
+      'INSERT OR IGNORE INTO schema_migrations (version, applied_at) VALUES (2, ?)',
+      new Date().toISOString(),
+    );
+    await db.execAsync('PRAGMA user_version = 2');
   }
 }

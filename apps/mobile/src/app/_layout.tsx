@@ -6,7 +6,7 @@ import { AppState, StyleSheet, type AppStateStatus } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { BootScreen } from '../components/BootScreen';
+import { BootContentReady, BootExperience } from '../components/BootExperience';
 import { UpdateProvider } from '../components/UpdateProvider';
 import { DatabaseProvider } from '../db/DatabaseProvider';
 import { migrateDatabase } from '../db/migrations';
@@ -42,31 +42,34 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
-        <UpdateProvider>
-          <Suspense fallback={<BootScreen />}>
-            <SQLiteProvider databaseName="shengzhang.db" onInit={migrateDatabase} useSuspense>
-              <DatabaseProvider>
-                <StatusBar style="dark" />
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    contentStyle: { backgroundColor: colors.canvas },
-                    animation: 'fade',
-                  }}
-                >
-                  <Stack.Screen name="index" options={{ animation: 'fade' }} />
-                  <Stack.Screen name="stats" options={{ animation: 'fade' }} />
-                  <Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} />
-                  <Stack.Screen name="categories" options={{ animation: 'slide_from_right' }} />
-                  <Stack.Screen
-                    name="entry"
-                    options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
-                  />
-                </Stack>
-              </DatabaseProvider>
-            </SQLiteProvider>
-          </Suspense>
-        </UpdateProvider>
+        <BootExperience>
+          <UpdateProvider>
+            <Suspense fallback={null}>
+              <SQLiteProvider databaseName="shengzhang.db" onInit={migrateDatabase} useSuspense>
+                <DatabaseProvider>
+                  <StatusBar style="dark" />
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      contentStyle: { backgroundColor: colors.canvas },
+                      animation: 'fade',
+                    }}
+                  >
+                    <Stack.Screen name="index" options={{ animation: 'fade' }} />
+                    <Stack.Screen name="stats" options={{ animation: 'fade' }} />
+                    <Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} />
+                    <Stack.Screen name="categories" options={{ animation: 'slide_from_right' }} />
+                    <Stack.Screen
+                      name="entry"
+                      options={{ animation: 'slide_from_bottom', presentation: 'modal' }}
+                    />
+                  </Stack>
+                  <BootContentReady />
+                </DatabaseProvider>
+              </SQLiteProvider>
+            </Suspense>
+          </UpdateProvider>
+        </BootExperience>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

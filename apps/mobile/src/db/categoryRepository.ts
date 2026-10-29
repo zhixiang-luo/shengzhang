@@ -29,6 +29,7 @@ export interface CreateCategoryInput {
   type: 'expense' | 'income';
   parentId: string | null;
   color: string;
+  icon?: string;
 }
 
 export function createCategory(db: AppDatabase, input: CreateCategoryInput): CategoryRow {
@@ -63,7 +64,7 @@ export function createCategory(db: AppDatabase, input: CreateCategoryInput): Cat
       name,
       type: input.type,
       parentId: input.parentId,
-      icon: parent?.icon ?? 'other',
+      icon: input.icon?.trim() || parent?.icon || 'other',
       color: parent?.color ?? input.color,
       sortOrder,
       isPreset: false,
@@ -78,10 +79,14 @@ export function createCategory(db: AppDatabase, input: CreateCategoryInput): Cat
   return created;
 }
 
-export function renameCategory(db: AppDatabase, id: string, nextName: string) {
+export function updateCategory(
+  db: AppDatabase,
+  id: string,
+  input: { name: string; icon?: string },
+) {
   const category = findCategory(db, id);
   if (!category) throw new Error('分类不存在');
-  const name = nextName.trim();
+  const name = input.name.trim();
   if (!name || name.length > 12) throw new Error('分类名称需要 1–12 个字');
 
   const duplicate = listCategories(db, true).some(
@@ -94,9 +99,17 @@ export function renameCategory(db: AppDatabase, id: string, nextName: string) {
   if (duplicate) throw new Error('同级分类里已经有这个名字');
 
   db.update(categories)
-    .set({ name, updatedAt: new Date().toISOString() })
+    .set({
+      name,
+      icon: input.icon?.trim() || category.icon,
+      updatedAt: new Date().toISOString(),
+    })
     .where(eq(categories.id, id))
     .run();
+}
+
+export function renameCategory(db: AppDatabase, id: string, nextName: string) {
+  updateCategory(db, id, { name: nextName });
 }
 
 export function setCategoryArchived(db: AppDatabase, id: string, archived: boolean) {

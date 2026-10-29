@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CategoryEditorSheet } from '../components/CategoryEditorSheet';
+import { CategoryIcon } from '../components/CategoryIcon';
 import { Icon } from '../components/Icon';
 import {
   listCategories,
@@ -73,6 +74,9 @@ function CategoryChildItem({
           <Icon name="drag" size={15} color={colors.inkTertiary} />
         </View>
         <View style={[styles.childLine, { backgroundColor: parentColor }]} />
+        <View style={[styles.childIcon, { backgroundColor: `${parentColor}18` }]}>
+          <CategoryIcon color={parentColor} icon={child.icon} size={15} strokeWidth={1.65} />
+        </View>
         <Text style={styles.childName}>{child.name}</Text>
         <Text style={styles.childEdit}>编辑</Text>
       </Pressable>
@@ -180,7 +184,9 @@ function CategoryRootItem({
           <View style={styles.dragHandle}>
             <Icon name="drag" size={18} color={colors.inkTertiary} />
           </View>
-          <View style={[styles.colorDot, { backgroundColor: item.color }]} />
+          <View style={[styles.rootIcon, { backgroundColor: `${item.color}18` }]}>
+            <CategoryIcon color={item.color} icon={item.icon} size={20} strokeWidth={1.7} />
+          </View>
           <View style={styles.rootCopy}>
             <Text style={styles.rootName}>{item.name}</Text>
             <Text style={styles.rootMeta}>
@@ -365,6 +371,14 @@ export default function CategoriesScreen() {
                       onPress={() => setEditor({ type, category, parent })}
                       style={[styles.hiddenRow, index < hidden.length - 1 && styles.hiddenDivider]}
                     >
+                      <View style={[styles.hiddenIcon, { backgroundColor: `${parent?.color ?? category.color}16` }]}>
+                        <CategoryIcon
+                          color={parent?.color ?? category.color}
+                          icon={category.icon}
+                          size={15}
+                          strokeWidth={1.65}
+                        />
+                      </View>
                       <Text style={styles.hiddenName}>{category.name}</Text>
                       <Text style={styles.hiddenMeta}>{parent ? `${parent.name} / 二级` : '一级分类'}</Text>
                       <Text style={styles.restoreText}>恢复</Text>
@@ -498,10 +512,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  colorDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+  rootIcon: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
   },
   rootCopy: {
     flex: 1,
@@ -554,6 +570,14 @@ const styles = StyleSheet.create({
     width: 14,
     height: 1,
     marginRight: 9,
+  },
+  childIcon: {
+    width: 26,
+    height: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+    borderRadius: 9,
   },
   childMain: {
     flex: 1,
@@ -611,6 +635,14 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.inkSecondary,
     fontSize: 12,
+  },
+  hiddenIcon: {
+    width: 26,
+    height: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.sm,
+    borderRadius: 9,
   },
   hiddenMeta: {
     marginRight: spacing.md,

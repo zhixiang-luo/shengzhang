@@ -1,6 +1,6 @@
 {
   "name": "@shengzhang/mobile",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": "expo-router/entry",
   "dependencies": {
     "@shengzhang/contracts": "workspace:*",

@@ -14,13 +14,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   createCategory,
-  renameCategory,
   setCategoryArchived,
+  updateCategory,
   type CategoryRow,
 } from '../db/categoryRepository';
 import { useDatabase } from '../db/DatabaseProvider';
+import {
+  normalizeCategoryIcon,
+  resolveCategoryIcon,
+  type CategoryIconName,
+} from '../features/categories/categoryIcons';
 import { colors, spacing, typography } from '../theme/tokens';
 import { AnimatedSheetModal } from './AnimatedSheetModal';
+import { CategoryIconPicker } from './CategoryIconPicker';
 
 type CategoryEditorSheetProps = {
   type: 'expense' | 'income';
@@ -42,6 +48,12 @@ export function CategoryEditorSheet({
   const db = useDatabase();
   const insets = useSafeAreaInsets();
   const [name, setName] = useState(category?.name ?? '');
+  const [icon, setIcon] = useState<CategoryIconName>(() =>
+    resolveCategoryIcon({
+      explicitIcon: category?.icon,
+      parentIcon: parent?.icon,
+    }),
+  );
   const [error, setError] = useState<string | null>(null);
   const [sheetVisible, setSheetVisible] = useState(true);
   const scrollRef = useRef<ScrollViewInstance>(null);
@@ -77,13 +89,14 @@ export function CategoryEditorSheet({
   const save = () => {
     try {
       if (category) {
-        renameCategory(db, category.id, name);
+        updateCategory(db, category.id, { name, icon });
       } else {
         createCategory(db, {
           name,
           type,
           parentId: parent?.id ?? null,
           color: suggestedColor,
+          icon,
         });
       }
       onChanged();
@@ -157,6 +170,14 @@ export function CategoryEditorSheet({
                 value={name}
               />
             </View>
+            <CategoryIconPicker
+              color={category?.color ?? parent?.color ?? suggestedColor}
+              onChange={(nextIcon) => {
+                setIcon(normalizeCategoryIcon(nextIcon));
+                setError(null);
+              }}
+              value={icon}
+            />
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
             {category ? (

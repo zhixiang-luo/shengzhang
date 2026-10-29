@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomDock } from '../components/BottomDock';
 import { BrandMark } from '../components/BrandMark';
+import { CategoryIcon } from '../components/CategoryIcon';
 import { Icon } from '../components/Icon';
 import { UndoDeleteBanner } from '../components/UndoDeleteBanner';
 import { SwipeableDeleteRow } from '../components/SwipeableDeleteRow';
@@ -82,15 +83,23 @@ export default function LedgerScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.summary}>
-          <Text style={styles.summaryLabel}>本月支出</Text>
-          <View style={styles.amountLine}>
-            <Text style={styles.currency}>¥</Text>
-            <Text style={styles.amount}>{formatCents(summary.expenseMinor)}</Text>
+          <View pointerEvents="none" style={styles.summaryDecoration}>
+            <View style={styles.summaryOrbLarge} />
+            <View style={styles.summaryOrbSmall} />
+            <View style={styles.summaryOrbBottom} />
+            <View style={styles.summaryContour} />
           </View>
-          <View style={styles.summaryMeta}>
-            <Text style={styles.metaText}>收入 ¥{formatCents(summary.incomeMinor)}</Text>
-            <View style={styles.metaDot} />
-            <Text style={styles.metaText}>结余 ¥{formatCents(summary.balanceMinor)}</Text>
+          <View style={styles.summaryContent}>
+            <Text style={styles.summaryLabel}>本月支出</Text>
+            <View style={styles.amountLine}>
+              <Text style={styles.currency}>¥</Text>
+              <Text style={styles.amount}>{formatCents(summary.expenseMinor)}</Text>
+            </View>
+            <View style={styles.summaryMeta}>
+              <Text style={styles.metaText}>收入 ¥{formatCents(summary.incomeMinor)}</Text>
+              <View style={styles.metaDot} />
+              <Text style={styles.metaText}>结余 ¥{formatCents(summary.balanceMinor)}</Text>
+            </View>
           </View>
         </View>
 
@@ -156,9 +165,12 @@ export default function LedgerScreen() {
                       ]}
                     >
                       <View style={[styles.categoryMark, { backgroundColor: `${transaction.categoryColor}22` }]}>
-                        <Text style={[styles.categoryInitial, { color: transaction.categoryColor }]}>
-                          {transaction.categoryName.slice(0, 1)}
-                        </Text>
+                        <CategoryIcon
+                          color={transaction.categoryColor}
+                          icon={transaction.categoryIcon}
+                          size={19}
+                          strokeWidth={1.7}
+                        />
                       </View>
                       <View style={styles.transactionCopy}>
                         <Text numberOfLines={1} style={styles.transactionTitle}>
@@ -270,10 +282,62 @@ const styles = StyleSheet.create({
   },
   summary: {
     marginTop: spacing.sm,
+    overflow: 'hidden',
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.xl,
     borderRadius: radii.lg,
     backgroundColor: colors.ink,
+  },
+  summaryDecoration: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+  summaryOrbLarge: {
+    position: 'absolute',
+    top: -112,
+    right: -48,
+    width: 230,
+    height: 230,
+    borderRadius: 115,
+    backgroundColor: '#5E4742',
+    opacity: 0.7,
+  },
+  summaryOrbSmall: {
+    position: 'absolute',
+    top: 18,
+    right: 26,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: colors.blushDeep,
+    opacity: 0.13,
+  },
+  summaryOrbBottom: {
+    position: 'absolute',
+    bottom: -116,
+    left: -72,
+    width: 196,
+    height: 196,
+    borderRadius: 98,
+    backgroundColor: '#7B6057',
+    opacity: 0.32,
+  },
+  summaryContour: {
+    position: 'absolute',
+    top: 24,
+    right: 22,
+    width: 70,
+    height: 70,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 253, 248, 0.08)',
+    borderRadius: 35,
+  },
+  summaryContent: {
+    position: 'relative',
+    zIndex: 1,
   },
   summaryLabel: {
     color: 'rgba(255, 253, 248, 0.62)',
@@ -439,11 +503,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
-  },
-  categoryInitial: {
-    fontFamily: typography.display,
-    fontSize: 17,
-    fontWeight: '600',
   },
   transactionCopy: {
     flex: 1,

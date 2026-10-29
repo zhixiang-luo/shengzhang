@@ -86,6 +86,10 @@
 - Android `0.1.4` 修复首次麦克风授权流程：授权前不创建录音会话，首次授权成功后显示可关闭的“麦克风已经准备好”提示，避免系统弹窗打断按压后误报“录音过短”。
 - 新建手动账单现在默认展开自绘金额键盘，并在金额末尾显示短光标；编辑已有账单保持键盘收起。点击分类、时间、备注、空白或开始滚动会自动收起键盘。
 - 启动体验已统一为圆形品牌装置：`design/assets/splash-mark.svg` 导出 2048px 原生启动图，React `BootScreen` 增加声账字标、品牌主张、本地账本状态和克制呼吸动画，不使用菱形旋转图形。
+- `0.1.5` 候选版重做启动体验：首次安装播放完整 2.72 秒入场；普通冷启动在 300ms 内 ready 时直接进入主页，超过 300ms 才显示简化等待层；后台恢复不播放。原生 Splash 与 React 首帧均使用无缺省侧弧的完整圆形。
+- 本月支出卡片加入暖棕与腮红半透明圆形、细轮廓和呼吸层次；装饰层不接收点击，金额与收支信息保持最高视觉层级。
+- 分类图标升级为独立线性图标体系：内置二级分类不再继承一级图标，账本列表、统计、分类管理和手动记账选择器均读取 `categories.icon`。自定义分类创建和编辑可选择图标，未知值回退到 `other`。
+- SQLite schema 升至 v2，迁移只更新 `is_preset = 1` 的内置分类图标，保留用户自定义分类和历史账单数据。
 - 官网首版已落地到 `deploy/site/`：包含首屏语音入账动态演示、传统记账步骤对比、三张真实产品界面切换、能力卡片、隐私数据流、质量数据、独立开发者故事，以及 Android 内测和 GitHub Releases 双入口。
 - 官网使用无外部依赖的 `index.html`、`styles.css`、`app.js`，并纳入品牌 SVG、分享图和原型截图；支持滚动揭示、鼠标光晕、设备倾斜、声波和转写循环，并对 `prefers-reduced-motion` 做完整降级。
 - 官网已在 `1440×1000`、`768×1024`、`390×844` 和 `375×812` 四种视口完成布局验收；均无横向滚动，移动端导航、三个产品界面标签和方向键切换通过，页面自身无控制台错误。详细规格见 `docs/27-official-website.md`。
@@ -100,7 +104,7 @@
 - 官网 footer 已展示 `京ICP备2026073107号` 并链接工信部备案系统，canonical 与 Open Graph 地址统一为 `https://bigai.xin/shengzhang/`。
 - preview 通道已发布 HTTPS 域名 OTA：Update Group `a2f27f47-d1fb-49ed-8529-cfd26ea0957c`，runtime `0.1.4`，Android/iOS bundle 均确认写入 `https://bigai.xin`。
 - GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
-- Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；58 项测试全部通过，其中移动端新增首次授权和金额键盘回归测试 5 项。
+- Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；当前 71 项测试全部通过，其中移动端包含首次授权、金额键盘、启动分档、首启版本和分类图标回归测试 18 项。
 - 已接入隐私优先的第一方匿名统计：官网访问/下载、App 启动、语音开始/完成/保存/撤销/取消/失败、手动新增/编辑/删除、统计、分类和设置事件。事件只包含固定名称、平台、版本、条数、耗时和错误原因；金额、分类名、备注、转写和录音不上报。
 - 匿名安装 ID 在服务端使用私有 Salt 哈希后写入按日 JSONL；设置页提供“匿名使用统计”关闭开关，官网遵循 DNT/GPC。
 - 已增加 `pnpm --filter @shengzhang/api analytics:report` 报告脚本，可查看独立下载访客、活跃安装、启动频率、语音成功率、累计新增账单和每日趋势。
@@ -145,9 +149,9 @@
 
 ## 下一步最小任务
 
-1. 在已安装 `0.1.4` 的 Android 真机接收 preview OTA，确认语音请求和 WebSocket 已从 IP 切换到 `https://bigai.xin`。
-2. 评审官网首版视觉、文案与下载入口；确认后用真实设备截图替换原型素材。
-3. 从官网直接下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
+1. 在 Expo/Android 真机验证 `0.1.5` 候选版：首装完整入场、二次冷启动跳过/简化、后台恢复不播放入场、分类图标选择器和摘要卡片装饰。
+2. 构建 `0.1.5 (15)` APK 后验证原生 Splash 到 React 首帧无跳变，并发布 preview OTA。
+3. 从正式域名下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
 4. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
 5. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
 6. 用真实供应商账单补齐成本看板的 DeepSeek、网关和存储成本。
@@ -185,7 +189,7 @@ expo-updates config: passed
 expo-doctor: 20/20 passed
 domain tests: 23 passed
 api tests: 30 passed
-mobile tests: 5 passed (first-permission flow + amount-keypad default state)
+mobile tests: 18 passed (boot policy, intro version, category icons, permissions, keypad)
 voice eval: 200/200 exact, amount/type/category/date 100%
 cost dashboard: ASR scenario generated
 account/payment feasibility: official Apple/WeChat/Alipay pages reviewed on 2026-10-20
@@ -193,7 +197,7 @@ SQLite schema: sqlite3 语法与 foreign_key_check 通过
 official website: desktop/tablet/mobile viewport checks passed, 0 local console errors
 analytics ingestion: public POST 202, hashed install id, report aggregation passed
 analytics test data: cleared after verification
-android bundle export: passed for 0.1.4
+android bundle export: passed for 0.1.5 candidate
 android preview build: b623433e-835c-4e80-9c51-adcb74bb61a7 finished
 android preview site: 0.1.4 APK atomically deployed, Content-Length 109914393
 android preview sha256: 6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b

@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomDock } from '../components/BottomDock';
+import { CategoryIcon } from '../components/CategoryIcon';
 import { Icon } from '../components/Icon';
 import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
 import { VoiceResultSheet } from '../components/VoiceResultSheet';
@@ -221,7 +222,19 @@ export default function StatsScreen() {
                       }
                       style={styles.categoryRow}
                     >
-                      <View style={[styles.categoryDot, { backgroundColor: category?.color ?? colors.inkTertiary }]} />
+                      <View
+                        style={[
+                          styles.categoryIcon,
+                          { backgroundColor: `${category?.color ?? colors.inkTertiary}18` },
+                        ]}
+                      >
+                        <CategoryIcon
+                          color={category?.color ?? colors.inkTertiary}
+                          icon={category?.icon}
+                          size={18}
+                          strokeWidth={1.7}
+                        />
+                      </View>
                       <View style={styles.categoryCopy}>
                         <View style={styles.categoryLabelRow}>
                           <View style={styles.categoryNameRow}>
@@ -476,10 +489,12 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     minHeight: 48,
   },
-  categoryDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  categoryIcon: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 11,
   },
   categoryCopy: {
     flex: 1,

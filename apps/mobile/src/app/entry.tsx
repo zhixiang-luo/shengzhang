@@ -25,6 +25,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AmountKeypad } from '../components/AmountKeypad';
 import { AnimatedSheetModal } from '../components/AnimatedSheetModal';
+import { CategoryIcon } from '../components/CategoryIcon';
+import { CategoryIconPicker } from '../components/CategoryIconPicker';
 import { DateTimePickerSheet } from '../components/DateTimePickerSheet';
 import { Icon } from '../components/Icon';
 import { createCategory, listCategories, type CategoryRow } from '../db/categoryRepository';
@@ -35,6 +37,11 @@ import {
   softDeleteTransaction,
   updateTransaction,
 } from '../db/transactionRepository';
+import {
+  normalizeCategoryIcon,
+  resolveCategoryIcon,
+  type CategoryIconName,
+} from '../features/categories/categoryIcons';
 import { shouldAutoOpenAmountKeypad } from '../features/entry/entryInteraction';
 import { trackAnalyticsEvent } from '../services/analytics';
 import { useUndoDeleteStore } from '../stores/undoStore';
@@ -144,6 +151,7 @@ export default function EntryScreen() {
   const [error, setError] = useState<string | null>(initial.error);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryIcon, setNewCategoryIcon] = useState<CategoryIconName>('other');
   const [newCategoryLevel, setNewCategoryLevel] = useState<'root' | 'sub'>('root');
   const [categoryError, setCategoryError] = useState<string | null>(null);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -171,6 +179,12 @@ export default function EntryScreen() {
     () => allCategories.filter((category) => category.parentId === categoryId),
     [allCategories, categoryId],
   );
+  const newCategoryColor =
+    selectedRoot?.color ??
+    NEW_CATEGORY_COLORS[
+      allCategories.filter((category) => category.type === type && category.parentId === null)
+        .length % NEW_CATEGORY_COLORS.length
+    ];
   const displayedAmount = amount ? formatAmountExpression(amount) : '0.00';
   const amountFontSize =
     amount.length >= 18 ? 20 : amount.length >= 14 ? 24 : amount.length >= 10 ? 28 : 36;
@@ -196,7 +210,13 @@ export default function EntryScreen() {
 
   const openCategoryModal = () => {
     setNewCategoryName('');
-    setNewCategoryLevel(categoryId ? 'sub' : 'root');
+    const nextLevel = categoryId ? 'sub' : 'root';
+    setNewCategoryLevel(nextLevel);
+    setNewCategoryIcon(
+      resolveCategoryIcon({
+        parentIcon: nextLevel === 'sub' ? selectedRoot?.icon : null,
+      }),
+    );
     setCategoryError(null);
     categoryInputFocusedRef.current = false;
     setCategoryModalVisible(true);
@@ -214,12 +234,12 @@ export default function EntryScreen() {
         setCategoryError('请先选择一个一级分类');
         return;
       }
-      const color = NEW_CATEGORY_COLORS[allCategories.filter((item) => item.parentId === null).length % NEW_CATEGORY_COLORS.length];
       const created = createCategory(db, {
         name: newCategoryName,
         type,
         parentId,
-        color,
+        color: newCategoryColor,
+        icon: newCategoryIcon,
       });
       const nextCategories = listCategories(db);
       setAllCategories(nextCategories);
@@ -485,7 +505,14 @@ export default function EntryScreen() {
                     selected && { borderColor: category.color, backgroundColor: `${category.color}18` },
                   ]}
                 >
-                  <View style={[styles.rootDot, { backgroundColor: category.color }]} />
+                  <View style={[styles.rootCategoryIcon, { backgroundColor: `${category.color}18` }]}>
+                    <CategoryIcon
+                      color={category.color}
+                      icon={category.icon}
+                      size={15}
+                      strokeWidth={1.7}
+                    />
+                  </View>
                   <Text style={[styles.rootCategoryText, selected && { color: colors.ink }]}>
                     {category.name}
                   </Text>
@@ -504,6 +531,12 @@ export default function EntryScreen() {
                     onPress={() => setSubcategoryId(category.id)}
                     style={[styles.subcategory, selected && styles.subcategorySelected]}
                   >
+                    <CategoryIcon
+                      color={selected ? colors.blushDeep : colors.inkTertiary}
+                      icon={category.icon}
+                      size={14}
+                      strokeWidth={1.7}
+                    />
                     <Text style={[styles.subcategoryText, selected && styles.subcategoryTextSelected]}>
                       {category.name}
                     </Text>
@@ -623,7 +656,10 @@ export default function EntryScreen() {
 
               <View style={styles.sheetSegment}>
                 <Pressable
-                  onPress={() => setNewCategoryLevel('root')}
+                  onPress={() => {
+                    setNewCategoryLevel('root');
+                    setNewCategoryIcon('other');
+                  }}
                   style={[
                     styles.sheetSegmentItem,
                     newCategoryLevel === 'root' && styles.sheetSegmentActive,
@@ -640,7 +676,14 @@ export default function EntryScreen() {
                 </Pressable>
                 <Pressable
                   disabled={!selectedRoot}
-                  onPress={() => setNewCategoryLevel('sub')}
+                  onPress={() => {
+                    setNewCategoryLevel('sub');
+                    setNewCategoryIcon(
+                      resolveCategoryIcon({
+                        parentIcon: selectedRoot?.icon,
+                      }),
+                    );
+                  }}
                   style={[
                     styles.sheetSegmentItem,
                     newCategoryLevel === 'sub' && styles.sheetSegmentActive,
@@ -682,6 +725,14 @@ export default function EntryScreen() {
                   value={newCategoryName}
                 />
               </View>
+              <CategoryIconPicker
+                color={newCategoryColor}
+                onChange={(icon) => {
+                  setNewCategoryIcon(normalizeCategoryIcon(icon));
+                  setCategoryError(null);
+                }}
+                value={newCategoryIcon}
+              />
               {categoryError ? <Text style={styles.categoryModalError}>{categoryError}</Text> : null}
 
               <View style={styles.sheetActions}>
@@ -898,10 +949,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: colors.surface,
   },
-  rootDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
+  rootCategoryIcon: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
   },
   rootCategoryText: {
     color: colors.inkSecondary,
@@ -916,8 +969,10 @@ const styles = StyleSheet.create({
   },
   subcategory: {
     minHeight: 44,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
     paddingHorizontal: 14,
     borderRadius: 12,
     backgroundColor: colors.surface,

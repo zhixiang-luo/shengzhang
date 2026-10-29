@@ -12,22 +12,6 @@ export function BrandMark({ size = 72 }: BrandMarkProps) {
       <Circle cx="64" cy="64" r="59" fill={colors.blushSoft} />
       <G transform="translate(0 4)">
         <Path
-          d="M24 55c-7 7-7 19 0 26"
-          fill="none"
-          opacity={0.65}
-          stroke={colors.blushDeep}
-          strokeLinecap="round"
-          strokeWidth={3.2}
-        />
-        <Path
-          d="M104 55c7 7 7 19 0 26"
-          fill="none"
-          opacity={0.65}
-          stroke={colors.blushDeep}
-          strokeLinecap="round"
-          strokeWidth={3.2}
-        />
-        <Path
           d="M39 37c-7.4-8.2-8.6-17.8-1.8-21.2 6.4-3 12.3 3.2 15.7 12.9"
           fill={colors.blush}
           stroke={colors.ink}

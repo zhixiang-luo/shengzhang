@@ -72,7 +72,7 @@ export function useLedgerMonth() {
           categoryName: category?.name ?? '其他',
           subcategoryName: subcategory?.name ?? null,
           categoryColor: category?.color ?? '#A39A91',
-          categoryIcon: category?.icon ?? 'other',
+          categoryIcon: subcategory?.icon ?? category?.icon ?? 'other',
         };
       }),
     [categoryMap, transactions],

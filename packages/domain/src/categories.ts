@@ -15,7 +15,7 @@ interface CategoryGroup {
   name: string;
   icon: string;
   color: string;
-  children: string[];
+  children: Array<{ name: string; icon: string }>;
 }
 
 const EXPENSE_GROUPS: CategoryGroup[] = [
@@ -24,91 +24,156 @@ const EXPENSE_GROUPS: CategoryGroup[] = [
     name: '餐饮',
     icon: 'food',
     color: '#E89A96',
-    children: ['早餐', '午餐', '晚餐', '咖啡奶茶', '外卖', '水果零食', '聚餐'],
+    children: [
+      { name: '早餐', icon: 'breakfast' },
+      { name: '午餐', icon: 'lunch' },
+      { name: '晚餐', icon: 'dinner' },
+      { name: '咖啡奶茶', icon: 'coffee' },
+      { name: '外卖', icon: 'takeout' },
+      { name: '水果零食', icon: 'snack' },
+      { name: '聚餐', icon: 'dining' },
+    ],
   },
   {
     id: 'expense-transport',
     name: '交通',
     icon: 'transport',
     color: '#D7A66F',
-    children: ['公交地铁', '打车', '加油充电', '停车', '火车飞机', '单车'],
+    children: [
+      { name: '公交地铁', icon: 'transit' },
+      { name: '打车', icon: 'taxi' },
+      { name: '加油充电', icon: 'fuel' },
+      { name: '停车', icon: 'parking' },
+      { name: '火车飞机', icon: 'train' },
+      { name: '单车', icon: 'bike' },
+    ],
   },
   {
     id: 'expense-shopping',
     name: '购物',
     icon: 'shopping',
     color: '#C99187',
-    children: ['服饰', '日用品', '数码', '美妆个护', '家居'],
+    children: [
+      { name: '服饰', icon: 'clothing' },
+      { name: '日用品', icon: 'daily' },
+      { name: '数码', icon: 'digital' },
+      { name: '美妆个护', icon: 'beauty' },
+      { name: '家居', icon: 'household' },
+    ],
   },
   {
     id: 'expense-home',
     name: '居住',
     icon: 'home',
     color: '#A78870',
-    children: ['房租', '水电燃气', '物业', '维修'],
+    children: [
+      { name: '房租', icon: 'rent' },
+      { name: '水电燃气', icon: 'utilities' },
+      { name: '物业', icon: 'property' },
+      { name: '维修', icon: 'repair' },
+    ],
   },
   {
     id: 'expense-entertainment',
     name: '娱乐',
     icon: 'entertainment',
     color: '#9EAD98',
-    children: ['电影演出', '游戏', '会员订阅', '旅游', '其他'],
+    children: [
+      { name: '电影演出', icon: 'movie' },
+      { name: '游戏', icon: 'game' },
+      { name: '会员订阅', icon: 'subscription' },
+      { name: '旅游', icon: 'recreation' },
+      { name: '其他', icon: 'entertainmentOther' },
+    ],
   },
   {
     id: 'expense-health',
     name: '医疗健康',
     icon: 'health',
     color: '#8EAAA5',
-    children: ['门诊', '药品', '体检', '保险'],
+    children: [
+      { name: '门诊', icon: 'clinic' },
+      { name: '药品', icon: 'medicine' },
+      { name: '体检', icon: 'checkup' },
+      { name: '保险', icon: 'insurance' },
+    ],
   },
   {
     id: 'expense-education',
     name: '学习教育',
     icon: 'education',
     color: '#9B9BB6',
-    children: ['书籍', '课程', '考试', '文具'],
+    children: [
+      { name: '书籍', icon: 'book' },
+      { name: '课程', icon: 'course' },
+      { name: '考试', icon: 'exam' },
+      { name: '文具', icon: 'stationery' },
+    ],
   },
   {
     id: 'expense-gift',
     name: '人情礼物',
     icon: 'gift',
     color: '#D18B8B',
-    children: ['红包', '礼物', '请客', '孝敬'],
+    children: [
+      { name: '红包', icon: 'redpacket' },
+      { name: '礼物', icon: 'present' },
+      { name: '请客', icon: 'treat' },
+      { name: '孝敬', icon: 'family' },
+    ],
   },
   {
     id: 'expense-communication',
     name: '通讯网络',
     icon: 'communication',
     color: '#91A6B5',
-    children: ['话费', '宽带', '云服务'],
+    children: [
+      { name: '话费', icon: 'phone' },
+      { name: '宽带', icon: 'internet' },
+      { name: '云服务', icon: 'cloud' },
+    ],
   },
   {
     id: 'expense-pet',
     name: '宠物',
     icon: 'pet',
     color: '#C49A7A',
-    children: ['主粮零食', '医疗', '用品', '服务'],
+    children: [
+      { name: '主粮零食', icon: 'petfood' },
+      { name: '医疗', icon: 'petmedical' },
+      { name: '用品', icon: 'petsupply' },
+      { name: '服务', icon: 'petservice' },
+    ],
   },
   {
     id: 'expense-sports',
     name: '运动',
     icon: 'sports',
     color: '#8DA18C',
-    children: ['场地', '装备', '课程'],
+    children: [
+      { name: '场地', icon: 'venue' },
+      { name: '装备', icon: 'equipment' },
+      { name: '课程', icon: 'fitness' },
+    ],
   },
   {
     id: 'expense-travel',
     name: '旅行',
     icon: 'travel',
     color: '#8FA8B1',
-    children: ['住宿', '门票', '交通', '餐饮'],
+    children: [
+      { name: '住宿', icon: 'hotel' },
+      { name: '门票', icon: 'ticket' },
+      { name: '交通', icon: 'tripTransport' },
+      { name: '餐饮', icon: 'tripFood' },
+    ],
   },
   {
     id: 'expense-other',
     name: '其他',
     icon: 'other',
     color: '#A39A91',
-    children: ['其他'],
+    children: [{ name: '其他', icon: 'other' }],
   },
 ];
 
@@ -136,13 +201,13 @@ function buildSeeds(): DefaultCategorySeed[] {
       color: group.color,
       sortOrder: index,
     });
-    group.children.forEach((name, childIndex) => {
+    group.children.forEach(({ name, icon }, childIndex) => {
       seeds.push({
         id: `${group.id}-${childIndex + 1}`,
         name,
         type: 'expense',
         parentId: group.id,
-        icon: group.icon,
+        icon,
         color: group.color,
         sortOrder: childIndex,
       });
