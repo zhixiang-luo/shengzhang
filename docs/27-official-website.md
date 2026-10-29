@@ -63,7 +63,8 @@
 
 当前下载入口：
 
-- Android 内测：官网稳定入口 `/downloads/shengzhang-android-preview.apk?download=latest`；
+- 正式官网：`https://bigai.xin/shengzhang/`；
+- Android 内测：官网稳定入口 `/shengzhang/downloads/shengzhang-android-preview.apk?download=latest`；
 - 全量版本索引：GitHub Releases；
 - 源码：`https://github.com/zhixiang-luo/shengzhang`。
 
@@ -81,13 +82,13 @@
 python3 -m http.server 4174 -d deploy/site
 ```
 
-2026-10-21 已部署到现有 ECS，临时公网入口为 `http://8.152.201.57/`。首页、CSS、JavaScript、产品截图与原有 `/health` 均从公网返回 `200`。
+2026-10-29 已切换到正式域名 `https://bigai.xin/shengzhang/`。`bigai.xin` 与 `www.bigai.xin` 均解析到现有 ECS；根路径跳转到 `/shengzhang/`，误拼 `/shengzheng/` 也以 301 跳转到正确路径。
 
-该 IP 入口只用于备案完成前的临时访问，不配置表单、登录或支付，也不应作为长期推广地址。中国大陆服务器绑定正式域名前，必须完成 ICP 备案；备案通过并配置 HTTPS 后，再替换当前测试入口。
+HTTPS 使用 Let’s Encrypt 证书，SAN 覆盖 `bigai.xin`、`www.bigai.xin`，有效期至 2027-01-26。`certbot.timer` 自动续期已通过 dry-run；阿里云安全组与 Ubuntu UFW 均已放行 443/TCP。官网 footer 展示 `京ICP备2026073107号` 并链接工信部备案系统。
 
 Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-android-preview.apk`，官网直接提供下载，不依赖 Expo 登录。当前稳定安装包为 `0.1.4 (14)`，文件大小 109,914,393 字节，SHA-256 为 `6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b`。旧版可直接覆盖安装并保留本地账本。
 
-2026-10-23 10:36（Asia/Shanghai）已完成官网原子替换。首页主文案不再展示版本号，下载链接改为稳定的 `?download=latest`；公网响应 `200` 且 `Content-Length` 为 109,914,393 字节，服务器端 SHA-256 与构建产物一致。上一版 `0.1.3` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.3-preview.apk`。
+首页主文案不展示版本号，下载链接使用稳定的 `?download=latest`；正式域名下公网响应 `200` 且 `Content-Length` 为 109,914,393 字节，服务器端 SHA-256 与构建产物一致。上一版 `0.1.3` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.3-preview.apk`。
 
 ## 7. 验收基线
 
@@ -106,7 +107,7 @@ Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-a
 
 1. 用真实 Android 与 iPhone 设备截图替换原型截图；
 2. 后续原生版本按需把 APK 附加到对应 GitHub Release，OTA-only 版本只保留更新说明；
-3. 备案和 HTTPS 就绪后部署到 `bigai.xin`；
+3. 保持正式域名的证书续期、API/WebSocket 健康检查和路径迁移监控；
 4. 增加可单独分享的社交预览图与产品演示视频；
 5. 在不引入追踪的前提下，评估是否需要匿名下载来源统计；
 6. 月末回顾和分享卡上线后，再扩展对应官网章节。

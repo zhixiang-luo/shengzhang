@@ -54,16 +54,18 @@ Preview：
 
 ```bash
 cd apps/mobile
-EXPO_NO_DOTENV=1 EXPO_PUBLIC_API_BASE_URL=http://8.152.201.57 \
-  npx eas-cli@latest update --channel preview --message "修复：更新说明"
+EXPO_NO_DOTENV=1 EXPO_PUBLIC_API_BASE_URL=https://bigai.xin \
+  npx eas-cli@latest update --channel preview --environment preview \
+  --message "修复：更新说明"
 ```
 
 Production：
 
 ```bash
 cd apps/mobile
-EXPO_NO_DOTENV=1 EXPO_PUBLIC_API_BASE_URL=https://正式域名 \
-  npx eas-cli@latest update --channel production --message "版本说明"
+EXPO_NO_DOTENV=1 EXPO_PUBLIC_API_BASE_URL=https://bigai.xin \
+  npx eas-cli@latest update --channel production --environment production \
+  --message "版本说明"
 ```
 
 首次发布前需要登录 EAS，并确认项目 `04dd154b-655a-4b0e-bd3f-f3fafd76ab3d` 已创建对应分支和 channel。
@@ -171,3 +173,19 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/b623433e
 - 官网首页已改为无版本号文案和 `?download=latest` 固定链接。
 - GitHub Pre-release `v0.1.4-preview.1` 已发布，包含完整更新说明、EAS 构建页、官网下载入口和 APK 附件。
 - GitHub 公开 API 已确认附件 `shengzhang-0.1.4-preview.apk` 状态为 `uploaded`，大小 109,914,393 字节，digest 与本地 SHA-256 一致；公开下载响应 `200` 且 `Content-Length` 相同。
+
+## 11. 正式 HTTPS 域名 OTA
+
+2026-10-29 已将 preview 通道的 API 地址从临时 IP 切换为 `https://bigai.xin`：
+
+| 项目 | 记录 |
+| --- | --- |
+| Channel / Environment | `preview` / `preview` |
+| Runtime Version | `0.1.4` |
+| Platform | Android、iOS |
+| Update Group | `a2f27f47-d1fb-49ed-8529-cfd26ea0957c` |
+| Android Update | `01a18527-f8c0-791a-be2b-dfc7dfaf82e5` |
+| iOS Update | `01a18527-f8c0-73eb-9dd6-845222567dd4` |
+| 源码提交 | `9c2a8cb` |
+
+本地 Android 与 iOS Hermes bundle 均已确认包含 `https://bigai.xin`，且不再包含 `http://8.152.201.57`。正式域名以 HTTPS 提供 `/v1/` 与 `/health`，`wss://bigai.xin/v1/voice/stream` 握手验证通过。临时 IP 的 `/v1/` 与 `/health` 暂时保留，供尚未收到 OTA 的旧安装兼容。

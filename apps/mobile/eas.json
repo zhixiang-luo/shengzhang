@@ -13,8 +13,7 @@
       "distribution": "internal",
       "channel": "preview",
       "env": {
-        "ALLOW_CLEARTEXT_API": "1",
-        "EXPO_PUBLIC_API_BASE_URL": "http://8.152.201.57"
+        "EXPO_PUBLIC_API_BASE_URL": "https://bigai.xin"
       },
       "android": {
         "buildType": "apk"

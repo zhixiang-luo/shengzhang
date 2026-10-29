@@ -89,13 +89,16 @@
 - 官网首版已落地到 `deploy/site/`：包含首屏语音入账动态演示、传统记账步骤对比、三张真实产品界面切换、能力卡片、隐私数据流、质量数据、独立开发者故事，以及 Android 内测和 GitHub Releases 双入口。
 - 官网使用无外部依赖的 `index.html`、`styles.css`、`app.js`，并纳入品牌 SVG、分享图和原型截图；支持滚动揭示、鼠标光晕、设备倾斜、声波和转写循环，并对 `prefers-reduced-motion` 做完整降级。
 - 官网已在 `1440×1000`、`768×1024`、`390×844` 和 `375×812` 四种视口完成布局验收；均无横向滚动，移动端导航、三个产品界面标签和方向键切换通过，页面自身无控制台错误。详细规格见 `docs/27-official-website.md`。
-- 官网已部署到现有阿里云 ECS 的 `/opt/shengzhang/site`，临时入口 `http://8.152.201.57/` 已从公网验证；首页、样式、脚本、产品截图和原有语音 `/health` 均返回 `200`。正式域名仍等待 ICP 备案与 HTTPS。
-- Android 内测 APK 已上传到官网稳定路径 `/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；当前为 `0.1.4 (14)`，服务器端 SHA-256 与内测构建一致。
+- 官网已切换到正式域名 `https://bigai.xin/shengzhang/`；根路径跳转到该子目录，误拼 `/shengzheng/` 与 `www` 都 301 到规范地址。首页、样式、脚本、图片和 APK 下载均从公网验证。
+- Android 内测 APK 已上传到正式域名稳定路径 `/shengzhang/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；当前为 `0.1.4 (14)`，服务器端 SHA-256 与内测构建一致。
 - App 已升级到 `0.1.3` 并接入 `expo-updates` + EAS Update：启动自动检查、回到前台限频检查、下载完成提示、立即重启和设置页手动检查均已实现；preview/production 使用独立 channel，runtimeVersion 跟随 appVersion。
 - 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。面向千级注册用户，生产值已调整为 IP 每分钟 30、每日 600、全局每分钟 120、每日 5000；内部连续 31 次无效请求验证为前 30 次 `400`、第 31 次 `429`。
 - GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Releases。`v0.1.3-preview.1` Pre-release 已附带完整 APK 附件，官网与 Release 均可分发同一构建。
 - GitHub 已发布 `v0.1.4-preview.1` Pre-release 并附完整 APK，标题采用用户可读的更新说明，Tag 保留技术版本；官网主下载入口与链接已移除版本号，改为稳定的 `?download=latest`。
 - Android `0.1.4` 原生构建已完成：构建 ID `b623433e-835c-4e80-9c51-adcb74bb61a7`，版本 `0.1.4 (14)`，APK 109,914,393 字节，SHA-256 `6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b`；官网已原子替换并从公网验证。
+- 正式域名已启用 Let’s Encrypt HTTPS：证书 SAN 覆盖 `bigai.xin` 与 `www.bigai.xin`，有效期至 2027-01-26，自动续期 dry-run 通过；阿里云安全组和 Ubuntu UFW 均已放行 443/TCP。
+- 官网 footer 已展示 `京ICP备2026073107号` 并链接工信部备案系统，canonical 与 Open Graph 地址统一为 `https://bigai.xin/shengzhang/`。
+- preview 通道已发布 HTTPS 域名 OTA：Update Group `a2f27f47-d1fb-49ed-8529-cfd26ea0957c`，runtime `0.1.4`，Android/iOS bundle 均确认写入 `https://bigai.xin`。
 - GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
 - Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；58 项测试全部通过，其中移动端新增首次授权和金额键盘回归测试 5 项。
 - 已接入隐私优先的第一方匿名统计：官网访问/下载、App 启动、语音开始/完成/保存/撤销/取消/失败、手动新增/编辑/删除、统计、分类和设置事件。事件只包含固定名称、平台、版本、条数、耗时和错误原因；金额、分类名、备注、转写和录音不上报。
@@ -110,7 +113,7 @@
 - 已用 `video-shotcraft` 镜头卡与 Remotion 制作 1920×1080 横屏宣传片《一句话，两笔账》，工程位于 `design/video/shengzhang-shotcraft/`；当前为 6 段晓晓普通话女声旁白、原创程序化配乐、转场拟音、镜头卡工作台和帧级分镜。旁白通过 `edge-tts` 生成，文案固定于 `scripts/voice_lines.json`，按画面窗口校准语速；Yunyang 男声和原 Tingting 女声保留用于回退对比。
 - shotcraft 主版为 `design/exports/video/声账-shotcraft-宣传片.mp4`，无 BGM 版为 `design/exports/video/声账-shotcraft-宣传片-无BGM.mp4`；两版均为 25.23 秒、757 帧、30fps、H.264 + AAC 48kHz stereo，且复用完全相同的视频流（MD5 `c6c2b9b05b4ac5e68d3543e5b96cb6bd`）。完整解码与无黑帧检查通过；带 BGM 版约 -16.0 LUFS / -1.8 dBTP，无 BGM 版约 -16.0 LUFS / -2.7 dBTP。主版 SHA-256 为 `5cd3f07f908b9e58537067e95accb03795c30fe60507236689d00e8f81c371ef`，无 BGM 版 SHA-256 为 `65b06e42606d9152cd214bfe7e63960730a81c1442352291e7fb9e6a3ed0a3ab`。
 
-## 测试发布状态（2026-10-23）
+## 测试发布状态（2026-10-29）
 
 - Expo/EAS 项目已关联为 `@xiaozhuluozhixiang/shengzhang`，项目 ID 为 `04dd154b-655a-4b0e-bd3f-f3fafd76ab3d`。
 - 首个 Android 内测 APK 已通过 EAS Build 完成：构建 ID `d0e1f1f3-41c6-4bf3-8c3b-7eb6fd4f1585`，profile `preview`，版本 `0.1.0 (1)`，构建耗时 21 分 12 秒。
@@ -125,9 +128,9 @@
 - 2026-10-22 21:10（Asia/Shanghai）官网 `/downloads/shengzhang-android-preview.apk` 已通过临时文件校验后原子替换为 `0.1.3`；首页版本参数、OTA 提示和下载按钮同步更新。服务器端文件大小 109,854,465 字节、SHA-256 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`，旧 `0.1.2` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.2-preview.apk`。
 - 2026-10-23 10:36（Asia/Shanghai）官网已原子替换为 `0.1.4`，首页不再展示版本号，下载链接固定为 `?download=latest`；公网响应 `200` 且 `Content-Length` 为 109,914,393 字节。旧 `0.1.3` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.3-preview.apk`。
 - 两次 build 均使用同一 Android 签名证书，证书 MD5 为 `440A483CAFA42B8CE655EBC15DBAA2F2`；第二个 APK 的 ZIP 完整性和签名证书解析均通过。
-- 该 APK 使用 `preview` 配置中的临时测试 API `http://8.152.201.57` 和本地明文 HTTP 插件；本地手记账、统计和设置不依赖该接口。2026-10-21 08:46（Asia/Shanghai）复测 `/health` 返回正常，ECS 与 `shengzhang-api` 已恢复运行，可以开始语音真机测试。
-- 阿里云 ECS 已完成系统盘快照与格式化，部署环境为 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 和 systemd；`bigai.xin` 的公开 HTTP 入口仍受中国内地 ICP 备案阻断。
-- 个人 ICP 备案草稿已覆盖网站和 Android App，域名指向现有 ECS，Android 包名为 `com.shengzhang.ledger`；备案订单号、实例 ID 和身份材料只保存在本地运维记录，不写入公开仓库。
+- `0.1.4` 安装包在构建时嵌入过临时 IP；当前 preview OTA 已把 API 切换到 `https://bigai.xin`。服务端继续保留 IP 的 `/v1/` 与 `/health`，用于兼容尚未接收 OTA 的旧安装。
+- 阿里云 ECS 运行 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 1.24 和 systemd；正式域名 HTTP 308 到 HTTPS，公网 `/health` 返回 200，WSS 语音握手通过。
+- 个人 ICP 备案已通过并展示备案号 `京ICP备2026073107号`；Android 包名为 `com.shengzhang.ledger`，备案订单号、实例 ID 和身份材料只保存在本地运维记录，不写入公开仓库。
 
 ## 当前未实现
 
@@ -142,7 +145,7 @@
 
 ## 下一步最小任务
 
-1. 安装已完成的 `0.1.4` Android APK，验证首次麦克风授权、手动记账自动键盘和圆形启动图。
+1. 在已安装 `0.1.4` 的 Android 真机接收 preview OTA，确认语音请求和 WebSocket 已从 IP 切换到 `https://bigai.xin`。
 2. 评审官网首版视觉、文案与下载入口；确认后用真实设备截图替换原型素材。
 3. 从官网直接下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
 4. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
@@ -164,7 +167,7 @@
 - App 图标 PNG 已由品牌 SVG 生成，但 Android 自适应前景和启动页仍需高保真阶段复核。
 - GitHub 仓库和 Releases 已从匿名请求复验可访问；`v0.1.3-preview.1` 的 APK 附件 API 状态为 `uploaded`，公开下载响应大小为 109,854,465 字节。
 - GitHub 网页端上传大于 100 MiB 的 Release 附件可能在 policy/finalization 阶段失败；本项目已改用已认证的 GitHub CLI/API 上传。`v0.1.4-preview.1` 的 APK 附件已通过公开 API 和下载响应复验。
-- 临时 IP 入口使用明文 HTTP，只适合当前静态官网预览；备案和域名就绪后应尽快切换 HTTPS，不把临时 IP 作为长期推广地址。
+- 临时 IP 入口仅为旧安装兼容而保留；新版本只使用 HTTPS 正式域名。待确认用户都已收到 OTA 后，再评估关闭 IP 的网页跳转或 API 兼容。
 - 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
 - `pnpm audit --prod` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 两项高危告警；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。宣传片工程自身 `npm audit` 为 0。
 
@@ -197,6 +200,14 @@ android preview sha256: 6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519
 github release asset: shengzhang-0.1.4-preview.apk uploaded, size 109914393
 github release digest: sha256:6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b
 github release public download: HTTP 200, Content-Length 109914393
+official domain: https://bigai.xin/shengzhang/ HTTP 200
+official domain redirects: / -> /shengzhang/, /shengzheng/ -> /shengzhang/, www -> apex
+official domain assets/downloads: image/css/js/apk reachable
+official domain tls: bigai.xin + www.bigai.xin, expires 2027-01-26
+official domain renew dry-run: passed
+official domain api: /health HTTP 200
+official domain websocket: wss_open
+preview OTA domain: a2f27f47-d1fb-49ed-8529-cfd26ea0957c, runtime 0.1.4
 promo video lint: 0 errors / 0 warnings
 promo video runtime: 0 errors
 promo video contrast: 69/69 passed WCAG AA
