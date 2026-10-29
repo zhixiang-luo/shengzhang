@@ -189,3 +189,40 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/b623433e
 | 源码提交 | `9c2a8cb` |
 
 本地 Android 与 iOS Hermes bundle 均已确认包含 `https://bigai.xin`，且不再包含 `http://8.152.201.57`。正式域名以 HTTPS 提供 `/v1/` 与 `/health`，`wss://bigai.xin/v1/voice/stream` 握手验证通过。临时 IP 的 `/v1/` 与 `/health` 暂时保留，供尚未收到 OTA 的旧安装兼容。
+
+## 12. Android `0.1.5` 预览候选构建
+
+2026-10-29 已完成 `0.1.5` 的 Android 原生预览候选构建。本版包含完整圆形启动图、首启与冷启动分档、月度摘要卡装饰和分类独立图标，因此不能通过 `0.1.4` OTA 获得；需要安装新的原生 APK。
+
+| 项目 | 记录 |
+| --- | --- |
+| EAS Build | `250250ce-0722-40a7-af4e-d276ae4b61b9` |
+| 源码提交 | `9c39483eca20c68475fd3e0413a841aab711f832` |
+| Profile / Channel | `preview` / `preview` |
+| App Version / Version Code | `0.1.5` / `15` |
+| Runtime Version | `0.1.5` |
+| 包名 | `com.shengzhang.ledger` |
+| 构建完成时间 | 2026-10-29 10:59:44（Asia/Shanghai） |
+| APK 大小 | 109,937,553 字节（约 104.8 MiB） |
+| APK SHA-256 | `0be61cd6aa907cac3ea563ae95dd860cfeefcbac0ce6dd88c543d178871f539b` |
+
+构建页：
+
+```text
+https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/250250ce-0722-40a7-af4e-d276ae4b61b9
+```
+
+候选包下载地址：
+
+```text
+https://expo.dev/artifacts/eas/1aU4s3uYxQBdl0a-G2cH09Unpe0YdNFWVOPpa7I3v5A.apk
+```
+
+发布前状态：
+
+- `pnpm typecheck` 通过。
+- `pnpm lint` 通过。
+- `pnpm test` 通过，共 71 项。
+- 本地 APK 下载完成，`unzip -t` 完整性检查通过。
+- `assets/app.config` 已确认版本为 `0.1.5`，runtime 为 `0.1.5`，包名为 `com.shengzhang.ledger`。
+- 当前仅完成候选构建；官网稳定下载文件和 GitHub Release 仍保留 `0.1.4`，待 Android 真机确认首装入场、冷启动策略、分类图标选择器和摘要卡装饰后再替换。

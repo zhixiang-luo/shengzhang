@@ -133,6 +133,8 @@
 - 2026-10-23 10:36（Asia/Shanghai）官网已原子替换为 `0.1.4`，首页不再展示版本号，下载链接固定为 `?download=latest`；公网响应 `200` 且 `Content-Length` 为 109,914,393 字节。旧 `0.1.3` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.3-preview.apk`。
 - 两次 build 均使用同一 Android 签名证书，证书 MD5 为 `440A483CAFA42B8CE655EBC15DBAA2F2`；第二个 APK 的 ZIP 完整性和签名证书解析均通过。
 - `0.1.4` 安装包在构建时嵌入过临时 IP；当前 preview OTA 已把 API 切换到 `https://bigai.xin`。服务端继续保留 IP 的 `/v1/` 与 `/health`，用于兼容尚未接收 OTA 的旧安装。
+- Android `0.1.5` 原生候选包已通过 EAS Build 完成：构建 ID `250250ce-0722-40a7-af4e-d276ae4b61b9`，源码提交 `9c39483`，profile/channel 为 `preview`，版本 `0.1.5 (15)`，runtime `0.1.5`；APK 文件大小 109,937,553 字节，SHA-256 为 `0be61cd6aa907cac3ea563ae95dd860cfeefcbac0ce6dd88c543d178871f539b`，ZIP 完整性与嵌入版本配置检查均通过。
+- `0.1.5` 尚未替换官网稳定下载文件，也未创建 GitHub Release；官网与 GitHub 当前正式预览包仍为 `0.1.4`，避免未经真机验收的候选版直接分发给现有用户。
 - 阿里云 ECS 运行 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 1.24 和 systemd；正式域名 HTTP 308 到 HTTPS，公网 `/health` 返回 200，WSS 语音握手通过。
 - 个人 ICP 备案已通过并展示备案号 `京ICP备2026073107号`；Android 包名为 `com.shengzhang.ledger`，备案订单号、实例 ID 和身份材料只保存在本地运维记录，不写入公开仓库。
 
@@ -146,11 +148,12 @@
 - 完整成本看板：DeepSeek token、网关、存储、支付渠道、税费和客服账单尚未纳入。
 - 月末回顾页、隐私中心、分享卡和会员能力尚未实现。
 - iOS 内购、会员 entitlement、恢复购买、微信/支付宝 APP 支付均未实现。
+- Android `0.1.5` 候选包尚未完成真机验收、官网替换、GitHub Pre-release 和 preview OTA 发布。
 
 ## 下一步最小任务
 
-1. 在 Expo/Android 真机验证 `0.1.5` 候选版：首装完整入场、二次冷启动跳过/简化、后台恢复不播放入场、分类图标选择器和摘要卡片装饰。
-2. 构建 `0.1.5 (15)` APK 后验证原生 Splash 到 React 首帧无跳变，并发布 preview OTA。
+1. 在 Android 真机验证已构建的 `0.1.5 (15)` 候选包：首装完整入场、二次冷启动跳过/简化、后台恢复不播放入场、分类图标选择器、摘要卡片装饰和原生 Splash 到 React 首帧无跳变。
+2. 真机验收通过后原子替换官网稳定 APK、备份 `0.1.4`、创建 GitHub Pre-release `v0.1.5-preview.1`，并发布 runtime `0.1.5` 的 preview OTA。
 3. 从正式域名下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
 4. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
 5. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
@@ -201,6 +204,10 @@ android bundle export: passed for 0.1.5 candidate
 android preview build: b623433e-835c-4e80-9c51-adcb74bb61a7 finished
 android preview site: 0.1.4 APK atomically deployed, Content-Length 109914393
 android preview sha256: 6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b
+android 0.1.5 candidate build: 250250ce-0722-40a7-af4e-d276ae4b61b9 finished
+android 0.1.5 candidate size: 109937553
+android 0.1.5 candidate sha256: 0be61cd6aa907cac3ea563ae95dd860cfeefcbac0ce6dd88c543d178871f539b
+android 0.1.5 candidate zip/config: passed
 github release asset: shengzhang-0.1.4-preview.apk uploaded, size 109914393
 github release digest: sha256:6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b
 github release public download: HTTP 200, Content-Length 109914393
