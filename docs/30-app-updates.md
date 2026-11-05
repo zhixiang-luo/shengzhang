@@ -349,7 +349,7 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/986291b4
 
 ## 18. Android `0.2.1` 启动体验原生发布
 
-2026-11-05 完成 `0.2.1` Android 原生构建，2026-11-06 完成官网、CDN、服务端更新策略和 GitHub 发布记录同步。本版修改了 Android 原生启动图，因此必须重新构建安装包，不能只靠 `0.2.0` OTA。
+2026-11-05 完成 `0.2.1` Android 原生构建，2026-11-06 完成官网、CDN、服务端更新策略、GitHub Pre-release 和 preview OTA。本版修改了 Android 原生启动图，因此必须重新构建安装包，不能只靠 `0.2.0` OTA。
 
 | 项目 | 记录 |
 | --- | --- |
@@ -383,5 +383,25 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/e0c11c47
 - API 已切换发布目录 `/opt/shengzhang/releases/20261106-000115`，服务以 systemd 自动拉起并保持 `active`。
 - 公网更新策略验证：`0.2.1 → none`、`0.2.0 → optional`、`0.1.6 → optional`、`0.1.4 → optional`、`0.1.3 → required`。
 - 公网 `/health` 返回 `200` 且 `status=ok`。
+- GitHub Pre-release `v0.2.1-preview.1` 已发布并附带同名 APK，公开 API 返回附件状态 `uploaded`、大小 107,723,132 字节。
 
 安装后仍需在 Android 真机验收原生字标与 React 首帧无跳变、首装/进程冷启动/后台恢复三档策略，以及从官网、CDN 和 GitHub 三处下载同一哈希的 APK 覆盖安装后本地账本是否保留。
+
+## 19. Runtime `0.2.1` Preview OTA
+
+2026-11-06 已为 `0.2.1` runtime 发布 preview OTA：
+
+| 项目 | 记录 |
+| --- | --- |
+| Channel / Environment | `preview` / `preview` |
+| Runtime Version | `0.2.1` |
+| Platform | Android、iOS |
+| Update Group | `5ee8d355-e8a9-465e-bd52-3e1b6d3c3edb` |
+| Android Update | `01a1ac78-a9ed-7882-b262-fc1b0995adfb` |
+| iOS Update | `01a1ac78-a9ed-7263-9dde-2a7c67132e87` |
+| 源码提交 | `9bb75e98ab449fdfcef1dbf3158955247fd77916` |
+| EAS Dashboard | `https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/updates/5ee8d355-e8a9-465e-bd52-3e1b6d3c3edb` |
+
+本次第一次上传在 Expo 资产存储建立 TLS 连接时中断，Bundle 已成功生成；复用同一 `apps/mobile/dist` 产物并通过 `--skip-bundler` 重试后上传完成，没有重新打包或改变提交。
+
+OTA 只负责后续兼容的 JS/TS 更新与在线更新清单。原生启动图已经固化在 APK 内，因此新用户或旧版用户仍需先覆盖安装 `0.2.1 (18)` APK，之后才能接收 runtime `0.2.1` 的后续 OTA。

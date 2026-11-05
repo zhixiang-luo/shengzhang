@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.1` Android 原生包已构建并切换到官网、OSS + CDN 和服务端更新策略，正在完成 GitHub Release 与 runtime `0.2.1` preview OTA。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
+项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.1` Android 原生包已发布到官网、OSS + CDN、服务端更新策略和 GitHub Pre-release，runtime `0.2.1` preview OTA 也已上线。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
 
 ## 已完成
 
@@ -186,6 +186,8 @@
 - OSS/CDN 已切换到 `releases/shengzhang-0.2.1-preview.apk`；完整下载大小和 SHA-256 与本地构建逐字节一致。
 - 官网已切换到 `0.2.1` CDN 下载入口，页面主文案不突出版本号；API 已部署到 `/opt/shengzhang/releases/20261106-000115`，公网策略为 `0.2.1 → none`、`0.2.0/0.1.6/0.1.4 → optional`、`0.1.3 → required`，`/health` 正常。
 - 服务器 5 分钟巡检日志已增加 10 MiB 轮转与 5 份保留；GitHub 外部看门狗工作流升级到固定 Ubuntu 24.04 与 `actions/checkout@v7`，待提交到默认分支后生效。
+- GitHub Pre-release `v0.2.1-preview.1` 已发布并附带 APK；公开 API 返回资源状态 `uploaded`、大小 107,723,132 字节。
+- runtime `0.2.1` preview OTA 已发布到 Android/iOS：Update Group `5ee8d355-e8a9-465e-bd52-3e1b6d3c3edb`，Android `01a1ac78-a9ed-7882-b262-fc1b0995adfb`，iOS `01a1ac78-a9ed-7263-9dde-2a7c67132e87`，源码提交 `9bb75e9`。
 
 ## 当前未实现
 
@@ -199,7 +201,7 @@
 - `0.1.7` 的 Android/iOS 系统分享、文件选择器以及“导出 → 清空 → 恢复”真机闭环尚未验收。
 - `0.2.0` Android 原生构建已完成，但 PNG 清晰度、系统分享、取消行为、临时文件清理和 `react-native-view-shot` 真机可用性尚未验收；iOS 原生构建尚未完成。
 - iOS 内购、会员 entitlement、恢复购买、微信/支付宝 APP 支付均未实现。
-- Android `0.2.1` 已替换官网稳定下载文件；GitHub Pre-release 与 runtime `0.2.1` preview OTA 正在本次发布流程中完成，启动动画与 0.2.1 完整真机闭环仍待验收。
+- Android `0.2.1` 已替换官网稳定下载文件，GitHub Pre-release 和 runtime `0.2.1` preview OTA 均已发布；启动动画与 0.2.1 完整真机闭环仍待验收。
 - 服务器旧 `/downloads/` 路径仍返回旧安装包，仅用于短时兼容；官网与 App 更新接口不再把它作为稳定入口。待旧安装升级率足够高后再下线。
 - 语音失败恢复、单笔修正和首次引导已包含在 `0.2.0`，待 Android/iOS 真机回归。
 
@@ -286,6 +288,10 @@ ios export: passed
 0.2.1 official site: switched to CDN object
 0.2.1 api update policy: 0.2.1 -> none, 0.2.0 -> optional, 0.1.3 -> required
 0.2.1 health: HTTP 200, status=ok
+0.2.1 github release: v0.2.1-preview.1 prerelease, APK uploaded
+0.2.1 github release asset: 107723132 bytes
+0.2.1 preview OTA: 5ee8d355-e8a9-465e-bd52-3e1b6d3c3edb, runtime 0.2.1, android + ios
+0.2.1 preview OTA commit: 9bb75e98ab449fdfcef1dbf3158955247fd77916
 boot policy typecheck: passed
 boot policy lint: passed
 boot policy tests: domain 34 + mobile 56 + api 38 = 128 passed
