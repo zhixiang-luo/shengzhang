@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" role="img" aria-labelledby="title">
+  <title id="title">声账启动字标与声波</title>
+  <text x="360" y="126" text-anchor="middle" fill="#292624" font-family="Songti SC, Noto Serif CJK SC, serif" font-size="136" font-weight="600" letter-spacing="14">声账</text>
+  <g transform="translate(312 184)" fill="#E89A96">
+    <rect x="0" y="11" width="5" height="10" rx="2.5" opacity=".42"/>
+    <rect x="15" y="6" width="5" height="20" rx="2.5" opacity=".58"/>
+    <rect x="30" y="0" width="5" height="32" rx="2.5" opacity=".88"/>
+    <rect x="45" y="4" width="5" height="24" rx="2.5" opacity=".72"/>
+    <rect x="60" y="2" width="5" height="28" rx="2.5" opacity=".82"/>
+    <rect x="75" y="8" width="5" height="16" rx="2.5" opacity=".55"/>
+    <rect x="90" y="12" width="5" height="8" rx="2.5" opacity=".4"/>
+  </g>
+</svg>

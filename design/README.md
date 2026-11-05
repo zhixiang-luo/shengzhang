@@ -26,6 +26,7 @@
 | `assets/app-icon.svg` | 1024 方形 App 图标 |
 | `assets/adaptive-icon.svg` | Android 自适应图标透明前景 |
 | `assets/monochrome-icon.svg` | Android 单色主题图标 |
+| `assets/splash-wordmark.svg` | 原生启动字标与极小声波 |
 | `assets/sound-wave.svg` | 语音状态与空状态装饰 |
 | `exports/brand-mark.png` | 1024px 品牌标记导出 |
 | `exports/brand-lockup.png` | 2400px 横向品牌组合导出 |
@@ -54,7 +55,7 @@
 - 一屏最多一个腮红主按钮；其他操作用墨色文字或浅色底。
 - 账单金额使用等宽数字特性，列表金额右对齐。
 - 不把每个模块都装进白色卡片；优先通过留白和分隔线组织。
-- 小猪插图只出现在启动、空状态、成功反馈和引导中。
+- 小猪插图只出现在空状态、引导和成功反馈中，不进入原生启动图或 React 启动首帧。
 - 图表不追求彩虹分类，主要使用腮红、鼠尾草绿、沙金和暖灰。
 - 动效只服务于状态变化，不做装饰性循环动画。
 - 首版不做深色模式，但必须验证系统深色外观下的可读性。

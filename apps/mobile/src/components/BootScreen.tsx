@@ -10,7 +10,6 @@ import {
 
 import { BOOT_FULL_INTRO_MS, BOOT_QUICK_INTRO_MS } from '../features/boot/bootPolicy';
 import { colors, radii, spacing, typography } from '../theme/tokens';
-import { BrandMark } from './BrandMark';
 
 export type BootScreenMode = 'full' | 'quick';
 
@@ -19,7 +18,15 @@ type BootScreenProps = {
   onFinish?: () => void;
 };
 
-const WAVE_WEIGHTS = [0.36, 0.62, 1, 0.7, 0.9, 0.52, 0.34];
+const WAVE_BARS = [
+  { weight: 0.36, opacity: 0.42 },
+  { weight: 0.62, opacity: 0.58 },
+  { weight: 1, opacity: 0.88 },
+  { weight: 0.7, opacity: 0.72 },
+  { weight: 0.9, opacity: 0.82 },
+  { weight: 0.52, opacity: 0.55 },
+  { weight: 0.34, opacity: 0.4 },
+];
 
 export function BootScreen({ mode, onFinish }: BootScreenProps) {
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -30,7 +37,7 @@ export function BootScreen({ mode, onFinish }: BootScreenProps) {
   const [footer] = useState(() => new Animated.Value(0));
   const [breath] = useState(() => new Animated.Value(0));
   const [statusPulse] = useState(() => new Animated.Value(0));
-  const [waves] = useState(() => WAVE_WEIGHTS.map(() => new Animated.Value(0)));
+  const [waves] = useState(() => WAVE_BARS.map(() => new Animated.Value(1)));
   const onFinishRef = useRef(onFinish);
 
   useEffect(() => {
@@ -55,7 +62,7 @@ export function BootScreen({ mode, onFinish }: BootScreenProps) {
     identity.setValue(0);
     status.setValue(0);
     footer.setValue(0);
-    waves.forEach((value) => value.setValue(0));
+    waves.forEach((value) => value.setValue(1));
 
     if (reduceMotion) {
       halo.setValue(1);
@@ -67,6 +74,8 @@ export function BootScreen({ mode, onFinish }: BootScreenProps) {
       const timer = setTimeout(() => onFinishRef.current?.(), mode === 'full' ? 700 : 300);
       return () => clearTimeout(timer);
     }
+
+    waves.forEach((value) => value.setValue(mode === 'full' ? 0.84 : 0.92));
 
     const introAnimations = [
       Animated.timing(ring, {
@@ -165,11 +174,11 @@ export function BootScreen({ mode, onFinish }: BootScreenProps) {
     };
   }, [breath, footer, halo, identity, mode, reduceMotion, ring, status, statusPulse, waves]);
 
-  const plateScale = breath.interpolate({
+  const wordmarkScale = breath.interpolate({
     inputRange: [0, 1],
-    outputRange: [1, 1.012],
+    outputRange: [1, 1.018],
   });
-  const plateTranslateY = breath.interpolate({
+  const wordmarkTranslateY = breath.interpolate({
     inputRange: [0, 1],
     outputRange: [0, -3],
   });
@@ -244,22 +253,25 @@ export function BootScreen({ mode, onFinish }: BootScreenProps) {
         />
         <Animated.View
           style={[
-            styles.plate,
+            styles.wordmarkStage,
             {
-              transform: [{ translateY: plateTranslateY }, { scale: plateScale }],
+              transform: [{ translateY: wordmarkTranslateY }, { scale: wordmarkScale }],
             },
           ]}
         >
-          <BrandMark size={140} />
+          <Text style={styles.bootWordmark}>声账</Text>
           <View pointerEvents="none" style={styles.wave}>
-            {WAVE_WEIGHTS.map((weight, index) => (
+            {WAVE_BARS.map(({ weight, opacity }, index) => (
               <Animated.View
                 key={index}
                 style={[
                   styles.waveBar,
                   {
-                    height: 7 + weight * 19,
-                    opacity: waves[index],
+                    height: 4 + weight * 8,
+                    opacity: waves[index].interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, opacity],
+                    }),
                     transform: [{ scaleY: waves[index] }],
                   },
                 ]}
@@ -278,7 +290,6 @@ export function BootScreen({ mode, onFinish }: BootScreenProps) {
           },
         ]}
       >
-        <Text style={styles.wordmark}>声账</Text>
         <Text style={styles.tagline}>说一句，就记好。</Text>
       </Animated.View>
 
@@ -355,70 +366,55 @@ const styles = StyleSheet.create({
     borderRadius: 142,
   },
   brandStage: {
-    width: 220,
-    height: 220,
+    width: 280,
+    height: 180,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -44,
+    marginTop: -24,
   },
   halo: {
     position: 'absolute',
-    width: 198,
-    height: 198,
+    width: 224,
+    height: 224,
     borderWidth: 1,
     borderColor: 'rgba(157, 86, 87, 0.2)',
-    borderRadius: 99,
+    borderRadius: 112,
     backgroundColor: 'rgba(247, 221, 216, 0.24)',
   },
   ring: {
     position: 'absolute',
-    width: 194,
-    height: 194,
+    width: 214,
+    height: 214,
     borderWidth: 1,
     borderColor: 'rgba(232, 154, 150, 0.42)',
-    borderRadius: 97,
+    borderRadius: 107,
   },
-  plate: {
-    width: 164,
-    height: 164,
+  wordmarkStage: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(157, 86, 87, 0.13)',
-    borderRadius: 82,
-    backgroundColor: colors.surface,
-    shadowColor: colors.blushDeep,
-    shadowOffset: { width: 0, height: 22 },
-    shadowOpacity: 0.14,
-    shadowRadius: 34,
-    elevation: 8,
   },
   wave: {
-    position: 'absolute',
-    bottom: 10,
-    height: 30,
+    height: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 10,
-    borderRadius: 15,
-    backgroundColor: colors.surface,
+    gap: 3,
+    marginTop: 4,
   },
   waveBar: {
-    width: 3,
-    borderRadius: 2,
+    width: 2,
+    borderRadius: 1,
     backgroundColor: colors.blush,
   },
   identity: {
     alignItems: 'center',
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
-  wordmark: {
+  bootWordmark: {
     color: colors.ink,
     fontFamily: typography.display,
-    fontSize: 42,
+    fontSize: 44,
     fontWeight: '600',
-    letterSpacing: 7,
+    letterSpacing: 8,
   },
   tagline: {
     marginTop: 5,
