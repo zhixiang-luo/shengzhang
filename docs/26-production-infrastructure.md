@@ -146,7 +146,7 @@ Key 只放服务端环境变量或 Secrets Manager，不进入 App、构建产�
 
 当前已经落地两层监控：
 
-- 服务器每 5 分钟执行 `deploy/ops-alert.sh`，检查 API、Nginx、`/health`、磁盘、可用内存、负载、ECS 网络收发吞吐和最近 15 分钟 error 日志。当前小服务器默认在持续出网达到 2.5 Mbps 时预警、4.0 Mbps 时视为紧急，后续应根据 ECS 实际带宽和供应商并发额度调整。
+- 服务器每 5 分钟执行 `deploy/ops-alert.sh`，检查 API、Nginx、`/health`、磁盘、可用内存、负载、ECS 网络收发吞吐和最近 15 分钟 error 日志。当前小服务器默认在持续出网达到 2.5 Mbps 时预警、4.0 Mbps 时视为紧急，后续应根据 ECS 实际带宽和供应商并发额度调整。巡检日志达到 10 MiB 时自动轮转，保留 5 份。
 - GitHub Actions 工作流 `.github/workflows/production-health.yml` 推送到默认分支后每 5 分钟从外部访问 `https://bigai.xin/health`。它能覆盖整台 ECS、公网或本机监控进程失联的情况；异常时创建一次运维 Issue 并发邮件，恢复后关闭 Issue 并发送恢复邮件。GitHub 的定时任务可能有数分钟调度延迟，因此它只作为整机失联兜底，不能替代服务器本机 5 分钟检查。
 - 服务器每天 00:50 生成运营日报，Codex 每天 08:00 读取并汇报；活跃安装达到 100、300、500、1000，或昨日完整语音达到 500、1500、2500 时提升容量提示等级。
 

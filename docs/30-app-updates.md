@@ -240,8 +240,8 @@ https://expo.dev/artifacts/eas/1aU4s3uYxQBdl0a-G2cH09Unpe0YdNFWVOPpa7I3v5A.apk
 - 首次安装入场动画改为在实际播放完成后才写入“已看过”；首次启动中途退出时，下次仍会播放。
 - `GET /v1/app/update-policy` 已部署到 `https://bigai.xin`；`0.1.6` 发布后公网验证 `0.1.4` 返回 `optional`、`0.1.3` 返回 `required`，iOS 在未配置商店地址时返回 `none`。
 
-服务端 Android latest 已切到 `0.2.0`，minimum 保留 `0.1.4`；下载地址使用
-`https://download.bigai.xin/releases/shengzhang-0.2.0-preview.apk?download=latest&version=0.2.0`。
+服务端 Android latest 已切到 `0.2.1`，minimum 保留 `0.1.4`；下载地址使用
+`https://download.bigai.xin/releases/shengzhang-0.2.1-preview.apk?download=latest&version=0.2.1`。
 
 ## 14. Android `0.1.6` 官网发布
 
@@ -346,3 +346,42 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/986291b4
 - 公网回归确认 `0.2.0 → none`、`0.1.6/0.1.4 → optional`、`0.1.3 → required`。
 
 服务器旧 `/downloads/` 路径只作短时兼容，后续可依据旧安装升级率下线。所有公开发行文件必须走版本化对象路径，避免覆盖缓存后的同一 URL。
+
+## 18. Android `0.2.1` 启动体验原生发布
+
+2026-11-05 完成 `0.2.1` Android 原生构建，2026-11-06 完成官网、CDN、服务端更新策略和 GitHub 发布记录同步。本版修改了 Android 原生启动图，因此必须重新构建安装包，不能只靠 `0.2.0` OTA。
+
+| 项目 | 记录 |
+| --- | --- |
+| EAS Build | `e0c11c47-ae73-46ae-88c8-474168672227` |
+| 源码提交 | `e979a05883c10f32db9e16af0f1d7c1712625a96` |
+| Profile / Channel | `preview` / `preview` |
+| App Version / Version Code | `0.2.1` / `18` |
+| Runtime Version | `appVersion` → `0.2.1` |
+| 包名 | `com.shengzhang.ledger` |
+| 构建完成时间 | 2026-11-05 23:50:51（Asia/Shanghai） |
+| APK 大小 | 107,723,132 字节（约 102.73 MiB） |
+| APK SHA-256 | `dbbf5f3f8657895ea2fa2ef9c686b959023a0a6bd56ed57056e17dac1b5fe084` |
+
+构建页：
+
+```text
+https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/e0c11c47-ae73-46ae-88c8-474168672227
+```
+
+发布状态：
+
+- 原生启动图已替换为奶油背景、横向“声账”字标和淡粉色声波；不再出现粉色圆盘、小猪、图标块或菱形缺陷。
+- React `BootScreen` 从相同字标展开光晕、品牌主张和本地账本状态；首次安装完整播放约 2.72 秒，后续进程冷启动快速播放约 1.2 秒，从后台恢复不播放。
+- 小猪 `BrandMark` 保留在空状态、引导、反馈和分享等品牌场景，但不再进入原生启动图或 React 首帧。
+- `pnpm typecheck`、`pnpm lint`、`pnpm test`（domain 34、mobile 58、API 38，共 130 项）和 `git diff --check` 均通过。
+- APK `unzip -t`、`aapt2 dump badging` 和包内 `assets/app.config` 检查通过，确认版本 `0.2.1`、versionCode `18`、runtime `0.2.1`、包名 `com.shengzhang.ledger`。
+- APK Signature v2 验证通过；签名证书 SHA-256 为 `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955`，与 `0.2.0` 相同，可直接覆盖安装并保留本地账本。
+- APK 已上传到阿里云 OSS `shengzhang-releases`，对象为 `releases/shengzhang-0.2.1-preview.apk`，通过 `download.bigai.xin` CDN 分发。
+- CDN 完整下载返回 `200`、`application/vnd.android.package-archive`、107,723,132 字节并支持 Range；下载文件 SHA-256 与本地构建逐字节一致。
+- 官网 `https://bigai.xin/shengzhang/` 已切换下载链接，主文案不突出展示版本号。
+- API 已切换发布目录 `/opt/shengzhang/releases/20261106-000115`，服务以 systemd 自动拉起并保持 `active`。
+- 公网更新策略验证：`0.2.1 → none`、`0.2.0 → optional`、`0.1.6 → optional`、`0.1.4 → optional`、`0.1.3 → required`。
+- 公网 `/health` 返回 `200` 且 `status=ok`。
+
+安装后仍需在 Android 真机验收原生字标与 React 首帧无跳变、首装/进程冷启动/后台恢复三档策略，以及从官网、CDN 和 GitHub 三处下载同一哈希的 APK 覆盖安装后本地账本是否保留。

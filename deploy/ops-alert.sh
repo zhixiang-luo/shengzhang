@@ -10,6 +10,33 @@ delivery_failed=0
 
 mkdir -p "$alert_state_dir/active"
 
+rotate_log() {
+  local path="$1"
+  local max_bytes="$2"
+  local keep_files="$3"
+  local index
+  local current_size
+
+  [ -f "$path" ] || return 0
+  current_size="$(wc -c < "$path" | tr -d ' ')"
+  [ "$current_size" -ge "$max_bytes" ] || return 0
+
+  index="$keep_files"
+  while [ "$index" -gt 1 ]; do
+    if [ -f "${path}.$((index - 1))" ]; then
+      mv -f "${path}.$((index - 1))" "${path}.${index}"
+    fi
+    index="$((index - 1))"
+  done
+  mv -f "$path" "${path}.1"
+  : > "$path"
+}
+
+rotate_log \
+  "$alert_log" \
+  "${OPS_ALERT_LOG_MAX_BYTES:-10485760}" \
+  "${OPS_ALERT_LOG_KEEP_FILES:-5}"
+
 now_text="$(TZ=Asia/Shanghai date '+%F %T %Z')"
 host_name="$(hostname)"
 api_active="$(systemctl is-active shengzhang-api 2>/dev/null || true)"

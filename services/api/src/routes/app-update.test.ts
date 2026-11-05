@@ -7,7 +7,7 @@ const updatePolicy = {
     latestVersion: '0.1.5',
     minimumSupportedVersion: '0.1.4',
     downloadUrl:
-      'https://download.bigai.xin/releases/shengzhang-0.2.0-preview.apk?download=latest',
+      'https://download.bigai.xin/releases/shengzhang-0.2.1-preview.apk?download=latest',
   },
   ios: {
     latestVersion: '0.1.5',

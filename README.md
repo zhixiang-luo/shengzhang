@@ -225,9 +225,9 @@ python3 -m http.server 4173
 
 ## 下载与发布
 
-最新 Android 内测版可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)，安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。官网不把版本号写进主文案，日常纯 JS 更新通过 EAS OTA 推送；只有原生依赖、权限、启动图或 runtime 变化时才要求重新下载安装包。`0.2.0` 已构建为新的原生安装包，包含本地数据导出与恢复、离线账单搜索和月度回顾分享卡。
+最新 Android 内测版可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)，安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。官网不把版本号写进主文案，日常纯 JS 更新通过 EAS OTA 推送；只有原生依赖、权限、启动图或 runtime 变化时才要求重新下载安装包。`0.2.1` 已构建为新的原生安装包，包含全新的原生启动字标、连续入场体验和与 React 首帧一致的品牌开场。
 
-GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。官网当前提供 `0.2.0 (17)`，GitHub Pre-release `v0.2.0-preview.1` 附带同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
+GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。官网当前提供 `0.2.1 (18)`，GitHub Pre-release `v0.2.1-preview.1` 附带同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
 
 当前尚未在 App Store 或国内 Android 应用商店正式上架。
 

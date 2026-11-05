@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   probe:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
       HEALTH_URL: https://bigai.xin/health
@@ -30,7 +30,7 @@ jobs:
       ALERT_SMTP_SECURITY: ${{ secrets.ALERT_SMTP_SECURITY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Probe public health endpoint
         id: probe

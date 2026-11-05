@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.0` Android 原生包已构建、发布到官网与 GitHub，官网 APK 已切换到带 HTTPS 的 OSS + CDN 下载链路，并完成服务端更新策略切换与 preview OTA。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
+项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.1` Android 原生包已构建并切换到官网、OSS + CDN 和服务端更新策略，正在完成 GitHub Release 与 runtime `0.2.1` preview OTA。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
 
 ## 已完成
 
@@ -180,6 +180,12 @@
 - 官网下载按钮、服务端 `.env` 和 `GET /v1/app/update-policy` 已切换到 `https://download.bigai.xin/releases/shengzhang-0.2.0-preview.apk?download=latest&version=0.2.0`；API 发布目录已原子切换到 `/opt/shengzhang/releases/20261105-2202` 并重启。
 - CDN HTTPS 公网验收通过：证书链与 SAN 正确，HTTP/2 返回 `200`，HTTP 自动 `301` 到 HTTPS，Range 下载正确，完整 APK SHA-256 与本地产物一致，重复请求为 CDN `HIT`。
 - 个人 ICP 备案已通过并展示备案号 `京ICP备2026073107号`；Android 包名为 `com.shengzhang.ledger`，备案订单号、实例 ID 和身份材料只保存在本地运维记录，不写入公开仓库。
+- Android `0.2.1` 原生包已完成：EAS Build `e0c11c47-ae73-46ae-88c8-474168672227`，源码提交 `e979a05`，版本 `0.2.1 (18)`，runtime `0.2.1`，大小 107,723,132 字节，SHA-256 `dbbf5f3f8657895ea2fa2ef9c686b959023a0a6bd56ed57056e17dac1b5fe084`。
+- `0.2.1` 原生启动图已替换为横向字标和声波，移除粉红圆盘与小猪；React 首帧从同一字标展开，并保留首次完整、进程冷启动快速、后台恢复不播放的三档策略。
+- `0.2.1` APK 的版本、包名、runtime、ZIP 完整性、Signature v2 与签名证书一致性均已检查；与 `0.2.0` 使用相同证书，可覆盖安装并保留本地账本。
+- OSS/CDN 已切换到 `releases/shengzhang-0.2.1-preview.apk`；完整下载大小和 SHA-256 与本地构建逐字节一致。
+- 官网已切换到 `0.2.1` CDN 下载入口，页面主文案不突出版本号；API 已部署到 `/opt/shengzhang/releases/20261106-000115`，公网策略为 `0.2.1 → none`、`0.2.0/0.1.6/0.1.4 → optional`、`0.1.3 → required`，`/health` 正常。
+- 服务器 5 分钟巡检日志已增加 10 MiB 轮转与 5 份保留；GitHub 外部看门狗工作流升级到固定 Ubuntu 24.04 与 `actions/checkout@v7`，待提交到默认分支后生效。
 
 ## 当前未实现
 
@@ -193,7 +199,7 @@
 - `0.1.7` 的 Android/iOS 系统分享、文件选择器以及“导出 → 清空 → 恢复”真机闭环尚未验收。
 - `0.2.0` Android 原生构建已完成，但 PNG 清晰度、系统分享、取消行为、临时文件清理和 `react-native-view-shot` 真机可用性尚未验收；iOS 原生构建尚未完成。
 - iOS 内购、会员 entitlement、恢复购买、微信/支付宝 APP 支付均未实现。
-- Android `0.2.0` 预览包已替换官网稳定下载文件并发布 GitHub Pre-release；runtime `0.2.0` 的 preview OTA 已发布，启动动画与 0.2.0 完整真机闭环仍待验收。
+- Android `0.2.1` 已替换官网稳定下载文件；GitHub Pre-release 与 runtime `0.2.1` preview OTA 正在本次发布流程中完成，启动动画与 0.2.1 完整真机闭环仍待验收。
 - 服务器旧 `/downloads/` 路径仍返回旧安装包，仅用于短时兼容；官网与 App 更新接口不再把它作为稳定入口。待旧安装升级率足够高后再下线。
 - 语音失败恢复、单笔修正和首次引导已包含在 `0.2.0`，待 Android/iOS 真机回归。
 
@@ -202,10 +208,10 @@
 1. 在 Android/iOS 真机验证 `0.1.7`：数据安全页布局、JSON/CSV 系统分享、文件选择与导入、覆盖确认、清空二次确认和“导出 → 清空 → 恢复”完整闭环。
 2. 在 Android/iOS 真机验证 `0.1.8`：日期选择 Sheet、日期单独清除、搜索与金额输入垂直居中、中文输入法、键盘避让、窄屏筛选面板、5000 笔账单搜索响应和结果进入编辑。
 3. 在 Android/iOS 真机验证 `0.2.0`：空/非空月回顾、长文案、动态字体、PNG 清晰度、系统分享、取消分享和临时文件清理。
-4. 安装官网 `0.2.0 (17)` APK，完成数据安全、搜索、月度回顾和新增原生模块的真机回归。
+4. 安装官网 `0.2.1 (18)` APK，完成数据安全、搜索、月度回顾和新增原生模块的真机回归。
 5. 在 Android/iOS 真机验证启动策略：首装完整入场、后续进程冷启动快速入场、后台恢复不播放入场，以及原生 Splash 到 React 首帧无跳变。
-6. 在 Android/iOS 真机验证 runtime `0.2.0` preview OTA 的自动检查、下载重启、快速入场、强制门禁和异常提示。
-7. 从正式域名和 GitHub Release 分别下载 APK，核对同一哈希，并在 Android 真机验证覆盖安装后本地账本保留。
+6. 在 Android/iOS 真机验证 runtime `0.2.1` preview OTA 的自动检查、下载重启、快速入场、强制门禁和异常提示。
+7. 从正式官网、CDN 和 GitHub Release 分别下载 APK，核对同一哈希，并在 Android 真机验证覆盖安装后本地账本保留。
 8. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；完成 iOS 原生构建、双端真机矩阵与 12–15 人封闭试用。
 9. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
 10. 用真实供应商账单补齐成本看板的 DeepSeek、网关和存储成本。
@@ -230,6 +236,7 @@
 - 紧急邮件通道尚未启用：服务器没有预装邮件代理，且 `/opt/shengzhang/ops/alerts.env` 尚未填入真实 SMTP App Password。在配置完成前，定时任务会记录告警状态，但无法真正投递邮件。
 - `0.2.0` 分享卡依赖新增原生模块，必须重新构建和覆盖安装；旧 APK 即使收到同 runtime OTA 也不能安全获得该能力。
 - `expo-sharing` 无法可靠判断用户是否最终发送或取消系统分享，因此运营报告只能把“打开分享面板”当作传播意向，不能当作完成分享。
+- `0.2.1` 修改了原生启动图，旧安装无法通过同 runtime OTA 获得；用户必须覆盖安装新的 APK，本地 SQLite 账本不受影响。
 - `pnpm audit --prod` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 两项高危告警；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。宣传片工程自身 `npm audit` 为 0。
 
 ## 最近验证
@@ -269,6 +276,16 @@ ios export: passed
 0.2.0 ios export: passed
 0.2.0 expo-doctor: 20/20 passed
 0.2.0 expo config: version/runtime policy confirmed at 0.2.0
+0.2.1 typecheck: passed
+0.2.1 lint: passed
+0.2.1 tests: domain 34 + mobile 58 + api 38 = 130 passed
+0.2.1 git diff --check: passed
+0.2.1 apk zip/config/signature: passed
+0.2.1 apk sha256: dbbf5f3f8657895ea2fa2ef9c686b959023a0a6bd56ed57056e17dac1b5fe084
+0.2.1 cdn download: HTTP 200, size and SHA-256 matched
+0.2.1 official site: switched to CDN object
+0.2.1 api update policy: 0.2.1 -> none, 0.2.0 -> optional, 0.1.3 -> required
+0.2.1 health: HTTP 200, status=ok
 boot policy typecheck: passed
 boot policy lint: passed
 boot policy tests: domain 34 + mobile 56 + api 38 = 128 passed
