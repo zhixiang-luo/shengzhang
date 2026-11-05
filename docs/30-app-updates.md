@@ -94,7 +94,7 @@ npx eas-cli@latest build --platform android --profile preview
 
 ## 8. 版本展示与分发策略
 
-- 官网主文案不展示版本号；下载链接保留 `/downloads/shengzhang-android-preview.apk?download=latest`，并追加当前发布版本查询参数，避免浏览器复用旧 APK 缓存。
+- 官网主文案不展示版本号；下载链接使用版本化 OSS 对象和 `?download=latest`，并追加当前发布版本查询参数，由 CDN 分发。
 - GitHub Releases 继续使用语义化 Tag，作为版本历史和回滚依据；面向用户的 Release 标题优先描述这次更新，不把版本号当作主标题。
 - 纯 JS/TS 更新通过 EAS Update 推送，GitHub Release 只需记录更新内容，不必每次附 APK。
 - 原生依赖、权限、桌面图标、原生启动图或 runtimeVersion 变化时，必须构建新 APK，并同步更新官网稳定下载文件与 GitHub Release 附件。
@@ -240,7 +240,8 @@ https://expo.dev/artifacts/eas/1aU4s3uYxQBdl0a-G2cH09Unpe0YdNFWVOPpa7I3v5A.apk
 - 首次安装入场动画改为在实际播放完成后才写入“已看过”；首次启动中途退出时，下次仍会播放。
 - `GET /v1/app/update-policy` 已部署到 `https://bigai.xin`；`0.1.6` 发布后公网验证 `0.1.4` 返回 `optional`、`0.1.3` 返回 `required`，iOS 在未配置商店地址时返回 `none`。
 
-服务端 Android latest 已切到 `0.2.0`，minimum 保留 `0.1.4`；下载地址使用 `?download=latest&version=0.2.0`，避免复用旧安装包缓存。
+服务端 Android latest 已切到 `0.2.0`，minimum 保留 `0.1.4`；下载地址使用
+`https://download.bigai.xin/releases/shengzhang-0.2.0-preview.apk?download=latest&version=0.2.0`。
 
 ## 14. Android `0.1.6` 官网发布
 
@@ -299,10 +300,10 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/986291b4
 - APK ZIP 完整性检查通过。
 - `assets/app.config` 已确认版本为 `0.2.0`，runtime policy 为 `appVersion`，包名为 `com.shengzhang.ledger`。
 - APK DEX 内已确认包含 `ExpoDocumentPicker` 与 `RNViewShot` 原生模块，证明两项新增原生依赖进入安装包。
-- 官网稳定 APK 已先上传临时文件、核对大小与 SHA-256，再原子替换；`0.1.6` 已备份到 `/opt/shengzhang/releases/shengzhang-0.1.6-preview.apk`。
+- 官网稳定 APK 已上传到阿里云 OSS 版本化目录 `releases/`，CDN 响应大小与本地 SHA-256 一致；服务器旧路径和 `0.1.6` 原包只保留作短时兼容。
 - API 已切换发布目录 `/opt/shengzhang/releases/20261105-1845`，Android latest 为 `0.2.0`，minimum 保持 `0.1.4`。
 - 公网策略验证：`0.2.0 → none`、`0.1.6/0.1.4 → optional`、`0.1.3 → required`。
-- 公网 APK 返回 `200`，`Content-Length` 为 107,955,328 字节。
+- CDN APK 返回 `200`，`Content-Type` 为 `application/vnd.android.package-archive`，`Content-Length` 为 107,955,328 字节。
 - GitHub Pre-release `v0.2.0-preview.1` 已附带 APK。
 
 本版新增 `expo-document-picker` 与 `react-native-view-shot`，因此必须覆盖安装新的原生包。安装后应继续在 Android/iOS 真机验证 JSON 导出与恢复、CSV 导出、清空本机、文件选择、回顾 PNG 清晰度、系统分享和取消分享。
@@ -330,3 +331,18 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/986291b4
 - 移除了启动阶段每 50ms 更新一次计时的常驻状态，减少无意义重渲染。
 
 发布前门禁：typecheck、lint、build、`git diff --check`、Android/iOS Expo export 全部通过；domain 34、mobile 56、API 38，共 128 项测试通过。待 Android/iOS 真机验证首次安装、进程冷启动、后台恢复和 OTA 下载重启闭环。
+
+## 17. 下载 CDN 的 HTTPS 正式切换
+
+2026-11-05 已完成 `download.bigai.xin` 的 HTTPS 上线，并把官网与服务端更新策略切换为 CDN 下载地址：
+
+- 使用云盾证书 `cert-95qrl`，没有把私钥保存到仓库、环境变量或普通日志；
+- HTTPS、HTTP/2、OCSP Stapling 和 HTTP → HTTPS 跳转均已启用；
+- 完整 APK 下载的 SHA-256 为
+  `684e0cf5b56099332664f158aa6752bf766e15571224315855363e93be988321`，与本地构建一致；
+- Range 请求返回正确字节数，重复请求命中 CDN 缓存；
+- 官网、服务端 `.env` 和 `GET /v1/app/update-policy` 均返回 CDN 地址；
+- API 已切换到发布目录 `/opt/shengzhang/releases/20261105-2202`；
+- 公网回归确认 `0.2.0 → none`、`0.1.6/0.1.4 → optional`、`0.1.3 → required`。
+
+服务器旧 `/downloads/` 路径只作短时兼容，后续可依据旧安装升级率下线。所有公开发行文件必须走版本化对象路径，避免覆盖缓存后的同一 URL。

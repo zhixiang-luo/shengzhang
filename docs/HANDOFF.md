@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.0` Android 原生包已构建、发布到官网与 GitHub，并完成服务端更新策略切换与 preview OTA。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
+项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.0` Android 原生包已构建、发布到官网与 GitHub，官网 APK 已切换到带 HTTPS 的 OSS + CDN 下载链路，并完成服务端更新策略切换与 preview OTA。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
 
 ## 已完成
 
@@ -170,8 +170,10 @@
 - 服务端 `.env` 已切换 latest `0.2.0`、download URL version `0.2.0`，发布目录原子切换到 `/opt/shengzhang/releases/20261105-1845` 并成功重启。
 - GitHub Pre-release `v0.2.0-preview.1` 已创建并附带 APK。
 - 阿里云 ECS 运行 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 1.24 和 systemd；正式域名 HTTP 308 到 HTTPS，公网 `/health` 返回 200，WSS 语音握手通过。
-- APK 已上传到阿里云 OSS `shengzhang-releases`（华北2·北京），通过 `download.bigai.xin` CDN 分发；HTTP 下载已验证 `200`，10 MB 分片实测由原服务器约 23.85 秒降至约 0.70 秒，分片 SHA-256 一致。CDN 已设置 100 GB/月流量、50 Mbps 带宽和每小时 100 万次 HTTPS 请求封顶，恢复策略为永不解封流量/带宽，避免异常刷量失控。
-- `download.bigai.xin` 的 DNS CNAME 已生效；CDN HTTPS 尚未启用。阿里云证书申请要求填写真实联系人姓名、邮箱和手机号，资料未在仓库中保存，因此当前停在用户补齐联系人信息的步骤，不能用自签名证书替代。
+- APK 已上传到阿里云 OSS `shengzhang-releases`（华北2·北京），通过 `download.bigai.xin` CDN 分发；10 MB 分片实测由原服务器约 23.85 秒降至约 0.70 秒，分片 SHA-256 一致。CDN 已设置 100 GB/月流量、50 Mbps 带宽和每小时 100 万次 HTTPS 请求封顶，恢复策略为永不解封流量/带宽，避免异常刷量失控。
+- `download.bigai.xin` 的 DNS CNAME 已生效，CDN 已使用云盾证书 `cert-95qrl` 启用 HTTPS、HTTP/2、OCSP Stapling 和 HTTP → HTTPS 跳转。旧证书私钥曾被工具日志回显，未用于生产，后续应在用户确认后评估吊销。
+- 官网下载按钮、服务端 `.env` 和 `GET /v1/app/update-policy` 已切换到 `https://download.bigai.xin/releases/shengzhang-0.2.0-preview.apk?download=latest&version=0.2.0`；API 发布目录已原子切换到 `/opt/shengzhang/releases/20261105-2202` 并重启。
+- CDN HTTPS 公网验收通过：证书链与 SAN 正确，HTTP/2 返回 `200`，HTTP 自动 `301` 到 HTTPS，Range 下载正确，完整 APK SHA-256 与本地产物一致，重复请求为 CDN `HIT`。
 - 个人 ICP 备案已通过并展示备案号 `京ICP备2026073107号`；Android 包名为 `com.shengzhang.ledger`，备案订单号、实例 ID 和身份材料只保存在本地运维记录，不写入公开仓库。
 
 ## 当前未实现
@@ -187,7 +189,7 @@
 - `0.2.0` Android 原生构建已完成，但 PNG 清晰度、系统分享、取消行为、临时文件清理和 `react-native-view-shot` 真机可用性尚未验收；iOS 原生构建尚未完成。
 - iOS 内购、会员 entitlement、恢复购买、微信/支付宝 APP 支付均未实现。
 - Android `0.2.0` 预览包已替换官网稳定下载文件并发布 GitHub Pre-release；runtime `0.2.0` 的 preview OTA 已发布，启动动画与 0.2.0 完整真机闭环仍待验收。
-- `download.bigai.xin` 目前仅验证 HTTP CDN，正式下载入口仍使用 `https://bigai.xin/...`，直到 CDN 自定义证书上传并完成 HTTPS 验收。
+- 服务器旧 `/downloads/` 路径仍返回旧安装包，仅用于短时兼容；官网与 App 更新接口不再把它作为稳定入口。待旧安装升级率足够高后再下线。
 - 语音失败恢复、单笔修正和首次引导已包含在 `0.2.0`，待 Android/iOS 真机回归。
 
 ## 下一步最小任务
@@ -273,6 +275,12 @@ runtime 0.2.0 preview OTA platforms: android, ios
 runtime 0.2.0 preview OTA commit: 12ea82c2c88ac808510e117e3a79c84c04e7d50a
 cdn http download: HTTP 200, Content-Type application/vnd.android.package-archive
 cdn range benchmark: 0.70s vs origin 23.85s, SHA-256 matched
+cdn https: HTTP/2 200, valid DigiCert chain, SAN download.bigai.xin
+cdn redirect: http -> https 301
+cdn full apk sha256: 684e0cf5b56099332664f158aa6752bf766e15571224315855363e93be988321
+cdn cache after full download: HIT TCP_MEM_HIT
+official download link: switched to download.bigai.xin
+api update policy: deployed from /opt/shengzhang/releases/20261105-2202
 voice eval: 200/200 exact, amount/type/category/date 100%
 cost dashboard: ASR scenario generated
 account/payment feasibility: official Apple/WeChat/Alipay pages reviewed on 2026-10-20

@@ -109,7 +109,7 @@ PNG 写入临时文件，系统分享面板返回后调用 `releaseCapture` 清�
 ```text
 pnpm typecheck
 pnpm lint
-pnpm test                 130 passed
+pnpm test                 128 passed
 git diff --check
 expo export --platform android
 expo export --platform ios

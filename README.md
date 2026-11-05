@@ -7,7 +7,7 @@
   <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-292624?logo=expo&logoColor=white" />
   <img alt="React Native 0.88" src="https://img.shields.io/badge/React_Native-0.88-61DAFB?logo=react&logoColor=111111" />
   <img alt="TypeScript 6" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
-  <img alt="Tests 130" src="https://img.shields.io/badge/tests-130_passed-63795E" />
+  <img alt="Tests 128" src="https://img.shields.io/badge/tests-128_passed-63795E" />
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-E89A96" /></a>
 </p>
 
@@ -91,7 +91,7 @@
 - **隐私边界明确**：录音仅用于本次识别，服务端不长期保存音频；语音模型不接收历史账单。
 - **隐私优先产品观测**：匿名统计激活、留存、功能渗透、语音时延与失败原因，不含金额、分类、备注、录音和转写正文。
 - **确定性月度回顾**：所有回顾事实由本地账单聚合生成，不让模型编造金额、分类或趋势；分享卡默认隐藏具体账目。
-- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 130 项自动化测试。
+- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 128 项自动化测试。
 
 ### 架构概览
 
@@ -114,7 +114,7 @@ flowchart LR
 | --- | --- |
 | TypeScript 严格检查 | 通过 |
 | ESLint | 通过 |
-| 自动化测试 | 130 / 130 通过 |
+| 自动化测试 | 128 / 128 通过 |
 | Expo Doctor | 20 / 20 通过 |
 | 中文 TTS 语音评测 | 200 / 200 通过 |
 | 松手到结构化完成 | P50 1.68s / P95 2.20s |
@@ -225,7 +225,7 @@ python3 -m http.server 4173
 
 ## 下载与发布
 
-最新 Android 内测版可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)，无需 Expo 或 GitHub 账户。官网不把版本号写进标题或下载链接，日常纯 JS 更新通过 EAS OTA 推送；只有原生依赖、权限、启动图或 runtime 变化时才要求重新下载安装包。`0.2.0` 已构建为新的原生安装包，包含本地数据导出与恢复、离线账单搜索和月度回顾分享卡。
+最新 Android 内测版可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)，安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。官网不把版本号写进主文案，日常纯 JS 更新通过 EAS OTA 推送；只有原生依赖、权限、启动图或 runtime 变化时才要求重新下载安装包。`0.2.0` 已构建为新的原生安装包，包含本地数据导出与恢复、离线账单搜索和月度回顾分享卡。
 
 GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。官网当前提供 `0.2.0 (17)`，GitHub Pre-release `v0.2.0-preview.1` 附带同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
 

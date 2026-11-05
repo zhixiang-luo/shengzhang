@@ -64,7 +64,7 @@
 当前下载入口：
 
 - 正式官网：`https://bigai.xin/shengzhang/`；
-- Android 内测：官网稳定入口 `/shengzhang/downloads/shengzhang-android-preview.apk?download=latest&version=0.2.0`；
+- Android 内测：`https://download.bigai.xin/releases/shengzhang-0.2.0-preview.apk?download=latest&version=0.2.0`；
 - 全量版本索引：GitHub Releases；
 - 源码：`https://github.com/zhixiang-luo/shengzhang`。
 
@@ -86,9 +86,15 @@ python3 -m http.server 4174 -d deploy/site
 
 HTTPS 使用 Let’s Encrypt 证书，SAN 覆盖 `bigai.xin`、`www.bigai.xin`，有效期至 2027-01-26。`certbot.timer` 自动续期已通过 dry-run；阿里云安全组与 Ubuntu UFW 均已放行 443/TCP。官网 footer 展示 `京ICP备2026073107号` 并链接工信部备案系统。
 
-Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-android-preview.apk`，官网直接提供下载，不依赖 Expo 登录。当前稳定安装包为 `0.2.0 (17)`，文件大小 107,955,328 字节，SHA-256 为 `684e0cf5b56099332664f158aa6752bf766e15571224315855363e93be988321`。旧版可直接覆盖安装并保留本地账本。
+Android 内测包保存在阿里云 OSS Bucket `shengzhang-releases` 的
+`releases/shengzhang-0.2.0-preview.apk`，通过 `download.bigai.xin` CDN 分发，官网直接提供下载，不依赖 Expo 登录。当前稳定安装包为 `0.2.0 (17)`，文件大小 107,955,328 字节，SHA-256 为 `684e0cf5b56099332664f158aa6752bf766e15571224315855363e93be988321`。旧版可直接覆盖安装并保留本地账本。服务器 `/downloads/` 旧路径只保留作短时兼容，不再作为稳定入口。
 
-首页主文案不展示版本号，下载链接使用 `?download=latest&version=0.2.0`，通过版本查询参数避免浏览器把旧 APK 当作同一资源继续使用；正式域名下公网响应 `200` 且 `Content-Length` 为 107,955,328 字节，服务器端 SHA-256 与构建产物一致。上一版 `0.1.6` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.6-preview.apk`。
+首页主文案不展示版本号，下载链接使用版本化对象路径并附加 `?download=latest&version=0.2.0`，便于统计下载来源并避免浏览器把旧 APK 当作同一资源继续使用。CDN 对象只存公开安装包和发行文件，禁止存放录音、账本、密钥或用户备份。
+
+2026-11-05 已完成 CDN HTTPS 切换：`download.bigai.xin` 使用云盾证书
+`cert-95qrl`，启用 HTTP/2、OCSP Stapling 和 HTTP → HTTPS 跳转。公网验收确认
+证书链与 SAN 正确、HTTP/2 返回 200、Range 下载可用、完整 APK 的 SHA-256 与本地文件一致，
+重复请求命中 CDN 缓存。阿里云账户仍保留月流量、峰值带宽和 HTTPS 请求数硬封顶。
 
 ## 7. 验收基线
 

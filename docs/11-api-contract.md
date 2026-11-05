@@ -46,10 +46,10 @@
 {
   "platform": "android",
   "currentVersion": "0.1.4",
-  "latestVersion": "0.1.6",
+  "latestVersion": "0.2.0",
   "minimumSupportedVersion": "0.1.4",
   "updateType": "optional",
-  "downloadUrl": "https://bigai.xin/shengzhang/downloads/shengzhang-android-preview.apk?download=latest&version=0.1.6",
+  "downloadUrl": "https://download.bigai.xin/releases/shengzhang-0.2.0-preview.apk?download=latest&version=0.2.0",
   "title": "有新版本可选",
   "message": "安装最新版本可使用新功能。覆盖安装会保留本地账本。"
 }

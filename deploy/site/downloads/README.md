@@ -1,17 +1,23 @@
 # Android 下载目录
 
-该目录在服务器上保存公开发布的内测 APK，但 APK 不提交到 Git。
+该目录只在服务器上保留旧版兼容下载，APK 不提交到 Git。
 
-当前稳定下载路径：
+正式下载入口已经迁到阿里云 OSS + CDN：
 
 ```text
-/downloads/shengzhang-android-preview.apk
+https://download.bigai.xin/releases/shengzhang-0.2.0-preview.apk?download=latest&version=0.2.0
 ```
 
-当前线上版本为 `0.2.0 (17)`，本地发布文件来自：
+网站与 App 更新接口只应引用 CDN 路径。服务器旧路径
+`/downloads/shengzhang-android-preview.apk` 只作为过渡兼容，不再作为稳定分发入口。
+
+当前线上版本为 `0.2.0 (17)`，版本化 OSS 对象来自：
 
 ```text
 dist/releases/shengzhang-0.2.0-preview.apk
 ```
 
-发布新构建时，先把签名后的 APK 上传到同目录临时文件，核对文件大小和 SHA-256，再将旧稳定包备份到 `/opt/shengzhang/releases/`，最后原子替换稳定路径。GitHub Release Notes 必须记录版本号、文件大小和 SHA-256。
+发布新构建时，先把签名后的 APK 上传为
+`releases/shengzhang-<version>-preview.apk`，核对 OSS/CDN 响应的文件大小与 SHA-256，
+再更新网站、服务端更新策略和 GitHub Release。GitHub Release Notes 必须记录版本号、
+文件大小和 SHA-256。
