@@ -1,4 +1,5 @@
 import { formatCents, summarizeAmounts } from '@shengzhang/domain';
+import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,6 +8,10 @@ import { useDatabase } from '../db/DatabaseProvider';
 import { createVoiceBatch, softDeleteVoiceBatch } from '../db/transactionRepository';
 import { trackAnalyticsEvent } from '../services/analytics';
 import { useVoiceResultStore } from '../stores/voiceResultStore';
+import {
+  attachSavedVoiceTransactionIds,
+  type SavedVoiceEntry,
+} from '../features/voice/voiceResultEditing';
 import { colors, spacing, typography } from '../theme/tokens';
 import { AnimatedSheetModal } from './AnimatedSheetModal';
 import { Icon } from './Icon';
@@ -24,6 +29,8 @@ export function VoiceResultSheet({ onSaved }: { onSaved: () => void }) {
   const [saveState, setSaveState] = useState<SaveState>('saving');
   const [error, setError] = useState<string | null>(null);
   const [sheetVisible, setSheetVisible] = useState(false);
+  const [savedEntries, setSavedEntries] = useState<SavedVoiceEntry[]>([]);
+  const [pendingEditId, setPendingEditId] = useState<string | null>(null);
 
   const saveBatch = useCallback(() => {
     if (!result || savingRef.current) return;
@@ -32,7 +39,8 @@ export function VoiceResultSheet({ onSaved }: { onSaved: () => void }) {
     setError(null);
     let didSave = false;
     try {
-      createVoiceBatch(db, result);
+      const transactionIds = createVoiceBatch(db, result);
+      setSavedEntries(attachSavedVoiceTransactionIds(result.entries, transactionIds));
       didSave = true;
     } catch (caught) {
       setSaveState('failed');
@@ -95,17 +103,29 @@ export function VoiceResultSheet({ onSaved }: { onSaved: () => void }) {
   const hint = isSaving
     ? '正在写入本机账本'
     : isSaved
-      ? '账本已更新，8 秒内可整批撤销'
+      ? '点一笔可修改；8 秒内可整批撤销'
       : '本机账本没有改变，可以重试';
 
   const close = () => {
     if (!isSaving) setSheetVisible(false);
   };
 
+  const handleClosed = () => {
+    const editId = pendingEditId;
+    setPendingEditId(null);
+    setSavedEntries([]);
+    clear();
+    if (editId) {
+      requestAnimationFrame(() => {
+        router.push({ pathname: '/entry', params: { id: editId } });
+      });
+    }
+  };
+
   return (
     <AnimatedSheetModal
       closeAccessibilityLabel="关闭语音结果"
-      onClosed={clear}
+      onClosed={handleClosed}
       onRequestClose={close}
       sheetStyle={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 20) }]}
       visible={sheetVisible}
@@ -128,28 +148,46 @@ export function VoiceResultSheet({ onSaved }: { onSaved: () => void }) {
           </View>
 
           <ScrollView style={styles.entries} showsVerticalScrollIndicator={false}>
-            {result.entries.map((entry, index) => (
-              <View key={`${result.requestId}-${index}`} style={styles.entry}>
-                <View>
-                  <Text style={styles.entryTitle}>
-                    {entry.note || entry.subcategoryName || entry.categoryName}
-                  </Text>
-                  <Text style={styles.entryMeta}>
-                    {entry.subcategoryName
-                      ? `${entry.categoryName} · ${entry.subcategoryName}`
-                      : entry.categoryName}
-                  </Text>
-                </View>
-                <Text
-                  style={[
-                    styles.entryAmount,
-                    entry.type === 'income' && styles.incomeAmount,
-                  ]}
+            {result.entries.map((entry, index) => {
+              const transactionId = savedEntries[index]?.transactionId;
+              const canEdit = isSaved && Boolean(transactionId);
+              return (
+                <Pressable
+                  accessibilityHint={canEdit ? '打开账单编辑' : undefined}
+                  accessibilityRole={canEdit ? 'button' : undefined}
+                  disabled={!canEdit}
+                  key={`${result.requestId}-${index}`}
+                  onPress={() => {
+                    if (!transactionId) return;
+                    setPendingEditId(transactionId);
+                    setSheetVisible(false);
+                  }}
+                  style={({ pressed }) => [styles.entry, pressed && styles.entryPressed]}
                 >
-                  {entry.type === 'income' ? '+' : '−'}¥{formatCents(entry.amountMinor)}
-                </Text>
-              </View>
-            ))}
+                  <View style={styles.entryCopy}>
+                    <Text style={styles.entryTitle}>
+                      {entry.note || entry.subcategoryName || entry.categoryName}
+                    </Text>
+                    <Text style={styles.entryMeta}>
+                      {entry.subcategoryName
+                        ? `${entry.categoryName} · ${entry.subcategoryName}`
+                        : entry.categoryName}
+                    </Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.entryAmount,
+                      entry.type === 'income' && styles.incomeAmount,
+                    ]}
+                  >
+                    {entry.type === 'income' ? '+' : '−'}¥{formatCents(entry.amountMinor)}
+                  </Text>
+                  {canEdit ? (
+                    <Icon name="chevron-right" size={14} color={colors.inkTertiary} />
+                  ) : null}
+                </Pressable>
+              );
+            })}
           </ScrollView>
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -162,6 +200,8 @@ export function VoiceResultSheet({ onSaved }: { onSaved: () => void }) {
                     softDeleteVoiceBatch(db, result.requestId);
                     trackAnalyticsEvent('voice_undone', { entryCount: result.entries.length });
                     onSaved();
+                    setPendingEditId(null);
+                    setSavedEntries([]);
                     setSheetVisible(false);
                   }}
                   style={styles.undoButton}
@@ -259,9 +299,15 @@ const styles = StyleSheet.create({
     minHeight: 55,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
+  },
+  entryPressed: {
+    opacity: 0.62,
+  },
+  entryCopy: {
+    flex: 1,
   },
   entryTitle: {
     color: colors.ink,

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveVoicePermissionAction } from './permissionFlow';
+import {
+  requiresPermissionExplanation,
+  resolveVoicePermissionAction,
+} from './permissionFlow';
 
 describe('resolveVoicePermissionAction', () => {
   it('starts immediately when permission was already granted', () => {
@@ -28,5 +31,16 @@ describe('resolveVoicePermissionAction', () => {
         permissionGranted: false,
       }),
     ).toBe('permission-denied');
+  });
+});
+
+describe('requiresPermissionExplanation', () => {
+  it('explains microphone and cloud use before the first system prompt', () => {
+    expect(requiresPermissionExplanation('undetermined')).toBe(true);
+  });
+
+  it('does not repeat the explanation after permission has been decided', () => {
+    expect(requiresPermissionExplanation('granted')).toBe(false);
+    expect(requiresPermissionExplanation('denied')).toBe(false);
   });
 });

@@ -73,7 +73,11 @@ interface EntryInitialState {
   ready: boolean;
 }
 
-function loadEntryState(db: ReturnType<typeof useDatabase>, editingId: string | null): EntryInitialState {
+function loadEntryState(
+  db: ReturnType<typeof useDatabase>,
+  editingId: string | null,
+  initialNote = '',
+): EntryInitialState {
   const now = new Date();
   try {
     const categories = listCategories(db);
@@ -84,7 +88,7 @@ function loadEntryState(db: ReturnType<typeof useDatabase>, editingId: string | 
         categories,
         type: 'expense',
         amount: '',
-        note: '',
+        note: initialNote.trim(),
         occurredAt: now,
         categoryId: root?.id ?? null,
         subcategoryId: firstChild?.id ?? null,
@@ -136,9 +140,10 @@ function loadEntryState(db: ReturnType<typeof useDatabase>, editingId: string | 
 
 export default function EntryScreen() {
   const db = useDatabase();
-  const params = useLocalSearchParams<{ id?: string }>();
+  const params = useLocalSearchParams<{ id?: string; note?: string }>();
   const editingId = typeof params.id === 'string' ? params.id : null;
-  const [initial] = useState(() => loadEntryState(db, editingId));
+  const recoveryNote = typeof params.note === 'string' ? params.note : '';
+  const [initial] = useState(() => loadEntryState(db, editingId, recoveryNote));
 
   const [allCategories, setAllCategories] = useState(initial.categories);
   const ready = initial.ready;
@@ -618,7 +623,9 @@ export default function EntryScreen() {
             </Pressable>
           ) : null}
 
-          <Text style={styles.privacy}>账单保存在本机。语音和云备份将在后续阶段接入。</Text>
+          <Text style={styles.privacy}>
+            账单保存在本机。录音仅用于本次识别，处理完成后丢弃。
+          </Text>
         </ScrollView>
         {amountKeypadVisible ? (
           <AmountKeypad onKey={appendAmount} onDelete={() => setAmount(deleteAmountKey)} />

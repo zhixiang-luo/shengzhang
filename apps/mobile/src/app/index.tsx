@@ -1,5 +1,7 @@
 import { formatCents, summarizeAmounts } from '@shengzhang/domain';
+import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -14,16 +16,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomDock } from '../components/BottomDock';
 import { BrandMark } from '../components/BrandMark';
 import { CategoryIcon } from '../components/CategoryIcon';
+import { FirstRunGuide } from '../components/FirstRunGuide';
 import { Icon } from '../components/Icon';
 import { UndoDeleteBanner } from '../components/UndoDeleteBanner';
 import { SwipeableDeleteRow } from '../components/SwipeableDeleteRow';
 import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
 import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useDatabase } from '../db/DatabaseProvider';
-import { softDeleteTransaction } from '../db/transactionRepository';
+import {
+  countTransactions,
+  softDeleteTransaction,
+} from '../db/transactionRepository';
+import {
+  ONBOARDING_VERSION,
+  ONBOARDING_VERSION_KEY,
+  hasSeenCurrentOnboarding,
+  shouldShowFirstRunGuide,
+} from '../features/onboarding/onboardingState';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
 import type { LedgerEntryView } from '../features/ledger/useLedgerMonth';
 import { useVoiceCapture } from '../features/voice/useVoiceCapture';
+import { buildManualEntryRecoveryParams } from '../features/voice/voiceRecovery';
 import { useUndoDeleteStore } from '../stores/undoStore';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatDayHeading, formatMonth, formatTime } from '../utils/date';
@@ -41,8 +54,49 @@ export default function LedgerScreen() {
     previousMonth,
     nextMonth,
   } = useLedgerMonth();
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
+  const [transactionCount] = useState(() => countTransactions(db));
 
   const openManualEntry = () => router.push('/entry');
+
+  useEffect(() => {
+    let mounted = true;
+    void SecureStore.getItemAsync(ONBOARDING_VERSION_KEY)
+      .then((value) => {
+        if (mounted) setHasSeenOnboarding(hasSeenCurrentOnboarding(value));
+      })
+      .catch(() => {
+        if (mounted) setHasSeenOnboarding(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const markOnboardingSeen = () => {
+    setHasSeenOnboarding(true);
+    void SecureStore.setItemAsync(ONBOARDING_VERSION_KEY, String(ONBOARDING_VERSION)).catch(
+      () => {
+        // A storage failure may repeat the guide, but must not block recording.
+      },
+    );
+  };
+
+  const openManualRecovery = () => {
+    const params = buildManualEntryRecoveryParams(voice.transcript);
+    voice.dismissOverlay();
+    requestAnimationFrame(() => {
+      router.push({ pathname: '/entry', params });
+    });
+  };
+
+  const guideVisible =
+    hasSeenOnboarding !== null &&
+    shouldShowFirstRunGuide({
+      hasSeen: hasSeenOnboarding,
+      loading,
+      transactionCount,
+    });
 
   const deleteFromList = (transaction: LedgerEntryView) => {
     useUndoDeleteStore.getState().setDeleted(transaction);
@@ -213,12 +267,24 @@ export default function LedgerScreen() {
         phase={voice.phase}
         transcript={voice.transcript}
         error={voice.error}
+        recovery={voice.recovery}
         cancelArmed={voice.cancelArmed}
         manualArmed={voice.manualArmed}
         audioLevel={voice.audioLevel}
+        onAllowMicrophone={() => void voice.allowMicrophone()}
+        onRetry={voice.retryVoiceRecovery}
+        onManualFallback={openManualRecovery}
         onDismiss={voice.dismissOverlay}
       />
       <VoiceResultSheet onSaved={refresh} />
+      <FirstRunGuide
+        onDismiss={markOnboardingSeen}
+        onManual={() => {
+          markOnboardingSeen();
+          openManualEntry();
+        }}
+        visible={guideVisible}
+      />
     </SafeAreaView>
   );
 }

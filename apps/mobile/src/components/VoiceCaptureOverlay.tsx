@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 
 import type { VoiceCapturePhase } from '../features/voice/useVoiceCapture';
+import type { VoiceRecoveryAttempt } from '../features/voice/voiceRecovery';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { Icon } from './Icon';
 
@@ -17,9 +18,13 @@ type VoiceCaptureOverlayProps = {
   phase: VoiceCapturePhase;
   transcript: string;
   error: string | null;
+  recovery: VoiceRecoveryAttempt | null;
   cancelArmed: boolean;
   manualArmed: boolean;
   audioLevel: Animated.Value;
+  onAllowMicrophone: () => void;
+  onRetry: () => void;
+  onManualFallback: () => void;
   onDismiss: () => void;
 };
 
@@ -27,9 +32,13 @@ export function VoiceCaptureOverlay({
   phase,
   transcript,
   error,
+  recovery,
   cancelArmed,
   manualArmed,
   audioLevel,
+  onAllowMicrophone,
+  onRetry,
+  onManualFallback,
   onDismiss,
 }: VoiceCaptureOverlayProps) {
   const [pulse] = useState(() => new Animated.Value(1));
@@ -60,6 +69,40 @@ export function VoiceCaptureOverlay({
   }, [phase, pulse]);
 
   if (phase === 'idle') return null;
+
+  if (phase === 'permission-intro') {
+    return (
+      <View accessibilityViewIsModal style={styles.root}>
+        <Pressable accessible={false} onPress={() => {}} style={styles.backdrop} />
+        <View style={styles.card}>
+          <View style={styles.heading}>
+            <View style={styles.mic}>
+              <Icon name="mic" size={19} color={colors.surface} strokeWidth={2} />
+            </View>
+            <View style={styles.headingCopy}>
+              <Text style={styles.eyebrow}>声账 · 第一次使用语音</Text>
+              <Text style={styles.title}>需要麦克风</Text>
+            </View>
+          </View>
+          <Text style={styles.permissionBody}>
+            声账只在你按住说话时录音。录音用于本次云端识别，处理完成后即丢弃；历史账单不会发送给语音模型。
+            授权后再按住底部按钮说一句。
+          </Text>
+          <View style={styles.recoveryActions}>
+            <Pressable onPress={onManualFallback} style={styles.secondaryAction}>
+              <Text style={styles.secondaryActionText}>手动记</Text>
+            </Pressable>
+            <Pressable onPress={onDismiss} style={styles.secondaryAction}>
+              <Text style={styles.secondaryActionText}>取消</Text>
+            </Pressable>
+            <Pressable onPress={onAllowMicrophone} style={styles.primaryAction}>
+              <Text style={styles.primaryActionText}>继续使用语音</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   if (phase === 'permission-ready') {
     return (
@@ -102,7 +145,6 @@ export function VoiceCaptureOverlay({
     <View accessibilityViewIsModal style={styles.root}>
       <Pressable accessible={false} onPress={() => {}} style={styles.backdrop} />
       <View
-        pointerEvents="none"
         style={[
           styles.card,
           cancelArmed && styles.cancelCard,
@@ -139,7 +181,15 @@ export function VoiceCaptureOverlay({
         </View>
 
         {phase === 'error' ? (
-          <Text style={styles.error}>{error ?? '请再按住说一句。'}</Text>
+          <View>
+            <Text style={styles.error}>{error ?? '请再按住说一句。'}</Text>
+            {transcript ? (
+              <View style={styles.recoveredTranscript}>
+                <Text style={styles.recoveredLabel}>刚才听到</Text>
+                <Text style={styles.recoveredText}>{transcript}</Text>
+              </View>
+            ) : null}
+          </View>
         ) : (
           <View style={styles.transcriptBox}>
             {phase === 'recording' && !transcript ? (
@@ -190,6 +240,21 @@ export function VoiceCaptureOverlay({
                   : '松手后整理账本'}
             </Text>
           </>
+        ) : null}
+        {phase === 'error' ? (
+          <View style={styles.recoveryActions}>
+            <Pressable onPress={onDismiss} style={styles.secondaryAction}>
+              <Text style={styles.secondaryActionText}>取消</Text>
+            </Pressable>
+            <Pressable onPress={onManualFallback} style={styles.secondaryAction}>
+              <Text style={styles.secondaryActionText}>手动记</Text>
+            </Pressable>
+            <Pressable onPress={onRetry} style={styles.primaryAction}>
+              <Text style={styles.primaryActionText}>
+                {recovery?.kind === 'reparse' ? '重新整理' : '重新说'}
+              </Text>
+            </Pressable>
+          </View>
         ) : null}
       </View>
     </View>
@@ -383,6 +448,65 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 250, 245, 0.72)',
     fontSize: 14,
     lineHeight: 23,
+  },
+  permissionBody: {
+    marginTop: spacing.xl,
+    color: 'rgba(255, 250, 245, 0.72)',
+    fontSize: 14,
+    lineHeight: 23,
+  },
+  recoveredTranscript: {
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radii.md,
+    backgroundColor: 'rgba(255, 250, 245, 0.07)',
+  },
+  recoveredLabel: {
+    color: 'rgba(255, 250, 245, 0.38)',
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  recoveredText: {
+    marginTop: 5,
+    color: colors.surface,
+    fontSize: 14,
+    lineHeight: 22,
+  },
+  recoveryActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.xl,
+  },
+  secondaryAction: {
+    minHeight: 44,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 250, 245, 0.13)',
+    borderRadius: radii.pill,
+    backgroundColor: 'rgba(255, 250, 245, 0.08)',
+    paddingHorizontal: spacing.sm,
+  },
+  secondaryActionText: {
+    color: 'rgba(255, 250, 245, 0.7)',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  primaryAction: {
+    minHeight: 44,
+    flex: 1.45,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radii.pill,
+    backgroundColor: colors.blushDeep,
+    paddingHorizontal: spacing.sm,
+  },
+  primaryActionText: {
+    color: colors.surface,
+    fontSize: 12,
+    fontWeight: '700',
   },
   waveform: {
     height: 66,

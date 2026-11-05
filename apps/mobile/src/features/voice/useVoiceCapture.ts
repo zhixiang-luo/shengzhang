@@ -14,12 +14,22 @@ import { getVoiceStreamUrl, parseVoiceTranscript } from '../../services/voiceApi
 import { useVoiceResultStore } from '../../stores/voiceResultStore';
 import { pcm16Level } from './audioChunks';
 import type { VoiceGestureMode } from './gesture';
-import { resolveVoicePermissionAction } from './permissionFlow';
+import {
+  requiresPermissionExplanation,
+  resolveVoicePermissionAction,
+  type VoicePermissionStatus,
+} from './permissionFlow';
 import { resolveVoiceEntries } from './voiceMapping';
+import {
+  resolveVoiceRecoveryAttempt,
+  type VoiceRecoveryAttempt,
+  type VoiceRecoveryStage,
+} from './voiceRecovery';
 
 export type VoiceCapturePhase =
   | 'idle'
   | 'requesting'
+  | 'permission-intro'
   | 'permission-ready'
   | 'recording'
   | 'processing'
@@ -71,6 +81,7 @@ export function useVoiceCapture() {
   const [error, setError] = useState<string | null>(null);
   const [cancelArmed, setCancelArmed] = useState(false);
   const [manualArmed, setManualArmed] = useState(false);
+  const [recovery, setRecovery] = useState<VoiceRecoveryAttempt | null>(null);
   const [audioLevel] = useState(() => new Animated.Value(0));
 
   const phaseRef = useRef<VoiceCapturePhase>('idle');
@@ -88,7 +99,6 @@ export function useVoiceCapture() {
   const recordingStartedAtRef = useRef(0);
   const lastLevelUpdateAtRef = useRef(0);
   const maxDurationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const noticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const updatePhase = useCallback((next: VoiceCapturePhase) => {
@@ -104,10 +114,10 @@ export function useVoiceCapture() {
     if (socket && socket.readyState === WebSocket.OPEN) socket.close();
   }, []);
 
-  const resetCaptureState = useCallback(() => {
+  const resetCaptureState = useCallback((clearTranscript = true) => {
     recordingRef.current = false;
     finishingRef.current = false;
-    transcriptRef.current = '';
+    if (clearTranscript) transcriptRef.current = '';
     if (maxDurationTimerRef.current) {
       clearTimeout(maxDurationTimerRef.current);
       maxDurationTimerRef.current = null;
@@ -117,27 +127,40 @@ export function useVoiceCapture() {
       noticeTimerRef.current = null;
     }
     if (mountedRef.current) {
-      setTranscript('');
+      if (clearTranscript) setTranscript('');
       setCancelArmed(false);
       setManualArmed(false);
+      setRecovery(null);
       audioLevel.setValue(0);
     }
   }, [audioLevel]);
 
   const showError = useCallback(
-    (message: string) => {
+    (
+      message: string,
+      {
+        stage = 'recognition',
+        transcript: retainedTranscript = transcriptRef.current,
+      }: {
+        stage?: VoiceRecoveryStage;
+        transcript?: string;
+      } = {},
+    ) => {
+      const attempt = resolveVoiceRecoveryAttempt({
+        stage,
+        transcript: retainedTranscript,
+      });
       trackAnalyticsEvent('voice_failed', { reason: voiceFailureReason(message) });
       updatePhase('error');
       setError(message);
+      setRecovery(attempt);
+      transcriptRef.current = attempt.transcript;
+      if (mountedRef.current) setTranscript(attempt.transcript);
       audioLevel.setValue(0);
       if (noticeTimerRef.current) {
         clearTimeout(noticeTimerRef.current);
         noticeTimerRef.current = null;
       }
-      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
-      errorTimerRef.current = setTimeout(() => {
-        if (phaseRef.current === 'error') updatePhase('idle');
-      }, 3200);
     },
     [audioLevel, updatePhase],
   );
@@ -197,6 +220,43 @@ export function useVoiceCapture() {
     }
   }, [stream]);
 
+  const processTranscript = useCallback(
+    async (finalTranscript: string) => {
+      const normalizedTranscript = finalTranscript.trim();
+      transcriptRef.current = normalizedTranscript;
+      if (mountedRef.current) setTranscript(normalizedTranscript);
+      updatePhase('processing');
+      setError(null);
+      setRecovery(null);
+
+      try {
+        const categories = listCategories(db);
+        const response = await parseVoiceTranscript(normalizedTranscript, categories);
+        const entries = resolveVoiceEntries(response, categories);
+        useVoiceResultStore.getState().setResult({
+          requestId: response.requestId,
+          transcript: response.transcript,
+          entries,
+        });
+        trackAnalyticsEvent('voice_completed', {
+          entryCount: entries.length,
+          durationMs: response.latencyMs,
+        });
+        closeSocket();
+        resetCaptureState();
+        updatePhase('idle');
+      } catch (caught) {
+        closeSocket();
+        resetCaptureState(false);
+        showError(caught instanceof Error ? caught.message : '语音识别失败', {
+          stage: 'structuring',
+          transcript: normalizedTranscript,
+        });
+      }
+    },
+    [closeSocket, db, resetCaptureState, showError, updatePhase],
+  );
+
   const finishRecording = useCallback(
     async (cancelled: boolean) => {
       if (finishingRef.current || !recordingRef.current) return;
@@ -224,12 +284,12 @@ export function useVoiceCapture() {
       const socket = socketRef.current;
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         closeSocket();
-        resetCaptureState();
-        if (transcriptRef.current.trim()) showError('语音连接已断开，请重试。');
-        else {
-          trackAnalyticsEvent('voice_failed', { reason: 'connection' });
-          updatePhase('idle');
-        }
+        const retainedTranscript = transcriptRef.current;
+        resetCaptureState(false);
+        showError('语音连接已断开，请重试。', {
+          stage: 'recognition',
+          transcript: retainedTranscript,
+        });
         return;
       }
       await wait(150);
@@ -239,44 +299,29 @@ export function useVoiceCapture() {
         const finalTranscript = (
           await withTimeout(finalPromise, FINAL_TIMEOUT_MS, '火山语音识别超时，请重试。')
         ).trim();
-        closeSocket();
         if (!finalTranscript) {
+          closeSocket();
           resetCaptureState();
           updatePhase('idle');
           trackAnalyticsEvent('voice_cancelled', { reason: 'empty' });
           return;
         }
 
-        transcriptRef.current = finalTranscript;
-        if (mountedRef.current) setTranscript(finalTranscript);
-        const categories = listCategories(db);
-        const response = await parseVoiceTranscript(finalTranscript, categories);
-        const entries = resolveVoiceEntries(response, categories);
-        useVoiceResultStore.getState().setResult({
-          requestId: response.requestId,
-          transcript: response.transcript,
-          entries,
-        });
-        trackAnalyticsEvent('voice_completed', {
-          entryCount: entries.length,
-          durationMs: response.latencyMs,
-        });
-        resetCaptureState();
-        updatePhase('idle');
+        await processTranscript(finalTranscript);
       } catch (caught) {
         closeSocket();
-        resetCaptureState();
-        if (transcriptRef.current.trim()) {
-          showError(caught instanceof Error ? caught.message : '语音识别失败');
-        } else {
-          updatePhase('idle');
-        }
+        const retainedTranscript = transcriptRef.current;
+        resetCaptureState(false);
+        showError(caught instanceof Error ? caught.message : '语音识别失败', {
+          stage: 'recognition',
+          transcript: retainedTranscript,
+        });
       }
     },
     [
       closeSocket,
       createFinalWaiter,
-      db,
+      processTranscript,
       resetCaptureState,
       showError,
       stopRecorder,
@@ -287,13 +332,13 @@ export function useVoiceCapture() {
   const startHold = useCallback(async () => {
     if (phaseRef.current === 'requesting' || phaseRef.current === 'recording') return;
     if (phaseRef.current === 'processing') return;
-    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
     if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
     releaseRef.current = null;
     finishingRef.current = false;
     transcriptRef.current = '';
     setTranscript('');
     setError(null);
+    setRecovery(null);
     setCancelArmed(false);
     setManualArmed(false);
     audioLevel.setValue(0);
@@ -301,6 +346,10 @@ export function useVoiceCapture() {
 
     try {
       const existing = await getRecordingPermissionsAsync();
+      if (requiresPermissionExplanation(existing.status as VoicePermissionStatus)) {
+        updatePhase('permission-intro');
+        return;
+      }
       const permission = existing.granted ? existing : await requestRecordingPermissionsAsync();
       const permissionAction = resolveVoicePermissionAction({
         hadPermissionBeforeRequest: existing.granted,
@@ -403,8 +452,12 @@ export function useVoiceCapture() {
       }, MAX_RECORDING_MS);
     } catch (caught) {
       closeSocket();
-      resetCaptureState();
-      showError(caught instanceof Error ? caught.message : '录音没有启动');
+      const retainedTranscript = transcriptRef.current;
+      resetCaptureState(false);
+      showError(caught instanceof Error ? caught.message : '录音没有启动', {
+        stage: 'recognition',
+        transcript: retainedTranscript,
+      });
     }
   }, [
     audioLevel,
@@ -416,6 +469,27 @@ export function useVoiceCapture() {
     stream,
     updatePhase,
   ]);
+
+  const allowMicrophone = useCallback(async () => {
+    if (noticeTimerRef.current) {
+      clearTimeout(noticeTimerRef.current);
+      noticeTimerRef.current = null;
+    }
+    updatePhase('requesting');
+    try {
+      const permission = await requestRecordingPermissionsAsync();
+      if (!permission.granted) {
+        showError('请允许声账使用麦克风，或改用手动记账。');
+        return;
+      }
+      updatePhase('permission-ready');
+      noticeTimerRef.current = setTimeout(() => {
+        if (phaseRef.current === 'permission-ready') updatePhase('idle');
+      }, 3200);
+    } catch (caught) {
+      showError(caught instanceof Error ? caught.message : '麦克风没有准备好');
+    }
+  }, [showError, updatePhase]);
 
   const setGestureMode = useCallback((mode: VoiceGestureMode) => {
     setCancelArmed(mode === 'cancel');
@@ -441,6 +515,15 @@ export function useVoiceCapture() {
     updatePhase('idle');
   }, [closeSocket, resetCaptureState, updatePhase]);
 
+  const retryVoiceRecovery = useCallback(() => {
+    if (phaseRef.current !== 'error' || !recovery) return;
+    if (recovery.kind === 'reparse' && recovery.transcript) {
+      void processTranscript(recovery.transcript);
+      return;
+    }
+    dismissOverlay();
+  }, [dismissOverlay, processTranscript, recovery]);
+
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -448,7 +531,6 @@ export function useVoiceCapture() {
       stream.stop();
       closeSocket();
       if (maxDurationTimerRef.current) clearTimeout(maxDurationTimerRef.current);
-      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
       if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
     };
   }, [closeSocket, stream]);
@@ -457,12 +539,15 @@ export function useVoiceCapture() {
     phase,
     transcript,
     error,
+    recovery,
     cancelArmed,
     manualArmed,
     audioLevel,
     startHold,
+    allowMicrophone,
     setGestureMode,
     endHold,
+    retryVoiceRecovery,
     dismissOverlay,
   };
 }

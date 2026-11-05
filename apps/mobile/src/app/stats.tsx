@@ -11,6 +11,7 @@ import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
 import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
 import { useVoiceCapture } from '../features/voice/useVoiceCapture';
+import { buildManualEntryRecoveryParams } from '../features/voice/voiceRecovery';
 import { trackAnalyticsEvent } from '../services/analytics';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatMonth, localDateKey } from '../utils/date';
@@ -35,6 +36,14 @@ export default function StatsScreen() {
   useEffect(() => {
     trackAnalyticsEvent('stats_opened');
   }, []);
+
+  const openManualRecovery = () => {
+    const params = buildManualEntryRecoveryParams(voice.transcript);
+    voice.dismissOverlay();
+    requestAnimationFrame(() => {
+      router.push({ pathname: '/entry', params });
+    });
+  };
 
   const categoryMap = new Map(categories.map((category) => [category.id, category]));
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
@@ -286,9 +295,13 @@ export default function StatsScreen() {
         phase={voice.phase}
         transcript={voice.transcript}
         error={voice.error}
+        recovery={voice.recovery}
         cancelArmed={voice.cancelArmed}
         manualArmed={voice.manualArmed}
         audioLevel={voice.audioLevel}
+        onAllowMicrophone={() => void voice.allowMicrophone()}
+        onRetry={voice.retryVoiceRecovery}
+        onManualFallback={openManualRecovery}
         onDismiss={voice.dismissOverlay}
       />
       <VoiceResultSheet onSaved={refresh} />

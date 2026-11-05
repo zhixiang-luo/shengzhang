@@ -138,6 +138,10 @@
 - 已查清安装包与 OTA 的版本错位：官网当前稳定 APK 仍为 `0.1.4`，EAS `preview` 分支目前只有 runtime `0.1.4` 的更新；`0.1.5` 尚无兼容 OTA。低于 `0.1.3` 的旧 APK 不含 `expo-updates`，必须覆盖安装一次；安装 `0.1.5` 原生包才能看到新版完整入场动画。
 - 已实现并部署双轨更新策略：兼容 JS/TS 更新由 EAS 自动下载；服务端 `GET /v1/app/update-policy` 根据当前安装版本返回 `none / optional / required`，强制模式使用不可关闭门禁，推荐模式允许稍后处理。更新异常不再把底层异常原文直接展示给用户。公网已验证 `0.1.4 → none`、`0.1.3 → required`，API 发布目录为 `/opt/shengzhang/releases/20261105-1525`。
 - 启动动画写入“已看过”的时机已从动画开始改为完整播放结束后；如果首次启动中途退出，下一次不会误跳过动画。
+- 语音失败恢复已形成可操作闭环：识别或结构化失败后保留当前临时转写，错误面板不再自动消失；结构化失败可直接“重新整理”，恢复转录和失败文本可一键转手动记账并预填备注。
+- 语音结果卡已支持单笔修正：批量保存返回的交易 ID 与结果行一一对应，点击某一行会关闭整批结果卡并打开该笔真实账单编辑，避免修改后继续暴露整批撤销导致误删。
+- 首次使用说明已加入：空账本且当前引导版本未完成时展示“按住说话、松手入账、单笔可改”和手动记账入口；完成后按版本持久化。首次请求麦克风前先解释录音用途、处理方式和历史账单边界，再进入系统授权。
+- 新增单元测试覆盖语音恢复动作、转写手动预填、保存交易 ID 对齐、首次引导版本和麦克风解释决策。
 - 阿里云 ECS 运行 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 1.24 和 systemd；正式域名 HTTP 308 到 HTTPS，公网 `/health` 返回 200，WSS 语音握手通过。
 - 个人 ICP 备案已通过并展示备案号 `京ICP备2026073107号`；Android 包名为 `com.shengzhang.ledger`，备案订单号、实例 ID 和身份材料只保存在本地运维记录，不写入公开仓库。
 
@@ -152,6 +156,7 @@
 - 月末回顾页、隐私中心、分享卡和会员能力尚未实现。
 - iOS 内购、会员 entitlement、恢复购买、微信/支付宝 APP 支付均未实现。
 - Android `0.1.6` 预览包尚未完成真机验收、官网替换、GitHub Pre-release 和 preview OTA 发布。
+- 本轮语音失败恢复、单笔修正和首次引导尚待下一版真机验收与安装包构建。
 
 ## 下一步最小任务
 
@@ -196,8 +201,12 @@ expo export --platform android: passed
 expo-updates config: passed
 expo-doctor: 20/20 passed
 domain tests: 23 passed
-api tests: 30 passed
-mobile tests: 18 passed (boot policy, intro version, category icons, permissions, keypad)
+api tests: 38 passed
+mobile tests: 35 passed (boot policy, onboarding, permissions, voice recovery, keypad)
+typecheck: passed
+lint: passed
+android export: passed
+ios export: passed
 voice eval: 200/200 exact, amount/type/category/date 100%
 cost dashboard: ASR scenario generated
 account/payment feasibility: official Apple/WeChat/Alipay pages reviewed on 2026-10-20

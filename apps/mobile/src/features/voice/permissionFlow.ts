@@ -3,6 +3,12 @@ export type VoicePermissionAction =
   | 'show-ready-notice'
   | 'permission-denied';
 
+export type VoicePermissionStatus = 'granted' | 'denied' | 'undetermined';
+
+export function requiresPermissionExplanation(status: VoicePermissionStatus): boolean {
+  return status === 'undetermined';
+}
+
 export function resolveVoicePermissionAction({
   hadPermissionBeforeRequest,
   permissionGranted,

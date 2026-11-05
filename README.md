@@ -7,7 +7,7 @@
   <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-292624?logo=expo&logoColor=white" />
   <img alt="React Native 0.88" src="https://img.shields.io/badge/React_Native-0.88-61DAFB?logo=react&logoColor=111111" />
   <img alt="TypeScript 6" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
-  <img alt="Tests 83" src="https://img.shields.io/badge/tests-83_passed-63795E" />
+  <img alt="Tests 96" src="https://img.shields.io/badge/tests-96_passed-63795E" />
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-E89A96" /></a>
 </p>
 
