@@ -8,11 +8,11 @@ import {
   View,
 } from 'react-native';
 
-import { BOOT_FULL_INTRO_MS } from '../features/boot/bootPolicy';
+import { BOOT_FULL_INTRO_MS, BOOT_QUICK_INTRO_MS } from '../features/boot/bootPolicy';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { BrandMark } from './BrandMark';
 
-export type BootScreenMode = 'full' | 'bridge';
+export type BootScreenMode = 'full' | 'quick';
 
 type BootScreenProps = {
   mode: BootScreenMode;
@@ -152,13 +152,13 @@ export function BootScreen({ mode, onFinish }: BootScreenProps) {
     );
     pulseAnimation.start();
 
-    const timer =
-      mode === 'full'
-        ? setTimeout(() => onFinishRef.current?.(), BOOT_FULL_INTRO_MS)
-        : null;
+    const timer = setTimeout(
+      () => onFinishRef.current?.(),
+      mode === 'full' ? BOOT_FULL_INTRO_MS : BOOT_QUICK_INTRO_MS,
+    );
 
     return () => {
-      if (timer) clearTimeout(timer);
+      clearTimeout(timer);
       introAnimation.stop();
       breathAnimation.stop();
       pulseAnimation.stop();
@@ -204,9 +204,7 @@ export function BootScreen({ mode, onFinish }: BootScreenProps) {
 
   return (
     <View
-      accessibilityLabel={
-        mode === 'full' ? '声账正在启动' : '声账正在准备本地账本'
-      }
+      accessibilityLabel="声账正在启动"
       accessibilityLiveRegion="polite"
       style={styles.container}
     >

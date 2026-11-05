@@ -40,13 +40,11 @@ export function BootContentReady() {
 }
 
 export function BootExperience({ children }: { children: ReactNode }) {
-  const [startedAt] = useState(() => Date.now());
   const splashHiddenRef = useRef(false);
   const closingRef = useRef(false);
   const [hasSeenIntro, setHasSeenIntro] = useState<boolean | null>(null);
   const [contentReady, setContentReady] = useState(false);
-  const [elapsedMs, setElapsedMs] = useState(0);
-  const [fullFinished, setFullFinished] = useState(false);
+  const [introFinished, setIntroFinished] = useState(false);
   const [overlayDismissed, setOverlayDismissed] = useState(false);
   const [opacity] = useState(() => new Animated.Value(1));
   const [translateY] = useState(() => new Animated.Value(0));
@@ -60,7 +58,7 @@ export function BootExperience({ children }: { children: ReactNode }) {
   }, []);
 
   const markContentReady = useCallback(() => setContentReady(true), []);
-  const finishFullIntro = useCallback(() => setFullFinished(true), []);
+  const finishIntro = useCallback(() => setIntroFinished(true), []);
 
   useEffect(() => {
     let mounted = true;
@@ -76,44 +74,33 @@ export function BootExperience({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setElapsedMs(Date.now() - startedAt);
-    }, 50);
-    return () => clearInterval(timer);
-  }, [startedAt]);
-
   const presentation = useMemo(
-    () =>
-      hasSeenIntro === null
-        ? 'waiting'
-        : resolveBootPresentation({
-            hasSeenIntro,
-            contentReady,
-            elapsedMs,
-          }),
-    [contentReady, elapsedMs, hasSeenIntro],
+    () => (hasSeenIntro === null ? 'waiting' : resolveBootPresentation({ hasSeenIntro })),
+    [hasSeenIntro],
   );
   const overlayMode: BootScreenMode | null =
-    presentation === 'full-intro' ? 'full' : presentation === 'bridge' ? 'bridge' : null;
+    presentation === 'full-intro'
+      ? 'full'
+      : presentation === 'quick-intro'
+        ? 'quick'
+        : null;
   const overlayVisible = Boolean(overlayMode) && !overlayDismissed;
 
   useEffect(() => {
-    if (!shouldPersistBootIntro(fullFinished)) return;
+    if (overlayMode !== 'full' || !shouldPersistBootIntro(introFinished)) return;
     void SecureStore.setItemAsync(BOOT_INTRO_VERSION_KEY, String(BOOT_INTRO_VERSION)).catch(
       () => {
         // If storage is unavailable, the animation may repeat but startup remains usable.
       },
     );
-  }, [fullFinished]);
+  }, [introFinished, overlayMode]);
 
   useEffect(() => {
     if (contentReady && !overlayMode) hideNativeSplash();
   }, [contentReady, hideNativeSplash, overlayMode]);
 
   useEffect(() => {
-    const animationFinished = overlayMode === 'bridge' || fullFinished;
-    if (!overlayMode || !contentReady || !animationFinished || closingRef.current) return;
+    if (!overlayMode || !contentReady || !introFinished || closingRef.current) return;
 
     closingRef.current = true;
     Animated.parallel([
@@ -130,7 +117,7 @@ export function BootExperience({ children }: { children: ReactNode }) {
         useNativeDriver: true,
       }),
     ]).start(() => setOverlayDismissed(true));
-  }, [contentReady, fullFinished, opacity, overlayMode, translateY]);
+  }, [contentReady, introFinished, opacity, overlayMode, translateY]);
 
   return (
     <BootContentReadyContext.Provider value={markContentReady}>
@@ -147,10 +134,7 @@ export function BootExperience({ children }: { children: ReactNode }) {
               },
             ]}
           >
-            <BootScreen
-              mode={overlayMode}
-              onFinish={overlayMode === 'full' ? finishFullIntro : undefined}
-            />
+            <BootScreen mode={overlayMode} onFinish={finishIntro} />
           </Animated.View>
         ) : null}
       </View>

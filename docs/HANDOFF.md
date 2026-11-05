@@ -86,7 +86,7 @@
 - Android `0.1.4` 修复首次麦克风授权流程：授权前不创建录音会话，首次授权成功后显示可关闭的“麦克风已经准备好”提示，避免系统弹窗打断按压后误报“录音过短”。
 - 新建手动账单现在默认展开自绘金额键盘，并在金额末尾显示短光标；编辑已有账单保持键盘收起。点击分类、时间、备注、空白或开始滚动会自动收起键盘。
 - 启动体验已统一为圆形品牌装置：`design/assets/splash-mark.svg` 导出 2048px 原生启动图，React `BootScreen` 增加声账字标、品牌主张、本地账本状态和克制呼吸动画，不使用菱形旋转图形。
-- `0.1.5` 候选版重做启动体验：首次安装播放完整 2.72 秒入场；普通冷启动在 300ms 内 ready 时直接进入主页，超过 300ms 才显示简化等待层；后台恢复不播放。原生 Splash 与 React 首帧均使用无缺省侧弧的完整圆形。
+- 启动体验按进程生命周期分档：首次安装播放完整 2.72 秒入场；后续每次进程冷启动播放 1.2 秒快速入场；仅从后台恢复时不播放。原生 Splash 与 React 首帧均使用无缺省侧弧的完整圆形。
 - 本月支出卡片加入暖棕与腮红半透明圆形、细轮廓和呼吸层次；装饰层不接收点击，金额与收支信息保持最高视觉层级。
 - 分类图标升级为独立线性图标体系：内置二级分类不再继承一级图标，账本列表、统计、分类管理和手动记账选择器均读取 `categories.icon`。自定义分类创建和编辑可选择图标，未知值回退到 `other`。
 - SQLite schema 升至 v2，迁移只更新 `is_preset = 1` 的内置分类图标，保留用户自定义分类和历史账单数据。
@@ -138,6 +138,7 @@
 - `0.2.0` 安装包内嵌当前 JS 功能，但 runtime `0.2.0` 的 preview OTA 尚未单独发布。低于 `0.1.3` 的旧 APK 不含 `expo-updates`，必须覆盖安装一次。
 - 已实现并部署双轨更新策略：兼容 JS/TS 更新由 EAS 自动下载；服务端 `GET /v1/app/update-policy` 根据当前安装版本返回 `none / optional / required`，强制模式使用不可关闭门禁，推荐模式允许稍后处理。更新异常不再把底层异常原文直接展示给用户。公网已验证 `0.2.0 → none`、`0.1.6/0.1.4 → optional`、`0.1.3 → required`，API 发布目录为 `/opt/shengzhang/releases/20261105-1845`。
 - 启动动画写入“已看过”的时机已从动画开始改为完整播放结束后；如果首次启动中途退出，下一次不会误跳过动画。
+- 启动策略已从“只在首次安装播放”改为“首次完整、后续冷启动快速、后台恢复不播放”；移除了启动阶段每 50ms 更新一次计时的常驻状态，减少无意义重渲染。
 - 语音失败恢复已形成可操作闭环：识别或结构化失败后保留当前临时转写，错误面板不再自动消失；结构化失败可直接“重新整理”，恢复转录和失败文本可一键转手动记账并预填备注。
 - 语音结果卡已支持单笔修正：批量保存返回的交易 ID 与结果行一一对应，点击某一行会关闭整批结果卡并打开该笔真实账单编辑，避免修改后继续暴露整批撤销导致误删。
 - 首次使用说明已加入：空账本且当前引导版本未完成时展示“按住说话、松手入账、单笔可改”和手动记账入口；完成后按版本持久化。首次请求麦克风前先解释录音用途、处理方式和历史账单边界，再进入系统授权。
@@ -169,6 +170,8 @@
 - 服务端 `.env` 已切换 latest `0.2.0`、download URL version `0.2.0`，发布目录原子切换到 `/opt/shengzhang/releases/20261105-1845` 并成功重启。
 - GitHub Pre-release `v0.2.0-preview.1` 已创建并附带 APK。
 - 阿里云 ECS 运行 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 1.24 和 systemd；正式域名 HTTP 308 到 HTTPS，公网 `/health` 返回 200，WSS 语音握手通过。
+- APK 已上传到阿里云 OSS `shengzhang-releases`（华北2·北京），通过 `download.bigai.xin` CDN 分发；HTTP 下载已验证 `200`，10 MB 分片实测由原服务器约 23.85 秒降至约 0.70 秒，分片 SHA-256 一致。CDN 已设置 100 GB/月流量、50 Mbps 带宽和每小时 100 万次 HTTPS 请求封顶，恢复策略为永不解封流量/带宽，避免异常刷量失控。
+- `download.bigai.xin` 的 DNS CNAME 已生效；CDN HTTPS 尚未启用。阿里云证书申请要求填写真实联系人姓名、邮箱和手机号，资料未在仓库中保存，因此当前停在用户补齐联系人信息的步骤，不能用自签名证书替代。
 - 个人 ICP 备案已通过并展示备案号 `京ICP备2026073107号`；Android 包名为 `com.shengzhang.ledger`，备案订单号、实例 ID 和身份材料只保存在本地运维记录，不写入公开仓库。
 
 ## 当前未实现
@@ -184,6 +187,7 @@
 - `0.2.0` Android 原生构建已完成，但 PNG 清晰度、系统分享、取消行为、临时文件清理和 `react-native-view-shot` 真机可用性尚未验收；iOS 原生构建尚未完成。
 - iOS 内购、会员 entitlement、恢复购买、微信/支付宝 APP 支付均未实现。
 - Android `0.2.0` 预览包已替换官网稳定下载文件并发布 GitHub Pre-release；runtime `0.2.0` 的 preview OTA 和完整真机闭环仍未完成。
+- `download.bigai.xin` 目前仅验证 HTTP CDN，正式下载入口仍使用 `https://bigai.xin/...`，直到 CDN 自定义证书上传并完成 HTTPS 验收。
 - 语音失败恢复、单笔修正和首次引导已包含在 `0.2.0`，待 Android/iOS 真机回归。
 
 ## 下一步最小任务
@@ -192,7 +196,7 @@
 2. 在 Android/iOS 真机验证 `0.1.8`：日期选择 Sheet、日期单独清除、搜索与金额输入垂直居中、中文输入法、键盘避让、窄屏筛选面板、5000 笔账单搜索响应和结果进入编辑。
 3. 在 Android/iOS 真机验证 `0.2.0`：空/非空月回顾、长文案、动态字体、PNG 清晰度、系统分享、取消分享和临时文件清理。
 4. 安装官网 `0.2.0 (17)` APK，完成数据安全、搜索、月度回顾和新增原生模块的真机回归。
-5. 在 Android 真机验证 `0.1.6`：首装完整入场、动画完成后才记录、二次冷启动跳过/简化、后台恢复不播放入场、分类图标选择器、摘要卡片装饰和原生 Splash 到 React 首帧无跳变。
+5. 在 Android/iOS 真机验证启动策略：首装完整入场、后续进程冷启动快速入场、后台恢复不播放入场，以及原生 Splash 到 React 首帧无跳变。
 6. 为 runtime `0.2.0` 发布对应 preview OTA，验证自动检查、强制门禁和异常提示。
 7. 从正式域名和 GitHub Release 分别下载 APK，核对同一哈希，并在 Android 真机验证覆盖安装后本地账本保留。
 8. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；完成 iOS 原生构建、双端真机矩阵与 12–15 人封闭试用。
@@ -257,6 +261,15 @@ ios export: passed
 0.2.0 ios export: passed
 0.2.0 expo-doctor: 20/20 passed
 0.2.0 expo config: version/runtime policy confirmed at 0.2.0
+boot policy typecheck: passed
+boot policy lint: passed
+boot policy tests: domain 34 + mobile 56 + api 38 = 128 passed
+boot policy build: passed
+boot policy git diff --check: passed
+boot policy android export: passed
+boot policy ios export: passed
+cdn http download: HTTP 200, Content-Type application/vnd.android.package-archive
+cdn range benchmark: 0.70s vs origin 23.85s, SHA-256 matched
 voice eval: 200/200 exact, amount/type/category/date 100%
 cost dashboard: ASR scenario generated
 account/payment feasibility: official Apple/WeChat/Alipay pages reviewed on 2026-10-20
