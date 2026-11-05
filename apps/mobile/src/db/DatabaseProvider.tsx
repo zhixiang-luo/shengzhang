@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
-import { drizzle, type ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
-import { useSQLiteContext } from 'expo-sqlite';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
 
 import { schema } from './schema';
 
-type AppDatabase = ExpoSQLiteDatabase<typeof schema>;
+export type AppDatabase = ReturnType<typeof drizzle<typeof schema>> & {
+  $client: SQLiteDatabase;
+};
 
 const DatabaseContext = createContext<AppDatabase | null>(null);
 

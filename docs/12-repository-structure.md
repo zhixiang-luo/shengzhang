@@ -13,6 +13,8 @@
 ├── apps/
 │   └── mobile/
 │       ├── src/app/             Expo Router 路由
+│       ├── src/features/        账本、语音、搜索、回顾、数据安全等用例
+│       ├── src/components/      页面组件、品牌资产与分享卡
 │       ├── src/theme/           当前移动端设计令牌
 │       ├── assets/              App 图标与启动资产
 │       ├── app.json             Expo 配置
@@ -53,6 +55,7 @@ services/api
 ## 3. 移动端模块规范
 
 - 路由文件只做页面组装，不写 SQL。
+- 纯业务规则放在 `src/features/<domain>/`，由单元测试覆盖；`search` 负责条件规范化、整数分比较和匹配语义，`review` 负责分享文案和文件名约束。
 - 每个 feature 使用 `components/`, `hooks/`, `services/`, `repository.ts` 的局部结构。
 - SQLite schema、迁移和 repository 集中在 `src/db/`；feature 不直接拼接 SQL。
 - 网络和 SDK 调用封装在 `src/services/`，页面不直接持有密钥或 token。

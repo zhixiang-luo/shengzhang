@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证与 M7 可信语音并行阶段**。真实流式语音、200 条自动化评测、本地账本闭环和首个 Android 内测 APK 已可用；真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
+项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.0` 代码与双端 Expo export 已通过，真人语料、原生构建和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
 
 ## 已完成
 
@@ -94,7 +94,7 @@
 - 官网使用无外部依赖的 `index.html`、`styles.css`、`app.js`，并纳入品牌 SVG、分享图和原型截图；支持滚动揭示、鼠标光晕、设备倾斜、声波和转写循环，并对 `prefers-reduced-motion` 做完整降级。
 - 官网已在 `1440×1000`、`768×1024`、`390×844` 和 `375×812` 四种视口完成布局验收；均无横向滚动，移动端导航、三个产品界面标签和方向键切换通过，页面自身无控制台错误。详细规格见 `docs/27-official-website.md`。
 - 官网已切换到正式域名 `https://bigai.xin/shengzhang/`；根路径跳转到该子目录，误拼 `/shengzheng/` 与 `www` 都 301 到规范地址。首页、样式、脚本、图片和 APK 下载均从公网验证。
-- Android 内测 APK 已上传到正式域名稳定路径 `/shengzhang/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；当前为 `0.1.4 (14)`，服务器端 SHA-256 与内测构建一致。
+- Android 内测 APK 已上传到正式域名稳定路径 `/shengzhang/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；当前为 `0.1.6 (16)`，大小 107,798,948 字节，SHA-256 为 `7289f328eff65b20235328c7b9c69d7016defe6c02096a35bfecb6a4b29c9a93`。
 - App 已升级到 `0.1.3` 并接入 `expo-updates` + EAS Update：启动自动检查、回到前台限频检查、下载完成提示、立即重启和设置页手动检查均已实现；preview/production 使用独立 channel，runtimeVersion 跟随 appVersion。
 - 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。面向千级注册用户，生产值已调整为 IP 每分钟 30、每日 600、全局每分钟 120、每日 5000；内部连续 31 次无效请求验证为前 30 次 `400`、第 31 次 `429`。
 - GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Releases。`v0.1.3-preview.1` Pre-release 已附带完整 APK 附件，官网与 Release 均可分发同一构建。
@@ -134,14 +134,36 @@
 - 两次 build 均使用同一 Android 签名证书，证书 MD5 为 `440A483CAFA42B8CE655EBC15DBAA2F2`；第二个 APK 的 ZIP 完整性和签名证书解析均通过。
 - `0.1.4` 安装包在构建时嵌入过临时 IP；当前 preview OTA 已把 API 切换到 `https://bigai.xin`。服务端继续保留 IP 的 `/v1/` 与 `/health`，用于兼容尚未接收 OTA 的旧安装。
 - Android `0.1.5` 原生候选包已通过 EAS Build 完成：构建 ID `250250ce-0722-40a7-af4e-d276ae4b61b9`，源码提交 `9c39483`，profile/channel 为 `preview`，版本 `0.1.5 (15)`，runtime `0.1.5`；APK 文件大小 109,937,553 字节，SHA-256 为 `0be61cd6aa907cac3ea563ae95dd860cfeefcbac0ce6dd88c543d178871f539b`，ZIP 完整性与嵌入版本配置检查均通过。
-- `0.1.5` 尚未替换官网稳定下载文件，也未创建 GitHub Release；官网与 GitHub 当前正式预览包仍为 `0.1.4`，避免未经真机验收的候选版直接分发给现有用户。
-- 已查清安装包与 OTA 的版本错位：官网当前稳定 APK 仍为 `0.1.4`，EAS `preview` 分支目前只有 runtime `0.1.4` 的更新；`0.1.5` 尚无兼容 OTA。低于 `0.1.3` 的旧 APK 不含 `expo-updates`，必须覆盖安装一次；安装 `0.1.5` 原生包才能看到新版完整入场动画。
-- 已实现并部署双轨更新策略：兼容 JS/TS 更新由 EAS 自动下载；服务端 `GET /v1/app/update-policy` 根据当前安装版本返回 `none / optional / required`，强制模式使用不可关闭门禁，推荐模式允许稍后处理。更新异常不再把底层异常原文直接展示给用户。公网已验证 `0.1.4 → none`、`0.1.3 → required`，API 发布目录为 `/opt/shengzhang/releases/20261105-1525`。
+- `0.1.5` 仍为未发布候选；官网当前稳定 APK 为 `0.1.6`，GitHub 最新公开 Release 仍为 `0.1.4`。
+- EAS `preview` 分支目前只有 runtime `0.1.4` 的更新；`0.1.6` 尚无兼容 OTA。低于 `0.1.3` 的旧 APK 不含 `expo-updates`，必须覆盖安装一次；安装官网 `0.1.6` 原生包才能看到新版完整入场动画和安装包更新策略。
+- 已实现并部署双轨更新策略：兼容 JS/TS 更新由 EAS 自动下载；服务端 `GET /v1/app/update-policy` 根据当前安装版本返回 `none / optional / required`，强制模式使用不可关闭门禁，推荐模式允许稍后处理。更新异常不再把底层异常原文直接展示给用户。公网已验证 `0.1.4 → optional`、`0.1.3 → required`、`0.1.6 → none`，API 发布目录为 `/opt/shengzhang/releases/20261105-1525`。
 - 启动动画写入“已看过”的时机已从动画开始改为完整播放结束后；如果首次启动中途退出，下一次不会误跳过动画。
 - 语音失败恢复已形成可操作闭环：识别或结构化失败后保留当前临时转写，错误面板不再自动消失；结构化失败可直接“重新整理”，恢复转录和失败文本可一键转手动记账并预填备注。
 - 语音结果卡已支持单笔修正：批量保存返回的交易 ID 与结果行一一对应，点击某一行会关闭整批结果卡并打开该笔真实账单编辑，避免修改后继续暴露整批撤销导致误删。
 - 首次使用说明已加入：空账本且当前引导版本未完成时展示“按住说话、松手入账、单笔可改”和手动记账入口；完成后按版本持久化。首次请求麦克风前先解释录音用途、处理方式和历史账单边界，再进入系统授权。
 - 新增单元测试覆盖语音恢复动作、转写手动预填、保存交易 ID 对齐、首次引导版本和麦克风解释决策。
+- `0.1.7` 已实现本地数据安全闭环：设置新增“数据安全”页，可导出完整版本化 JSON、导出 CSV、从 JSON 覆盖恢复、清空本机账本并恢复内置分类。
+- JSON 格式包含格式标识、schema 版本、导出时间、App 版本、分类/账单/语音批次计数、`fnv1a32` 校验和与完整可携带数据；恢复前验证分类层级、账单分类引用和语音批次引用。
+- JSON 恢复和清空均使用 SQLite exclusive transaction；真实 SQLite 自动化测试已验证写入失败后旧账本整体回滚。
+- CSV 使用 UTF-8 BOM、中文表头和 RFC 4180 转义，并中和 `=`, `+`, `-`, `@`, Tab、换行开头的公式注入；CSV 明确不作为恢复格式。
+- 设置页显示本机账单数、分类数和最近导出时间；当前无云备份时，数据安全页明确提示换机前先导出。
+- 新增数据安全匿名事件：打开、JSON 导出、CSV 导出、恢复和清空；事件不含账单数量、金额、分类、备注或文件内容。
+- `0.1.8` 已实现离线账单搜索：账本右上角提供 44×44 搜索入口，默认展示按时间倒序的最近账单。
+- 搜索支持备注/一级分类/二级分类关键词、支出/收入、两级分类、开始/结束日期、最低/最高金额，全部条件使用 AND 语义。
+- 金额筛选通过 `parseYuanToCents` 转为整数分；反向日期、非法日期、非法金额和反向金额范围均返回中文提示，条件错误时不展示误导性结果。
+- 搜索结果复用真实账单编辑页；归档分类仍能显示历史账单，搜索不依赖网络、账号、会员或云备份。
+- 新增 `ledger_search_opened` 与 `ledger_search_applied` 匿名事件，只记录筛选条件数量，不记录搜索词、金额、日期、分类名或结果内容。
+- `0.1.8` 自动化门禁通过：domain 28、mobile 49、API 38，共 115 项；Android/iOS Expo 导出均通过。
+- `0.2.0` 已实现确定性月度回顾：统计页空/非空月份均可进入 `/review?month=YYYY-MM`，回顾显示支出、收入、结余、分类、上月比较、日均、最高支出日、账单数和语音笔数。
+- 月度回顾聚合集中在 `packages/domain/src/monthly-review.ts`；当前月按已经过去的天数计算日均，历史月按完整自然月计算；空月份不生成虚构趋势或消费评价。
+- 分享卡先展示 App 内预览，再由用户主动生成 `1080×1350` PNG 并调起系统分享；默认不展示金额、备注、商户、分类名称或精确日期。
+- 分享摘要只使用分类占比区间、趋势方向、语音笔数和品牌 CTA；领域与移动端测试均验证敏感字段不会出现在默认摘要。
+- 新增 `react-native-view-shot@6.1.1` 原生依赖；旧安装包不能只通过 OTA 获得分享能力，发布 `0.2.0` 必须生成新的 Android/iOS 原生构建。
+- 新增 `monthly_review_opened`、`monthly_review_previewed`、`monthly_review_share_opened` 和 `monthly_review_share_failed` 匿名事件；`share_opened` 仅表示系统分享面板成功打开，不宣称发送完成或可靠识别取消。
+- 搜索页日期范围已从日期文本输入改为复用 `DateTimePickerSheet` 的日期模式：点击开始/结束字段打开现有月历，隐藏小时、分钟和“现在”，确认后保存 `YYYY-MM-DD`，取消不修改条件，已选日期可单独清除；手动记账继续使用日期与时间模式。
+- 搜索框、最低金额和最高金额输入统一为固定高度、零垂直内边距、固定行高和平台垂直居中；Android 关闭字体额外上下留白，占位词与用户输入使用同一基线。
+- `0.2.0` 自动化门禁通过：domain 34、mobile 58、API 38，共 130 项；typecheck、lint、`git diff --check`、Android/iOS Expo export 均通过。
+- 版本已升至 `0.2.0`，但尚未生成 EAS 原生构建、APK、iOS 构建、GitHub Release 或线上部署。
 - 阿里云 ECS 运行 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 1.24 和 systemd；正式域名 HTTP 308 到 HTTPS，公网 `/health` 返回 200，WSS 语音握手通过。
 - 个人 ICP 备案已通过并展示备案号 `京ICP备2026073107号`；Android 包名为 `com.shengzhang.ledger`，备案订单号、实例 ID 和身份材料只保存在本地运维记录，不写入公开仓库。
 
@@ -153,23 +175,27 @@
 - PostgreSQL、对象存储、云备份与恢复：不阻塞免费本地首发。
 - 高保真 UI 页面。
 - 完整成本看板：DeepSeek token、网关、存储、支付渠道、税费和客服账单尚未纳入。
-- 月末回顾页、隐私中心、分享卡和会员能力尚未实现。
+- 隐私中心与会员能力尚未实现；月度回顾和分享卡已实现代码，待原生构建与真机验收。
+- `0.1.7` 的 Android/iOS 系统分享、文件选择器以及“导出 → 清空 → 恢复”真机闭环尚未验收。
+- `0.2.0` 的 Android/iOS 原生构建、PNG 清晰度、系统分享、取消行为、临时文件清理和 `react-native-view-shot` 真机可用性尚未验收。
 - iOS 内购、会员 entitlement、恢复购买、微信/支付宝 APP 支付均未实现。
-- Android `0.1.6` 预览包尚未完成真机验收、官网替换、GitHub Pre-release 和 preview OTA 发布。
-- 本轮语音失败恢复、单笔修正和首次引导尚待下一版真机验收与安装包构建。
+- Android `0.1.6` 预览包已替换官网稳定下载文件；真机验收、GitHub Pre-release 和 preview OTA 仍未完成。
+- 本轮语音失败恢复、单笔修正和首次引导已包含在 `0.1.6`，待 Android 真机验收。
 
 ## 下一步最小任务
 
-1. 构建 Android `0.1.6` 预览包；该包包含双轨更新客户端、启动动画持久化修复和依赖补丁。
-2. 在 Android 真机验证 `0.1.6`：首装完整入场、动画完成后才记录、二次冷启动跳过/简化、后台恢复不播放入场、分类图标选择器、摘要卡片装饰和原生 Splash 到 React 首帧无跳变。
-3. 真机验收通过后原子替换官网稳定 APK、备份 `0.1.4`、创建 GitHub Pre-release，并把服务端 latest/minimum 调整到正式支持策略。
-4. 发布 runtime `0.1.6` 的 preview OTA，验证自动检查、强制门禁和异常提示。
-5. 从正式域名下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
-6. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
-7. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
-8. 用真实供应商账单补齐成本看板的 DeepSeek、网关和存储成本。
-9. 修复真人评测暴露的 P0/P1 问题，冻结内测候选版本。
-10. 微信登录、云备份和支付继续留在外部依赖 backlog；Apple 账号就绪后先评估 iOS 内购，不用等待微信。
+1. 在 Android/iOS 真机验证 `0.1.7`：数据安全页布局、JSON/CSV 系统分享、文件选择与导入、覆盖确认、清空二次确认和“导出 → 清空 → 恢复”完整闭环。
+2. 在 Android/iOS 真机验证 `0.1.8`：日期选择 Sheet、日期单独清除、搜索与金额输入垂直居中、中文输入法、键盘避让、窄屏筛选面板、5000 笔账单搜索响应和结果进入编辑。
+3. 在 Android/iOS 真机验证 `0.2.0`：空/非空月回顾、长文案、动态字体、PNG 清晰度、系统分享、取消分享和临时文件清理。
+4. 构建新的 `0.2.0` 原生安装包，确认 `react-native-view-shot` 进入原生二进制；不得把双端 Expo export 当作安装包验收。
+5. 在 Android 真机验证 `0.1.6`：首装完整入场、动画完成后才记录、二次冷启动跳过/简化、后台恢复不播放入场、分类图标选择器、摘要卡片装饰和原生 Splash 到 React 首帧无跳变。
+6. 真机验收通过后创建 GitHub Pre-release，并发布对应 preview OTA，验证自动检查、强制门禁和异常提示。
+7. 从正式域名下载 APK，在 Android 真机验证自动入账、8 秒撤销、保存失败重试和结果卡自动关闭。
+8. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；执行 iPhone/Android 真机矩阵与 12–15 人封闭试用。
+9. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
+10. 用真实供应商账单补齐成本看板的 DeepSeek、网关和存储成本。
+11. 修复真人评测暴露的 P0/P1 问题，冻结内测候选版本。
+12. 微信登录、云备份和支付继续留在外部依赖 backlog；Apple 账号就绪后先评估 iOS 内购，不用等待微信。
 
 ## 已知风险
 
@@ -186,6 +212,8 @@
 - GitHub 网页端上传大于 100 MiB 的 Release 附件可能在 policy/finalization 阶段失败；本项目已改用已认证的 GitHub CLI/API 上传。`v0.1.4-preview.1` 的 APK 附件已通过公开 API 和下载响应复验。
 - 临时 IP 入口仅为旧安装兼容而保留；新版本只使用 HTTPS 正式域名。待确认用户都已收到 OTA 后，再评估关闭 IP 的网页跳转或 API 兼容。
 - 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
+- `0.2.0` 分享卡依赖新增原生模块，必须重新构建和覆盖安装；旧 APK 即使收到同 runtime OTA 也不能安全获得该能力。
+- `expo-sharing` 无法可靠判断用户是否最终发送或取消系统分享，因此运营报告只能把“打开分享面板”当作传播意向，不能当作完成分享。
 - `pnpm audit --prod` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 两项高危告警；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。宣传片工程自身 `npm audit` 为 0。
 
 ## 最近验证
@@ -200,13 +228,31 @@ expo export --platform ios: passed
 expo export --platform android: passed
 expo-updates config: passed
 expo-doctor: 20/20 passed
-domain tests: 23 passed
+domain tests: 28 passed
 api tests: 38 passed
-mobile tests: 35 passed (boot policy, onboarding, permissions, voice recovery, keypad)
+mobile tests: 43 passed (boot, onboarding, permissions, voice recovery, data safety, SQLite rollback)
 typecheck: passed
 lint: passed
 android export: passed
 ios export: passed
+0.1.7 android export: passed
+0.1.7 ios export: passed
+0.1.8 typecheck: passed
+0.1.8 lint: passed
+0.1.8 tests: domain 28 + mobile 49 + api 38 = 115 passed
+0.1.8 git diff --check: passed
+0.1.8 android export: passed
+0.1.8 ios export: passed
+0.2.0 typecheck: passed
+0.2.0 lint: passed
+0.2.0 tests: domain 34 + mobile 58 + api 38 = 130 passed
+0.2.0 search date picker model: passed
+0.2.0 search date writeback: passed
+0.2.0 git diff --check: passed
+0.2.0 android export: passed
+0.2.0 ios export: passed
+0.2.0 expo-doctor: 20/20 passed
+0.2.0 expo config: version/runtime policy confirmed at 0.2.0
 voice eval: 200/200 exact, amount/type/category/date 100%
 cost dashboard: ASR scenario generated
 account/payment feasibility: official Apple/WeChat/Alipay pages reviewed on 2026-10-20
@@ -216,8 +262,8 @@ analytics ingestion: public POST 202, hashed install id, report aggregation pass
 analytics test data: cleared after verification
 android bundle export: passed for 0.1.5 candidate
 android preview build: b623433e-835c-4e80-9c51-adcb74bb61a7 finished
-android preview site: 0.1.4 APK atomically deployed, Content-Length 109914393
-android preview sha256: 6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b
+android preview site: 0.1.6 APK atomically deployed, Content-Length 107798948
+android preview sha256: 7289f328eff65b20235328c7b9c69d7016defe6c02096a35bfecb6a4b29c9a93
 android 0.1.5 candidate build: 250250ce-0722-40a7-af4e-d276ae4b61b9 finished
 android 0.1.5 candidate size: 109937553
 android 0.1.5 candidate sha256: 0be61cd6aa907cac3ea563ae95dd860cfeefcbac0ce6dd88c543d178871f539b

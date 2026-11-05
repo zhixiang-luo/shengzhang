@@ -20,8 +20,19 @@ export const ANALYTICS_EVENT_NAMES = [
   'transaction_updated',
   'transaction_deleted',
   'stats_opened',
+  'monthly_review_opened',
+  'monthly_review_previewed',
+  'monthly_review_share_opened',
+  'monthly_review_share_failed',
+  'ledger_search_opened',
+  'ledger_search_applied',
   'categories_opened',
   'settings_opened',
+  'data_safety_opened',
+  'data_backup_exported',
+  'data_backup_restored',
+  'data_csv_exported',
+  'local_ledger_cleared',
 ] as const;
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
@@ -31,6 +42,7 @@ export type AnalyticsEventProperties = {
   appVersion?: string | undefined;
   entryCount?: number | undefined;
   durationMs?: number | undefined;
+  filterCount?: number | undefined;
   reason?:
     | 'cancelled'
     | 'permission'
@@ -40,6 +52,7 @@ export type AnalyticsEventProperties = {
     | 'too_short'
     | 'provider'
     | 'save_failed'
+    | 'share_failed'
     | 'unknown'
     | undefined;
   source?: 'official_site' | undefined;

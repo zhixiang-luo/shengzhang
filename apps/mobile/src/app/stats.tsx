@@ -12,6 +12,7 @@ import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
 import { useVoiceCapture } from '../features/voice/useVoiceCapture';
 import { buildManualEntryRecoveryParams } from '../features/voice/voiceRecovery';
+import { monthKeyFromDate } from '../features/review/useMonthlyReview';
 import { trackAnalyticsEvent } from '../services/analytics';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { formatMonth, localDateKey } from '../utils/date';
@@ -60,7 +61,7 @@ export default function StatsScreen() {
   });
   const maxDaily = Math.max(...dailyValues.map((item) => item.amountMinor), 1);
   const maxDay = dailyValues.reduce(
-    (current, item) => (item.amountMinor > current.amountMinor ? item : current),
+    (current, item) => (item.amountMinor >= current.amountMinor ? item : current),
     dailyValues[0] ?? { day: 1, key: '', amountMinor: 0 },
   );
   const topCategories = expenseCategories;
@@ -87,6 +88,30 @@ export default function StatsScreen() {
     const key = entry.subcategoryName ?? '未细分';
     subcategoryTotals.set(key, (subcategoryTotals.get(key) ?? 0) + entry.amountMinor);
   }
+  const reviewEntry = (
+    <Pressable
+      accessibilityLabel="查看本月回顾"
+      onPress={() =>
+        router.push({
+          pathname: '/review',
+          params: { month: monthKeyFromDate(month) },
+        })
+      }
+      style={({ pressed }) => [
+        styles.reviewEntry,
+        pressed && styles.reviewEntryPressed,
+      ]}
+    >
+      <View style={styles.reviewEntryMark}>
+        <Text style={styles.reviewEntryMarkText}>月</Text>
+      </View>
+      <View style={styles.reviewEntryCopy}>
+        <Text style={styles.reviewEntryTitle}>这个月，过得怎么样？</Text>
+        <Text style={styles.reviewEntryBody}>用一分钟回看消费轮廓，生成隐私安全月卡</Text>
+      </View>
+      <Icon name="chevron-right" size={17} color={colors.blushDeep} />
+    </Pressable>
+  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -108,11 +133,14 @@ export default function StatsScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {entries.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyMark}>○</Text>
-            <Text style={styles.emptyTitle}>这个月还没有账单</Text>
-            <Text style={styles.emptyBody}>记下一笔后，这里会长出你的消费轮廓。</Text>
-          </View>
+          <>
+            <View style={styles.empty}>
+              <Text style={styles.emptyMark}>○</Text>
+              <Text style={styles.emptyTitle}>这个月还没有账单</Text>
+              <Text style={styles.emptyBody}>记下一笔后，这里会长出你的消费轮廓。</Text>
+            </View>
+            {reviewEntry}
+          </>
         ) : (
           <>
             <View style={styles.totalCard}>
@@ -122,6 +150,8 @@ export default function StatsScreen() {
                 收入 ¥{formatCents(summary.incomeMinor)} · 结余 ¥{formatCents(summary.balanceMinor)}
               </Text>
             </View>
+
+            {reviewEntry}
 
             <View style={styles.metricRow}>
               <View style={styles.metric}>
@@ -383,6 +413,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     marginTop: spacing.md,
+  },
+  reviewEntry: {
+    minHeight: 74,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderWidth: 1,
+    borderColor: '#E8CFC9',
+    borderRadius: 19,
+    backgroundColor: '#FFF8F5',
+  },
+  reviewEntryPressed: {
+    backgroundColor: colors.blushSoft,
+  },
+  reviewEntryMark: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    backgroundColor: colors.blushSoft,
+  },
+  reviewEntryMarkText: {
+    color: colors.blushDeep,
+    fontFamily: typography.display,
+    fontSize: 18,
+  },
+  reviewEntryCopy: {
+    flex: 1,
+  },
+  reviewEntryTitle: {
+    color: colors.ink,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  reviewEntryBody: {
+    marginTop: 3,
+    color: colors.inkTertiary,
+    fontSize: 9,
   },
   metric: {
     flex: 1,

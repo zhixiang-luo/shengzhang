@@ -71,6 +71,13 @@ describe('summarizeAnalytics', () => {
       }),
       event('manual_transaction_created', 'install-b', '2026-10-01T02:01:00.000Z'),
       event('stats_opened', 'install-b', '2026-10-01T02:02:00.000Z'),
+      event('ledger_search_opened', 'install-b', '2026-10-01T02:03:00.000Z'),
+      event('ledger_search_applied', 'install-b', '2026-10-01T02:03:05.000Z', {
+        filterCount: 2,
+      }),
+      event('monthly_review_opened', 'install-b', '2026-10-01T02:04:00.000Z'),
+      event('monthly_review_previewed', 'install-b', '2026-10-01T02:04:10.000Z'),
+      event('monthly_review_share_opened', 'install-b', '2026-10-01T02:04:20.000Z'),
     ]);
 
     expect(summary.activeUsers).toBe(2);
@@ -83,7 +90,18 @@ describe('summarizeAnalytics', () => {
     expect(summary.averageSessionSeconds).toBe(60);
     expect(summary.voiceLatencyP50Ms).toBe(1200);
     expect(summary.failureReasons).toEqual([{ reason: 'timeout', count: 1 }]);
-    expect(summary.featureUsers).toMatchObject({ voice: 1, manual: 1, stats: 1 });
+    expect(summary.featureUsers).toMatchObject({
+      voice: 1,
+      manual: 1,
+      stats: 1,
+      search: 1,
+      review: 1,
+    });
+    expect(summary.searchOpened).toBe(1);
+    expect(summary.searchApplied).toBe(1);
+    expect(summary.monthlyReviewOpened).toBe(1);
+    expect(summary.monthlyReviewPreviewed).toBe(1);
+    expect(summary.monthlyReviewShareOpened).toBe(1);
     expect(summary.platforms).toEqual([
       { key: 'android', activeUsers: 1 },
       { key: 'ios', activeUsers: 1 },

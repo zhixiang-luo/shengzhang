@@ -23,7 +23,8 @@ pnpm test
 
 ```bash
 pnpm run doctor
-pnpm --dir apps/mobile exec expo export --platform ios --output-dir /tmp/shengzhang-export
+pnpm --dir apps/mobile exec expo export --platform android --output-dir /tmp/shengzhang-export-android
+pnpm --dir apps/mobile exec expo export --platform ios --output-dir /tmp/shengzhang-export-ios
 ```
 
 涉及原型：
@@ -67,6 +68,14 @@ node qa.mjs
 - 分类归档后历史账单显示。
 - 语音多笔事务原子性。
 - JSON 导出后清空再导入。
+- 损坏 JSON、未知版本、数量不一致、非法分类引用和 checksum 错误必须被拒绝。
+- 恢复 SQL 中途失败时，上一笔账单仍完整保留。
+- CSV 中文 BOM、引号/逗号转义和公式注入防护。
+- 搜索关键词、收支类型、两级分类、日期和金额范围的 AND 组合。
+- 搜索条件非法、搜索无结果和离线读取路径。
+- 月度回顾总额与 `summarizeAmounts` 一致。
+- 当前月/历史月日均、上月无基准、最高支出日并列规则和空月份。
+- 分享摘要不含金额、备注、商户、分类名称和精确日期。
 - 云备份 checksum 错误、版本未知、网络中断。
 - 恢复失败后原库保持不变。
 
@@ -86,6 +95,9 @@ node qa.mjs
 - 核心 E2E 全通过。
 - 语音基准达到门槛。
 - 本地 JSON 导出、清空和恢复流程通过。
+- 账单搜索在 iOS/Android 真机可完成关键词、分类、日期和金额组合筛选。
+- 月度回顾在 iOS/Android 真机可打开空/非空月份，生成清晰 PNG 并调起系统分享。
+- `react-native-view-shot` 必须进入原生构建；双端 Expo export 不能替代安装包验收。
 - 隐私政策、用户协议、权限说明与备案完成。
 - 商店图标、启动页、截图、描述完成。
 - 无测试入口、模拟数据、调试菜单和硬编码密钥。

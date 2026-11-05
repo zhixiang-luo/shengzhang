@@ -41,6 +41,9 @@
 - [AI 供应商配置与 ASR 调研](./19-ai-providers.md)
 - [语音评测报告](./20-voice-eval-report.md)
 - [App 更新与发布](./30-app-updates.md)
+- [本地数据备份与恢复](./31-local-data-portability.md)
+- [账单搜索](./32-ledger-search.md)
+- [月度回顾与隐私分享卡](./33-monthly-review.md)
 
 ## 决策与交接
 
@@ -59,6 +62,8 @@
 | 官网内容、视觉与下载入口 | `docs/27-official-website.md` |
 | 开源授权、品牌与线上服务边界 | `docs/28-open-source-operations.md` + `TRADEMARK.md` |
 | 产品事件、匿名统计与报告口径 | `docs/29-privacy-first-analytics.md` |
+| 账单搜索规则与边界 | `docs/32-ledger-search.md` |
+| 月度回顾和分享卡隐私边界 | `docs/33-monthly-review.md` |
 | 技术与目录 | `docs/09`–`docs/12` |
 | 工程与发布流程 | `docs/13`–`docs/15` |
 | 视觉令牌 | `design/tokens/design-tokens.json` |

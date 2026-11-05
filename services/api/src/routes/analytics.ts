@@ -15,6 +15,7 @@ const propertiesSchema = z
     appVersion: z.string().max(32).optional(),
     entryCount: z.number().int().min(0).max(5).optional(),
     durationMs: z.number().int().min(0).max(43_200_000).optional(),
+    filterCount: z.number().int().min(0).max(7).optional(),
     reason: z
       .enum([
         'cancelled',
@@ -25,6 +26,7 @@ const propertiesSchema = z
         'too_short',
         'provider',
         'save_failed',
+        'share_failed',
         'unknown',
       ])
       .optional(),

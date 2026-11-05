@@ -46,10 +46,10 @@
 {
   "platform": "android",
   "currentVersion": "0.1.4",
-  "latestVersion": "0.1.5",
+  "latestVersion": "0.1.6",
   "minimumSupportedVersion": "0.1.4",
   "updateType": "optional",
-  "downloadUrl": "https://bigai.xin/shengzhang/downloads/shengzhang-android-preview.apk?download=latest",
+  "downloadUrl": "https://bigai.xin/shengzhang/downloads/shengzhang-android-preview.apk?download=latest&version=0.1.6",
   "title": "有新版本可选",
   "message": "安装最新版本可使用新功能。覆盖安装会保留本地账本。"
 }
@@ -206,14 +206,41 @@ Bearer 鉴权，成功返回 `204`，不删除本地账本。
 
 返回快照二进制。客户端完成 checksum 与 schema 校验后，在临时库恢复，成功才替换本地数据库。
 
-## 6. 超时与重试
+## 7. 匿名产品统计
+
+`POST /v1/analytics/events`
+
+```json
+{
+  "anonymousId": "local-installation-id",
+  "events": [
+    {
+      "name": "monthly_review_share_opened",
+      "occurredAt": "2026-11-05T09:30:00.000Z",
+      "properties": {
+        "platform": "android",
+        "appVersion": "0.2.0"
+      }
+    }
+  ]
+}
+```
+
+- 每次最多 20 个事件；属性使用严格白名单。
+- 服务端只保存匿名安装标识的不可逆哈希，不保存原始值。
+- 月度回顾事件为 `monthly_review_opened`、`monthly_review_previewed`、`monthly_review_share_opened` 和 `monthly_review_share_failed`。
+- 分享失败只允许固定原因 `share_failed`；系统分享取消不会单独上报。
+- 不支持金额、分类名、备注、日期、图片内容或分享目标属性。
+- 成功写入返回 `202 {"accepted": 1}`；格式错误返回 `400 INVALID_ANALYTICS_EVENT`，限流返回 `429 ANALYTICS_RATE_LIMITED`。
+
+## 8. 超时与重试
 
 - 客户端普通 API 超时 15 秒；语音 65 秒。
 - `GET` 可指数退避重试；语音和备份上传只在用户主动点击或后台策略允许时重试。
 - 4xx 不自动重试；401 先尝试一次单飞刷新。
 - 备份失败不阻塞账本写入。
 
-## 7. 契约维护
+## 9. 契约维护
 
 `packages/contracts` 是 DTO 的代码事实源。更改顺序：
 

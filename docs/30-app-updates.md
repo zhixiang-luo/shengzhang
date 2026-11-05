@@ -94,7 +94,7 @@ npx eas-cli@latest build --platform android --profile preview
 
 ## 8. 版本展示与分发策略
 
-- 官网主文案与下载链接不展示版本号，固定使用 `/downloads/shengzhang-android-preview.apk?download=latest`。
+- 官网主文案不展示版本号；下载链接保留 `/downloads/shengzhang-android-preview.apk?download=latest`，并追加当前发布版本查询参数，避免浏览器复用旧 APK 缓存。
 - GitHub Releases 继续使用语义化 Tag，作为版本历史和回滚依据；面向用户的 Release 标题优先描述这次更新，不把版本号当作主标题。
 - 纯 JS/TS 更新通过 EAS Update 推送，GitHub Release 只需记录更新内容，不必每次附 APK。
 - 原生依赖、权限、桌面图标、原生启动图或 runtimeVersion 变化时，必须构建新 APK，并同步更新官网稳定下载文件与 GitHub Release 附件。
@@ -238,6 +238,35 @@ https://expo.dev/artifacts/eas/1aU4s3uYxQBdl0a-G2cH09Unpe0YdNFWVOPpa7I3v5A.apk
 - 下载入口统一使用官网稳定 APK；iOS 未配置官方商店地址时不下发原生更新，避免死锁。
 - 更新检查异常不再直接展示底层 Java、网络或 Expo 错误；客户端会提示重试或从官网覆盖安装。
 - 首次安装入场动画改为在实际播放完成后才写入“已看过”；首次启动中途退出时，下次仍会播放。
-- `GET /v1/app/update-policy` 已部署到 `https://bigai.xin`；公网验证 `0.1.4` 返回 `none`、`0.1.3` 返回 `required`，iOS 在未配置商店地址时返回 `none`。
+- `GET /v1/app/update-policy` 已部署到 `https://bigai.xin`；`0.1.6` 发布后公网验证 `0.1.4` 返回 `optional`、`0.1.3` 返回 `required`，iOS 在未配置商店地址时返回 `none`。
 
-服务端当前默认仍指向 `0.1.4`，避免在官网稳定 APK 尚未替换时把用户引向错误版本。发布新的稳定 APK 后，把 Android 的 latest 切到新版本；需要推荐更新时把 minimum 留在 `0.1.4`，需要强制更新时才同步提高 minimum。
+服务端 Android latest 已切到 `0.1.6`，minimum 保留 `0.1.4`；下载地址使用 `?download=latest&version=0.1.6`，避免复用旧安装包缓存。
+
+## 14. Android `0.1.6` 官网发布
+
+2026-11-05 已将有效 EAS 构建发布到官网稳定下载入口：
+
+| 项目 | 记录 |
+| --- | --- |
+| EAS Build | `4f19c618-5644-451e-98bf-3abb46897efe` |
+| 源码提交 | `bbbb0244a103608164b955c84dec65da285390f8` |
+| Profile / Channel | `preview` / `preview` |
+| App Version / Version Code | `0.1.6` / `16` |
+| Runtime Version | `0.1.6` |
+| 包名 | `com.shengzhang.ledger` |
+| APK 大小 | 107,798,948 字节 |
+| APK SHA-256 | `7289f328eff65b20235328c7b9c69d7016defe6c02096a35bfecb6a4b29c9a93` |
+
+构建页：
+
+```text
+https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/4f19c618-5644-451e-98bf-3abb46897efe
+```
+
+发布状态：
+
+- 安装包 ZIP 完整性检查通过，1384 个条目可读取。
+- `assets/app.config` 已确认版本为 `0.1.6`，runtime 为 `0.1.6`，包名为 `com.shengzhang.ledger`。
+- 官网稳定下载文件已原子替换，`0.1.4` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.4-preview.apk`。
+- 公网 `Content-Length` 与构建产物一致。
+- GitHub Pre-release 和 runtime `0.1.6` 的 preview OTA 尚未发布。

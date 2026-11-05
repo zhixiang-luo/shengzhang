@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Icon } from '../components/Icon';
 import { useAppUpdates } from '../components/UpdateProvider';
 import { listCategories } from '../db/categoryRepository';
+import { readLastExportAt } from '../db/dataSafetyRepository';
 import { useDatabase } from '../db/DatabaseProvider';
 import { countTransactions } from '../db/transactionRepository';
 import {
@@ -14,12 +15,14 @@ import {
   setAnalyticsEnabled,
   trackAnalyticsEvent,
 } from '../services/analytics';
+import { formatLastExportAt } from '../features/dataSafety/dataSafetyMessages';
 import { colors, radii, spacing, typography } from '../theme/tokens';
 
 export default function SettingsScreen() {
   const db = useDatabase();
   const [transactionCount, setTransactionCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
+  const [lastExportAt, setLastExportAt] = useState<string | null>(null);
   const [analyticsEnabled, setAnalyticsEnabledState] = useState(true);
   const updates = useAppUpdates();
 
@@ -32,6 +35,7 @@ export default function SettingsScreen() {
     useCallback(() => {
       setTransactionCount(countTransactions(db));
       setCategoryCount(listCategories(db).length);
+      void readLastExportAt(db).then(setLastExportAt).catch(() => setLastExportAt(null));
     }, [db]),
   );
 
@@ -65,7 +69,11 @@ export default function SettingsScreen() {
 
         <Text style={styles.sectionLabel}>数据与账号</Text>
         <View style={styles.group}>
-          <SettingRow label="本地导出与恢复" value="下一阶段" />
+          <SettingRow
+            label="数据安全"
+            value={formatLastExportAt(lastExportAt)}
+            onPress={() => router.push('/data-safety')}
+          />
           <SettingRow label="账号与云备份" value="后续版本" />
           <SettingRow label="微信登录" value="暂缓评估" last />
         </View>

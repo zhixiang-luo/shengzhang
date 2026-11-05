@@ -14,6 +14,7 @@ export const colors = {
   border: '#E8E0D6',
   income: '#63795E',
   danger: '#B34F48',
+  dangerSoft: '#F8E4E1',
 } as const;
 
 export const spacing = {

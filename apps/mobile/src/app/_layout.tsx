@@ -57,7 +57,10 @@ export default function RootLayout() {
                   >
                     <Stack.Screen name="index" options={{ animation: 'fade' }} />
                     <Stack.Screen name="stats" options={{ animation: 'fade' }} />
+                    <Stack.Screen name="search" options={{ animation: 'slide_from_right' }} />
+                    <Stack.Screen name="review" options={{ animation: 'slide_from_right' }} />
                     <Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} />
+                    <Stack.Screen name="data-safety" options={{ animation: 'slide_from_right' }} />
                     <Stack.Screen name="categories" options={{ animation: 'slide_from_right' }} />
                     <Stack.Screen
                       name="entry"

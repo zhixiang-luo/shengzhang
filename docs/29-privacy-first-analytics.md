@@ -55,8 +55,19 @@
 | `transaction_updated` | 编辑已有账单成功 | 无账单内容 |
 | `transaction_deleted` | 删除账单 | 无账单内容 |
 | `stats_opened` | 打开统计页 | 平台、App 版本 |
+| `ledger_search_opened` | 打开搜索页 | 平台、App 版本 |
+| `ledger_search_applied` | 提交搜索或应用筛选 | 有效筛选条件数量（0–7） |
+| `monthly_review_opened` | 打开月度回顾页 | 平台、App 版本 |
+| `monthly_review_previewed` | 打开脱敏分享预览 | 平台、App 版本 |
+| `monthly_review_share_opened` | 成功生成 PNG 并打开系统分享面板 | 平台、App 版本 |
+| `monthly_review_share_failed` | 截图、设备能力或系统分享调用失败 | 固定原因 `share_failed` |
 | `categories_opened` | 打开分类管理 | 平台、App 版本 |
 | `settings_opened` | 打开设置 | 平台、App 版本 |
+| `data_safety_opened` | 打开数据安全页 | 平台、App 版本 |
+| `data_backup_exported` | 成功生成并分享 JSON 备份 | 无账单数量或内容 |
+| `data_csv_exported` | 成功分享 CSV | 无账单数量或内容 |
+| `data_backup_restored` | JSON 恢复成功 | 无账单数量或内容 |
+| `local_ledger_cleared` | 清空本机账本成功 | 无账单数量或内容 |
 
 ## 4. 指标口径
 
@@ -70,10 +81,15 @@
 - 语音撤销：`voice_undone` 次数和撤销条数。
 - D1/D7 留存：用户首次活跃日之后第 1 天/第 7 天是否再次产生 `app_opened`。
 - 功能渗透率：分别统计语音保存、手动新增、统计和分类管理的独立安装数。
+- 搜索使用：统计打开搜索页与提交筛选的独立安装数和事件次数；不上报搜索词、金额、日期、分类名或结果内容。
+- 回顾使用：统计打开回顾、打开预览、调起系统分享的独立安装数和事件次数；不上报金额、分类名、趋势值、日期或图片内容。
+- 数据安全使用：分别统计导出、CSV、恢复和清空的独立安装数与次数；不上报文件内容、金额或分类。
 - 会话时长：`app_backgrounded.durationMs` 的截断值，仅用于平均使用时长。
 - 语音质量：完成/保存率、客户端结构化耗时 P50/P95 和失败原因分布。
 
 统计文件分散在用户设备本地，卸载重装会生成新的匿名安装 ID。离线期间事件当前不补传，因此报告是产品趋势数据，不等同于财务级审计。
+
+系统分享面板不会可靠返回“发送成功”或“用户取消”。因此 `monthly_review_share_opened` 仅代表面板被成功调起；取消分享不记为错误，也不统计发送完成。分享失败事件只包含固定原因，不包含系统异常原文。
 
 ## 5. 用户控制
 

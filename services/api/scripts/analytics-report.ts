@@ -53,7 +53,13 @@ console.log(
 console.log(
   `功能用户 统计/分类   ${summary.featureUsers.stats} / ${summary.featureUsers.categories}`,
 );
+console.log(`功能用户 搜索        ${summary.featureUsers.search}`);
+console.log(`功能用户 月末回顾    ${summary.featureUsers.review}`);
 console.log(`功能打开 统计/分类   ${summary.statsOpened} / ${summary.categoriesOpened}`);
+console.log(`功能打开 搜索/应用   ${summary.searchOpened} / ${summary.searchApplied}`);
+console.log(
+  `回顾打开/预览/分享   ${summary.monthlyReviewOpened} / ${summary.monthlyReviewPreviewed} / ${summary.monthlyReviewShareOpened}`,
+);
 
 if (summary.failureReasons.length > 0) {
   console.log(

@@ -1,4 +1,4 @@
-import { buildMonthGrid, combineLocalDateTime, type CalendarCell } from '@shengzhang/domain';
+import { buildMonthGrid, type CalendarCell } from '@shengzhang/domain';
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import {
   Pressable,
@@ -12,6 +12,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, radii, spacing, typography } from '../theme/tokens';
 import { AnimatedSheetModal } from './AnimatedSheetModal';
+import {
+  formatPickerSelection,
+  pickerConfirmation,
+  type DateTimePickerMode,
+} from './dateTimePickerModel';
 import { Icon } from './Icon';
 
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
@@ -21,6 +26,7 @@ const MINUTES = Array.from({ length: 60 }, (_, index) => index);
 type DateTimePickerSheetProps = {
   visible: boolean;
   value: Date;
+  mode?: DateTimePickerMode;
   onClose: () => void;
   onConfirm: (date: Date) => void;
 };
@@ -37,11 +43,6 @@ function sameDay(a: Date, b: Date): boolean {
   );
 }
 
-function formatSelectedDate(date: Date, hour: number, minute: number): string {
-  const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-  return `${date.getMonth() + 1}月${date.getDate()}日 ${weekdays[date.getDay()]} · ${pad(hour)}:${pad(minute)}`;
-}
-
 function scrollToIndex(
   ref: RefObject<ScrollViewInstance | null>,
   index: number,
@@ -53,9 +54,11 @@ function scrollToIndex(
 export function DateTimePickerSheet({
   visible,
   value,
+  mode = 'datetime',
   onClose,
   onConfirm,
 }: DateTimePickerSheetProps) {
+  const dateOnly = mode === 'date';
   const insets = useSafeAreaInsets();
   const [today] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState(value);
@@ -103,7 +106,7 @@ export function DateTimePickerSheet({
 
   return (
     <AnimatedSheetModal
-      closeAccessibilityLabel="关闭时间选择器"
+      closeAccessibilityLabel={dateOnly ? '关闭日期选择器' : '关闭时间选择器'}
       onRequestClose={onClose}
       sheetStyle={[styles.sheet, { paddingBottom: Math.max(insets.bottom, 18) }]}
       visible={visible}
@@ -111,18 +114,22 @@ export function DateTimePickerSheet({
       <View style={styles.handle} />
       <View style={styles.header}>
         <View>
-          <Text style={styles.eyebrow}>SELECT DATE & TIME</Text>
-          <Text style={styles.title}>选择时间</Text>
+          <Text style={styles.eyebrow}>
+            {dateOnly ? 'SELECT DATE' : 'SELECT DATE & TIME'}
+          </Text>
+          <Text style={styles.title}>{dateOnly ? '选择日期' : '选择时间'}</Text>
         </View>
-        <Pressable onPress={chooseNow} style={styles.nowButton}>
-          <Icon name="clock" size={15} color={colors.blushDeep} />
-          <Text style={styles.nowText}>现在</Text>
-        </Pressable>
+        {dateOnly ? null : (
+          <Pressable onPress={chooseNow} style={styles.nowButton}>
+            <Icon name="clock" size={15} color={colors.blushDeep} />
+            <Text style={styles.nowText}>现在</Text>
+          </Pressable>
+        )}
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.selectedLabel}>
-          {formatSelectedDate(selectedDate, hour, minute)}
+          {formatPickerSelection(mode, selectedDate, hour, minute)}
         </Text>
 
         <View style={styles.calendar}>
@@ -187,64 +194,66 @@ export function DateTimePickerSheet({
           </View>
         </View>
 
-        <View style={styles.timeSection}>
-          <View style={styles.timeHeading}>
-            <Text style={styles.timeTitle}>具体时间</Text>
-            <Text style={styles.timeValue}>{pad(hour)}:{pad(minute)}</Text>
+        {dateOnly ? null : (
+          <View style={styles.timeSection}>
+            <View style={styles.timeHeading}>
+              <Text style={styles.timeTitle}>具体时间</Text>
+              <Text style={styles.timeValue}>{pad(hour)}:{pad(minute)}</Text>
+            </View>
+
+            <Text style={styles.timeLabel}>小时</Text>
+            <ScrollView
+              contentContainerStyle={styles.timeRow}
+              horizontal
+              onContentSizeChange={() => scrollToIndex(hourScrollRef, hour, 50)}
+              ref={hourScrollRef}
+              showsHorizontalScrollIndicator={false}
+            >
+              {HOURS.map((item) => (
+                <Pressable
+                  key={item}
+                  onPress={() => setHour(item)}
+                  style={[styles.timePill, hour === item && styles.timePillSelected]}
+                >
+                  <Text
+                    style={[
+                      styles.timePillText,
+                      hour === item && styles.timePillTextSelected,
+                    ]}
+                  >
+                    {pad(item)}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+
+            <Text style={styles.timeLabel}>分钟</Text>
+            <ScrollView
+              contentContainerStyle={styles.timeRow}
+              horizontal
+              onContentSizeChange={() => scrollToIndex(minuteScrollRef, minute, 50)}
+              ref={minuteScrollRef}
+              showsHorizontalScrollIndicator={false}
+            >
+              {MINUTES.map((item) => (
+                <Pressable
+                  key={item}
+                  onPress={() => setMinute(item)}
+                  style={[styles.timePill, minute === item && styles.timePillSelected]}
+                >
+                  <Text
+                    style={[
+                      styles.timePillText,
+                      minute === item && styles.timePillTextSelected,
+                    ]}
+                  >
+                    {pad(item)}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
           </View>
-
-          <Text style={styles.timeLabel}>小时</Text>
-          <ScrollView
-            contentContainerStyle={styles.timeRow}
-            horizontal
-            onContentSizeChange={() => scrollToIndex(hourScrollRef, hour, 50)}
-            ref={hourScrollRef}
-            showsHorizontalScrollIndicator={false}
-          >
-            {HOURS.map((item) => (
-              <Pressable
-                key={item}
-                onPress={() => setHour(item)}
-                style={[styles.timePill, hour === item && styles.timePillSelected]}
-              >
-                <Text
-                  style={[
-                    styles.timePillText,
-                    hour === item && styles.timePillTextSelected,
-                  ]}
-                >
-                  {pad(item)}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-
-          <Text style={styles.timeLabel}>分钟</Text>
-          <ScrollView
-            contentContainerStyle={styles.timeRow}
-            horizontal
-            onContentSizeChange={() => scrollToIndex(minuteScrollRef, minute, 50)}
-            ref={minuteScrollRef}
-            showsHorizontalScrollIndicator={false}
-          >
-            {MINUTES.map((item) => (
-              <Pressable
-                key={item}
-                onPress={() => setMinute(item)}
-                style={[styles.timePill, minute === item && styles.timePillSelected]}
-              >
-                <Text
-                  style={[
-                    styles.timePillText,
-                    minute === item && styles.timePillTextSelected,
-                  ]}
-                >
-                  {pad(item)}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
+        )}
       </ScrollView>
 
       <View style={styles.actions}>
@@ -252,10 +261,14 @@ export function DateTimePickerSheet({
           <Text style={styles.cancelText}>取消</Text>
         </Pressable>
         <Pressable
-          onPress={() => onConfirm(combineLocalDateTime(selectedDate, hour, minute))}
+          onPress={() =>
+            onConfirm(pickerConfirmation(mode, selectedDate, hour, minute))
+          }
           style={styles.confirmButton}
         >
-          <Text style={styles.confirmText}>确定时间</Text>
+          <Text style={styles.confirmText}>
+            {dateOnly ? '确定日期' : '确定时间'}
+          </Text>
         </Pressable>
       </View>
     </AnimatedSheetModal>

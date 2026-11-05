@@ -60,13 +60,13 @@
 | 语言 | TypeScript 6 严格模式 | `noUncheckedIndexedAccess`、`exactOptionalPropertyTypes` 已开启 |
 | 本地数据库 | expo-sqlite + Drizzle ORM | 迁移可控，类型安全，支持事务 |
 | 状态 | Zustand | 只存界面状态和当前会话；持久业务数据仍以 SQLite 为准 |
-| 校验 | Zod 4 | 服务端响应、备份导入和表单边界统一校验 |
+| 校验 | Zod 4 + 纯领域校验 | 服务端响应和表单边界使用 Zod；可携带备份使用无运行时依赖的纯函数校验 |
 | 录音 | expo-audio | 16kHz 单声道 AAC/M4A，按住录音、松手停止 |
 | 安全存储 | expo-secure-store | 只存访问令牌、刷新令牌和设备标识 |
 | 图表 | react-native-svg 自绘 | 视觉可控，避免引入重量级图表库 |
 | 动画 | react-native-reanimated | 录音、Sheet、结果卡和图表过渡 |
 | 分类排序 | react-native-reorderable-list | 兼容 Fabric、Gesture Handler 与 Reanimated，支持分组内拖拽；辅助功能保留上移/下移语义 |
-| 导出 | expo-file-system + expo-sharing | JSON 备份、CSV 导出 |
+| 导出与导入 | expo-file-system + expo-sharing + expo-document-picker | JSON 备份、CSV 导出、系统文件选择和分享 |
 | 触觉 | expo-haptics | 录音开始、成功和错误反馈 |
 
 Expo Go 可用于早期界面开发；微信 SDK、正式签名和商店构建必须使用 development build 或 EAS Build。
@@ -245,6 +245,18 @@ schema_migrations
 
 聚合逻辑放在 `packages/domain`，SQL 只负责取数，便于固定时区和空数据测试。
 
+### 5.5.1 本地账单搜索
+
+账单搜索保持“页面编排、Feature 规则、Repository 取数”的分层：
+
+- `listAllTransactions(db)` 只读取未删除账单，按 `occurredAt`、`createdAt` 倒序；
+- `listCategories(db, true)` 提供历史分类显示和筛选目录；
+- `apps/mobile/src/features/search/ledgerSearch.ts` 负责输入规范化、整数分比较和 AND 匹配；
+- `apps/mobile/src/app/search.tsx` 只负责条件面板、结果列表和导航；
+- 页面点击结果后进入既有 `/entry?id=<transactionId>`，不建立第二套编辑逻辑。
+
+金额范围在领域边界使用 `parseYuanToCents`，不会把浮点元值带入比较。日期使用设备的本地日期键与账单元数据中的本地日期视角一致。首版在设备内存中过滤，不新增 SQLite 索引或服务端接口；5000 笔账单性能需在真机验证后再决定是否增加缓存或全文索引。
+
 ### 5.6 语音交互
 
 移动端状态机：
@@ -281,6 +293,26 @@ parsing -> saving -> success -> undo_window
 - 备份上传前生成规范化 JSON，计算 SHA-256，服务端复核。
 - 恢复先下载到临时文件，校验 schema、checksum 和计数，再原子替换本地库。
 - 本地有数据而云端也有数据时，不自动合并，要求用户明确选择。
+
+### 5.8 本地数据安全
+
+- `packages/domain/src/data-portability.ts` 定义可携带格式、引用校验、计数和完整性和校验。
+- JSON 恢复使用 SQLite exclusive transaction，`DELETE` 后按分类、语音批次、账单、设置顺序重建。
+- 恢复失败整体回滚，当前账本保持不变。
+- 清空数据在同一事务中删除可携带表并重新写入内置分类。
+- CSV 只用于查看，带 UTF-8 BOM，并中和电子表格公式前缀。
+- 当前实现和验收边界见 [本地数据备份与恢复](./31-local-data-portability.md)。
+
+### 5.9 月度回顾与分享
+
+- `packages/domain/src/monthly-review.ts` 负责月度事实聚合、上月比较、日均、最高支出日和脱敏分享摘要。
+- 页面通过 `useMonthlyReview` 读取当前月和上月的本地账单；不调用网络、模型、账号或云备份。
+- 当前月日均使用已经过去的天数，历史月使用完整自然月天数；金额全部在整数分上计算。
+- 分享卡由 React Native 视图渲染，`react-native-view-shot` 导出 `1080×1350` PNG，`expo-sharing` 调起系统分享。
+- 默认分享摘要只包含月份、账单笔数、分类占比区间、趋势方向、语音笔数和品牌 CTA。
+- `expo-sharing` 不提供可靠的发送完成或取消结果；`monthly_review_share_opened` 只表示系统面板成功打开。
+- `react-native-view-shot` 是原生依赖，新增或升级后必须生成新的 Android/iOS 构建，不能只依赖 OTA。
+- 详细契约见 [月度回顾与隐私分享卡](./33-monthly-review.md)。
 
 ## 6. 服务端架构
 
@@ -400,24 +432,26 @@ voice_usage
 
 ```json
 {
-  "format": "shengzhang.backup",
+  "format": "shengzhang-backup",
   "schemaVersion": 1,
-  "createdAt": "2026-10-19T12:00:00.000Z",
-  "deviceId": "device-uuid",
+  "exportedAt": "2026-11-05T08:00:00.000Z",
+  "appVersion": "0.2.0",
   "counts": {
     "transactions": 128,
-    "categories": 41
+    "categories": 41,
+    "voiceBatches": 22
   },
   "data": {
     "transactions": [],
     "categories": [],
-    "settings": {}
+    "voiceBatches": [],
+    "appSettings": []
   },
-  "checksum": "sha256-over-canonical-data"
+  "checksum": "fnv1a32:12ab34cd"
 }
 ```
 
-服务端不接受未知 `schemaVersion`。每个版本提供纯函数迁移，迁移失败则整次恢复失败，本机原库不变。
+本地与服务端都不接受未知 `schemaVersion`。每个版本提供纯函数迁移，迁移失败则整次恢复失败，本机原库不变。当前 `0.1.7` 本地实现只生成版本 1，不读取未来版本。
 
 ### 6.6 鉴权与令牌
 

@@ -20,12 +20,24 @@ export type AnalyticsEventName =
   | 'transaction_updated'
   | 'transaction_deleted'
   | 'stats_opened'
+  | 'monthly_review_opened'
+  | 'monthly_review_previewed'
+  | 'monthly_review_share_opened'
+  | 'monthly_review_share_failed'
+  | 'ledger_search_opened'
+  | 'ledger_search_applied'
   | 'categories_opened'
-  | 'settings_opened';
+  | 'settings_opened'
+  | 'data_safety_opened'
+  | 'data_backup_exported'
+  | 'data_backup_restored'
+  | 'data_csv_exported'
+  | 'local_ledger_cleared';
 
 type AnalyticsProperties = {
   entryCount?: number;
   durationMs?: number;
+  filterCount?: number;
   reason?:
     | 'cancelled'
     | 'permission'
@@ -35,7 +47,8 @@ type AnalyticsProperties = {
     | 'too_short'
     | 'provider'
     | 'save_failed'
-    | 'unknown';
+    | 'unknown'
+    | 'share_failed';
 };
 
 const PREFERENCE_KEY = 'shengzhang.analytics-enabled';

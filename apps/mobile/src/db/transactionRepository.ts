@@ -224,6 +224,15 @@ export function listTransactionsBetween(
     .all();
 }
 
+export function listAllTransactions(db: AppDatabase): TransactionRow[] {
+  return db
+    .select()
+    .from(transactions)
+    .where(isNull(transactions.deletedAt))
+    .orderBy(desc(transactions.occurredAt), desc(transactions.createdAt))
+    .all();
+}
+
 export function countTransactions(db: AppDatabase): number {
   return db.select({ id: transactions.id }).from(transactions).where(isNull(transactions.deletedAt)).all().length;
 }

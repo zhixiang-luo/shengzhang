@@ -15,7 +15,9 @@ export type IconName =
   | 'ledger'
   | 'mic'
   | 'plus'
+  | 'search'
   | 'settings'
+  | 'share'
   | 'trash';
 
 type IconProps = {
@@ -78,6 +80,20 @@ export function Icon({ name, size = 22, color = colors.ink, strokeWidth = 1.8 }:
         </>
       )}
       {name === 'check' && <Path d="m5 12 4.5 4.5L19 7" {...common} />}
+      {name === 'search' && (
+        <>
+          <Circle cx="10.5" cy="10.5" r="6.5" {...common} />
+          <Path d="m15.4 15.4 4.1 4.1" {...common} />
+        </>
+      )}
+      {name === 'share' && (
+        <>
+          <Circle cx="6" cy="12" r="2.5" {...common} />
+          <Circle cx="18" cy="6" r="2.5" {...common} />
+          <Circle cx="18" cy="18" r="2.5" {...common} />
+          <Path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6" {...common} />
+        </>
+      )}
       {name === 'trash' && (
         <>
           <Path d="M4 7h16M9 7V4.5h6V7M7 7l1 13h8l1-13M10 11v5M14 11v5" {...common} />

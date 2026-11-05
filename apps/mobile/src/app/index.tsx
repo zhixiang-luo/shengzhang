@@ -121,6 +121,13 @@ export default function LedgerScreen() {
         </View>
         <View style={styles.headerActions}>
           <Pressable
+            accessibilityLabel="搜索账单"
+            onPress={() => router.push('/search')}
+            style={styles.iconButton}
+          >
+            <Icon name="search" size={20} color={colors.inkSecondary} />
+          </Pressable>
+          <Pressable
             accessibilityLabel="设置"
             onPress={() => router.push('/settings')}
             style={styles.iconButton}

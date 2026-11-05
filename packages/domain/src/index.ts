@@ -5,3 +5,5 @@ export * from './transaction';
 export * from './ledger';
 export * from './categories';
 export * from './calendar';
+export * from './data-portability';
+export * from './monthly-review';

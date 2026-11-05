@@ -7,7 +7,7 @@
   <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-292624?logo=expo&logoColor=white" />
   <img alt="React Native 0.88" src="https://img.shields.io/badge/React_Native-0.88-61DAFB?logo=react&logoColor=111111" />
   <img alt="TypeScript 6" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
-  <img alt="Tests 96" src="https://img.shields.io/badge/tests-96_passed-63795E" />
+  <img alt="Tests 130" src="https://img.shields.io/badge/tests-130_passed-63795E" />
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-E89A96" /></a>
 </p>
 
@@ -70,13 +70,16 @@
 | 本地 SQLite 与删除撤销 | ✅ 已完成 |
 | Android 内测 APK | ✅ 已通过 EAS Build |
 | OTA 增量更新 | ✅ 已接入 EAS Update，需安装含更新客户端的版本 |
-| 官网首版与移动端下载入口 | ✅ 已完成，等待域名发布 |
+| 官网与移动端下载入口 | ✅ 已部署到 `https://bigai.xin/shengzhang/` |
 | 匿名产品统计与用户开关 | ✅ 已完成 |
+| 本地 JSON 备份/恢复与 CSV 导出 | ✅ 已完成 |
+| 离线账单搜索与组合筛选 | ✅ 已完成 |
+| 确定性月度回顾与隐私分享卡 | ✅ 代码与双端导出完成，待真机验收 |
 | 30–50 条真人语音与双端真机矩阵 | 🚧 进行中 |
-| 月末回顾、JSON/CSV 导出、隐私中心 | 🚧 规划中 |
+| 隐私中心 | 🚧 进行中 |
 | 微信登录、云备份、会员与支付 | 🧭 外部依赖就绪后再启动 |
 
-项目当前处于 **M5 内测与质量验证阶段**。它已经可以完整跑通真实语音记账，但还没有作为正式商业版本上架。
+项目当前处于 **M5/M6 内测、质量验证与本地增强能力收口阶段**。真实语音、数据安全、账单搜索和确定性月度回顾已经形成离线闭环；真人语音、双端真机矩阵与原生分享卡验收仍在推进，它还没有作为正式商业版本上架。
 
 ## 技术亮点
 
@@ -87,7 +90,8 @@
 - **持续更新**：兼容修复通过 EAS Update 自动 OTA；原生变化由服务端版本策略提示覆盖安装，必要时可阻断已停止支持的旧版。
 - **隐私边界明确**：录音仅用于本次识别，服务端不长期保存音频；语音模型不接收历史账单。
 - **隐私优先产品观测**：匿名统计激活、留存、功能渗透、语音时延与失败原因，不含金额、分类、备注、录音和转写正文。
-- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 83 项自动化测试。
+- **确定性月度回顾**：所有回顾事实由本地账单聚合生成，不让模型编造金额、分类或趋势；分享卡默认隐藏具体账目。
+- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 130 项自动化测试。
 
 ### 架构概览
 
@@ -110,7 +114,7 @@ flowchart LR
 | --- | --- |
 | TypeScript 严格检查 | 通过 |
 | ESLint | 通过 |
-| 自动化测试 | 83 / 83 通过 |
+| 自动化测试 | 130 / 130 通过 |
 | Expo Doctor | 20 / 20 通过 |
 | 中文 TTS 语音评测 | 200 / 200 通过 |
 | 松手到结构化完成 | P50 1.68s / P95 2.20s |
@@ -191,6 +195,7 @@ python3 -m http.server 4173
 - [技术架构](docs/09-technical-architecture.md)
 - [语音评测报告](docs/20-voice-eval-report.md)
 - [后期产品战略](docs/21-post-mvp-strategy.md)
+- [月度回顾与隐私分享卡](docs/33-monthly-review.md)
 - [生产基础设施与上线清单](docs/26-production-infrastructure.md)
 - [当前开发交接](docs/HANDOFF.md)
 
@@ -200,12 +205,14 @@ python3 -m http.server 4173
 
 - 扩充真人、口音、噪声和弱网语音测试；
 - 完成 iOS / Android 中低端真机矩阵；
-- 打磨月末回顾、导出和个人数据管理。
+- 真机验收 JSON 导出、清空和恢复闭环；
+- 完成账单搜索与数据安全的双端真机验收；
+- 真机验收月度回顾、PNG 清晰度、系统分享和临时文件清理。
 
 ### 后续
 
 - 云备份与手动恢复；
-- 可控制的分享卡片与隐私中心；
+- 隐私中心与可选分享控制；
 - 多平台发布和更完整的无障碍支持。
 
 ### 外部依赖就绪后
@@ -214,13 +221,13 @@ python3 -m http.server 4173
 - 会员权益与支付；
 - 社区推广和邀请机制。
 
-产品范围和技术边界以 [实施路线图](docs/14-implementation-roadmap.md) 为准。
+产品范围和技术边界以 [实施路线图](docs/14-implementation-roadmap.md) 为准；备份格式详见 [本地数据备份与恢复](docs/31-local-data-portability.md)。
 
 ## 下载与发布
 
-最新 Android 内测版可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)，无需 Expo 或 GitHub 账户。官网不把版本号写进标题或下载链接，日常纯 JS 更新通过 EAS OTA 推送；只有原生依赖、权限、启动图或 runtime 变化时才要求重新下载安装包。
+最新 Android 内测版可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)，无需 Expo 或 GitHub 账户。官网不把版本号写进标题或下载链接，日常纯 JS 更新通过 EAS OTA 推送；只有原生依赖、权限、启动图或 runtime 变化时才要求重新下载安装包。`0.2.0` 新增原生截图模块，因此必须等待新的原生构建后再发布分享卡能力。
 
-GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。当前原生安装包为 `0.1.4 (14)`，可从 [v0.1.4 Release](https://github.com/zhixiang-luo/shengzhang/releases/tag/v0.1.4-preview.1) 下载，文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
+GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。官网当前仍提供已验收并上线的 `0.1.6 (16)`；仓库源码版本已升到 `0.2.0`，但在新的 Android/iOS 原生构建和真机验收完成前不会替换线上安装包。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
 
 当前尚未在 App Store 或国内 Android 应用商店正式上架。
 

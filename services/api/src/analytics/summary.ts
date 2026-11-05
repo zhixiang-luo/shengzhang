@@ -59,6 +59,11 @@ export type AnalyticsSummary = {
   manualEntryOpened: number;
   manualTransactionsCreated: number;
   statsOpened: number;
+  searchOpened: number;
+  searchApplied: number;
+  monthlyReviewOpened: number;
+  monthlyReviewPreviewed: number;
+  monthlyReviewShareOpened: number;
   categoriesOpened: number;
   totalEntriesCreated: number;
   averageEntriesPerActiveUser: number | null;
@@ -66,6 +71,8 @@ export type AnalyticsSummary = {
     voice: number;
     manual: number;
     stats: number;
+    search: number;
+    review: number;
     categories: number;
   };
   platforms: BreakdownSummary[];
@@ -298,6 +305,13 @@ export function summarizeAnalytics(
     manualEntryOpened: events.filter((event) => event.name === 'manual_entry_opened').length,
     manualTransactionsCreated,
     statsOpened: events.filter((event) => event.name === 'stats_opened').length,
+    searchOpened: events.filter((event) => event.name === 'ledger_search_opened').length,
+    searchApplied: events.filter((event) => event.name === 'ledger_search_applied').length,
+    monthlyReviewOpened: events.filter((event) => event.name === 'monthly_review_opened').length,
+    monthlyReviewPreviewed: events.filter((event) => event.name === 'monthly_review_previewed').length,
+    monthlyReviewShareOpened: events.filter(
+      (event) => event.name === 'monthly_review_share_opened',
+    ).length,
     categoriesOpened: events.filter((event) => event.name === 'categories_opened').length,
     totalEntriesCreated,
     averageEntriesPerActiveUser: ratio(totalEntriesCreated, activeUsers),
@@ -311,6 +325,25 @@ export function summarizeAnalytics(
       stats: uniqueCount(
         events
           .filter((event) => event.name === 'stats_opened')
+          .map((event) => event.installationHash),
+      ),
+      search: uniqueCount(
+        events
+          .filter(
+            (event) =>
+              event.name === 'ledger_search_opened' ||
+              event.name === 'ledger_search_applied',
+          )
+          .map((event) => event.installationHash),
+      ),
+      review: uniqueCount(
+        events
+          .filter(
+            (event) =>
+              event.name === 'monthly_review_opened' ||
+              event.name === 'monthly_review_previewed' ||
+              event.name === 'monthly_review_share_opened',
+          )
           .map((event) => event.installationHash),
       ),
       categories: uniqueCount(
