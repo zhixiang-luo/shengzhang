@@ -1,0 +1,120 @@
+name: Production health watchdog
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: production-health-watchdog
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HEALTH_URL: https://bigai.xin/health
+      INCIDENT_TITLE: "[运维] 声账公网健康检查失败"
+      GH_TOKEN: ${{ github.token }}
+      ALERT_EMAIL_TO: ${{ secrets.ALERT_EMAIL_TO }}
+      ALERT_EMAIL_FROM: ${{ secrets.ALERT_EMAIL_FROM }}
+      ALERT_SMTP_HOST: ${{ secrets.ALERT_SMTP_HOST }}
+      ALERT_SMTP_PORT: ${{ secrets.ALERT_SMTP_PORT }}
+      ALERT_SMTP_USER: ${{ secrets.ALERT_SMTP_USER }}
+      ALERT_SMTP_PASSWORD: ${{ secrets.ALERT_SMTP_PASSWORD }}
+      ALERT_SMTP_SECURITY: ${{ secrets.ALERT_SMTP_SECURITY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Probe public health endpoint
+        id: probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          health_code="$(curl --silent --show-error --output /tmp/health.json \
+            --write-out '%{http_code}' --connect-timeout 8 --max-time 15 \
+            --retry 2 --retry-delay 3 --retry-all-errors "$HEALTH_URL" || true)"
+          health_code="${health_code:-000}"
+          printf 'health_code=%s\n' "$health_code" >> "$GITHUB_OUTPUT"
+          if [ "$health_code" = "200" ]; then
+            printf 'healthy=true\n' >> "$GITHUB_OUTPUT"
+            printf 'HTTP %s: ' "$health_code"
+            head -c 300 /tmp/health.json
+            printf '\n'
+          else
+            printf 'healthy=false\n' >> "$GITHUB_OUTPUT"
+            {
+              printf '外部探测时间：%s\n' "$(TZ=Asia/Shanghai date '+%F %T CST')"
+              printf '地址：%s\n' "$HEALTH_URL"
+              printf 'HTTP 状态：%s\n' "$health_code"
+              printf '工作流：https://github.com/%s/actions/runs/%s\n' \
+                "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+              printf '\n请检查 ECS、公网带宽、安全组、Nginx、证书和 API 状态。\n'
+            } | tee /tmp/incident.txt
+          fi
+
+      - name: Find open incident
+        id: incident
+        shell: bash
+        run: |
+          set -euo pipefail
+          issue_number="$(gh issue list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state open \
+            --limit 100 \
+            --json number,title \
+            --jq ".[] | select(.title == env.INCIDENT_TITLE) | .number" \
+            | head -1)"
+          printf 'issue_number=%s\n' "$issue_number" >> "$GITHUB_OUTPUT"
+
+      - name: Send recovery email
+        if: steps.probe.outputs.healthy == 'true' && steps.incident.outputs.issue_number != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${ALERT_SMTP_PASSWORD:-}" ]; then
+            echo "::warning::SMTP secrets are not configured; GitHub issue will be closed without an email."
+            exit 0
+          fi
+          {
+            printf '声账公网健康检查已恢复。\n\n'
+            printf '恢复时间：%s\n' "$(TZ=Asia/Shanghai date '+%F %T CST')"
+            printf '地址：%s\n' "$HEALTH_URL"
+            printf 'HTTP 状态：200\n'
+            printf '工作流：https://github.com/%s/actions/runs/%s\n' \
+              "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID"
+          } | python3 deploy/send-alert-email.py "公网健康检查已恢复"
+
+      - name: Close recovered incident
+        if: steps.probe.outputs.healthy == 'true' && steps.incident.outputs.issue_number != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment "${{ steps.incident.outputs.issue_number }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --body "外部健康检查已恢复，HTTP 200。运行记录：https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          gh issue close "${{ steps.incident.outputs.issue_number }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --reason completed
+
+      - name: Open incident and send email
+        if: steps.probe.outputs.healthy != 'true' && steps.incident.outputs.issue_number == ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          issue_url="$(gh issue create \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$INCIDENT_TITLE" \
+            --body-file /tmp/incident.txt)"
+          echo "Opened $issue_url"
+          if [ -z "${ALERT_SMTP_PASSWORD:-}" ]; then
+            echo "::warning::SMTP secrets are not configured; incident issue was opened without an email."
+            exit 0
+          fi
+          python3 deploy/send-alert-email.py "公网健康检查失败" < /tmp/incident.txt

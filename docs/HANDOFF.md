@@ -109,7 +109,12 @@
 - 匿名安装 ID 在服务端使用私有 Salt 哈希后写入按日 JSONL；设置页提供“匿名使用统计”关闭开关，官网遵循 DNT/GPC。
 - 已增加 `pnpm --filter @shengzhang/api analytics:report` 报告脚本，可查看独立下载访客、活跃安装、启动频率、语音成功率、累计新增账单和每日趋势。
 - 服务器已安装 `/opt/shengzhang/bin/daily-ops-report.sh`，可生成北京时间前一日的 `server + analytics` Markdown 简报，并写入 `/opt/shengzhang/shared/reports/`。
-- Codex 心跳自动化 `声账每日运营简报` 已启用，每天北京时间 01:00 运行只读检查；异常时提示服务状态、磁盘/内存、错误日志和产品数据趋势。
+- Codex 心跳自动化 `声账每日运营简报` 已启用，每天北京时间 08:00 运行只读检查；异常时提示服务状态、磁盘/内存、错误日志和产品数据趋势。
+- 2026-11-05 已部署服务器端运维告警：`/opt/shengzhang/ops/ops-alert.sh` 每 5 分钟检查 API、Nginx、`/health`、磁盘、可用内存、系统负载、ECS 网络收发吞吐和最近 15 分钟 API error 日志；异常按 1 小时（紧急）或 6 小时（预警）冷却重发，恢复时发送恢复通知。当前 2 vCPU/约 1.7GB 内存的服务器把出网预警/紧急阈值暂设为 2.5/4.0 Mbps，触发后需要结合实际公网带宽和火山并发额度复核。
+- 新增 `.github/workflows/production-health.yml` 作为独立外部看门狗：随 `0.2.1` 发布提交进入默认分支后，GitHub 每 5 分钟访问公网 `/health`，在整台 ECS 或本机监控失联时创建运维 Issue 并发送邮件，恢复后关闭 Issue 并发送恢复邮件；邮件凭据复用 GitHub Actions Secrets。
+- 日报增加容量阈值：昨日活跃安装达到 100、300、500、1000 时分别提示里程碑、规划、预警和紧急；昨日语音开始达到 500、1500、2500 时分别提示观察、容量预警和紧急。服务器每天 00:50 生成日报，Codex 心跳每天 08:00 汇报。
+- 邮件告警脚本 `send-alert-email.py`、通知去重脚本 `ops-notify.sh` 和配置样例 `alerts.env.example` 已部署。本地可运行 `deploy/configure-email-alert.sh`，以隐藏输入方式把 SMTP App Password 写入服务器 `/opt/shengzhang/ops/alerts.env`（权限 0600），凭据不进入仓库或聊天。
+- 新增全局 Codex 技能 `email-alert`：QQ SMTP 授权码只存 macOS 钥匙串，其他项目可按需复用邮件告警，不把授权码写入项目文件或聊天；`configure-email-alert.sh` 完成本项目配置时也会同步保存该钥匙串条目。
 - 已制作 27 秒竖屏宣传片《一句话，长出三笔账》：围绕“按住说一句，松手自动入账”，用声波折成三笔真实账单，随后展示 8 秒整批撤销、本地优先与月度统计。当前旁白使用 Edge TTS `zh-CN-XiaoxiaoNeural`（晓晓普通话女声），原 Tingting 女声保留在 `assets/audio/vo-tingting/`。
 - 宣传片工程位于 `design/video/shengzhang-promo/`，包含分镜脚本、视觉规范、五段场景、中文旁白、原创配乐与可复现音频脚本；界面素材复用已评审原型截图。
 - 宣传片已通过 HyperFrames lint、runtime、motion 和逐帧布局检查；69 项文字对比度检查全部达到 WCAG AA，成片无黑帧或 1.2 秒以上静态段。
@@ -222,6 +227,7 @@
 - GitHub 网页端上传大于 100 MiB 的 Release 附件可能在 policy/finalization 阶段失败；本项目已改用已认证的 GitHub CLI/API 上传。`v0.1.4-preview.1` 的 APK 附件已通过公开 API 和下载响应复验。
 - 临时 IP 入口仅为旧安装兼容而保留；新版本只使用 HTTPS 正式域名。待确认用户都已收到 OTA 后，再评估关闭 IP 的网页跳转或 API 兼容。
 - 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
+- 紧急邮件通道尚未启用：服务器没有预装邮件代理，且 `/opt/shengzhang/ops/alerts.env` 尚未填入真实 SMTP App Password。在配置完成前，定时任务会记录告警状态，但无法真正投递邮件。
 - `0.2.0` 分享卡依赖新增原生模块，必须重新构建和覆盖安装；旧 APK 即使收到同 runtime OTA 也不能安全获得该能力。
 - `expo-sharing` 无法可靠判断用户是否最终发送或取消系统分享，因此运营报告只能把“打开分享面板”当作传播意向，不能当作完成分享。
 - `pnpm audit --prod` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 两项高危告警；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。宣传片工程自身 `npm audit` 为 0。
