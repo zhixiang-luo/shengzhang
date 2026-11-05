@@ -240,7 +240,7 @@ https://expo.dev/artifacts/eas/1aU4s3uYxQBdl0a-G2cH09Unpe0YdNFWVOPpa7I3v5A.apk
 - 首次安装入场动画改为在实际播放完成后才写入“已看过”；首次启动中途退出时，下次仍会播放。
 - `GET /v1/app/update-policy` 已部署到 `https://bigai.xin`；`0.1.6` 发布后公网验证 `0.1.4` 返回 `optional`、`0.1.3` 返回 `required`，iOS 在未配置商店地址时返回 `none`。
 
-服务端 Android latest 已切到 `0.1.6`，minimum 保留 `0.1.4`；下载地址使用 `?download=latest&version=0.1.6`，避免复用旧安装包缓存。
+服务端 Android latest 已切到 `0.2.0`，minimum 保留 `0.1.4`；下载地址使用 `?download=latest&version=0.2.0`，避免复用旧安装包缓存。
 
 ## 14. Android `0.1.6` 官网发布
 
@@ -270,3 +270,39 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/4f19c618
 - 官网稳定下载文件已原子替换，`0.1.4` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.4-preview.apk`。
 - 公网 `Content-Length` 与构建产物一致。
 - GitHub Pre-release 和 runtime `0.1.6` 的 preview OTA 尚未发布。
+
+## 15. Android `0.2.0` 原生发布
+
+2026-11-05 已完成 `0.2.0` Android 原生构建，并同步发布到官网、服务端更新策略和 GitHub Pre-release：
+
+| 项目 | 记录 |
+| --- | --- |
+| EAS Build | `986291b4-9975-40cd-ac7b-da1be3a94f49` |
+| 源码提交 | `31c95c57b54ccab29f7ab90762115148dba3b88a` |
+| Profile / Channel | `preview` / `preview` |
+| App Version / Version Code | `0.2.0` / `17` |
+| Runtime Version | `appVersion` → `0.2.0` |
+| 包名 | `com.shengzhang.ledger` |
+| APK 大小 | 107,955,328 字节 |
+| APK SHA-256 | `684e0cf5b56099332664f158aa6752bf766e15571224315855363e93be988321` |
+
+构建页：
+
+```text
+https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/986291b4-9975-40cd-ac7b-da1be3a94f49
+```
+
+发布状态：
+
+- typecheck、lint 和 130 项自动化测试通过。
+- EAS Build 内 Expo Doctor 20/20 通过，Android 原生编译完成。
+- APK ZIP 完整性检查通过。
+- `assets/app.config` 已确认版本为 `0.2.0`，runtime policy 为 `appVersion`，包名为 `com.shengzhang.ledger`。
+- APK DEX 内已确认包含 `ExpoDocumentPicker` 与 `RNViewShot` 原生模块，证明两项新增原生依赖进入安装包。
+- 官网稳定 APK 已先上传临时文件、核对大小与 SHA-256，再原子替换；`0.1.6` 已备份到 `/opt/shengzhang/releases/shengzhang-0.1.6-preview.apk`。
+- API 已切换发布目录 `/opt/shengzhang/releases/20261105-1845`，Android latest 为 `0.2.0`，minimum 保持 `0.1.4`。
+- 公网策略验证：`0.2.0 → none`、`0.1.6/0.1.4 → optional`、`0.1.3 → required`。
+- 公网 APK 返回 `200`，`Content-Length` 为 107,955,328 字节。
+- GitHub Pre-release `v0.2.0-preview.1` 已附带 APK。
+
+本版新增 `expo-document-picker` 与 `react-native-view-shot`，因此必须覆盖安装新的原生包。安装后应继续在 Android/iOS 真机验证 JSON 导出与恢复、CSV 导出、清空本机、文件选择、回顾 PNG 清晰度、系统分享和取消分享。

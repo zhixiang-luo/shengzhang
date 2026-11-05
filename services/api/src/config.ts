@@ -36,7 +36,7 @@ const environmentSchema = z.object({
   APP_UPDATE_ANDROID_LATEST_VERSION: z
     .string()
     .regex(/^\d+\.\d+\.\d+$/)
-    .default('0.1.6'),
+    .default('0.2.0'),
   APP_UPDATE_ANDROID_MINIMUM_VERSION: z
     .string()
     .regex(/^\d+\.\d+\.\d+$/)
@@ -44,7 +44,7 @@ const environmentSchema = z.object({
   APP_UPDATE_ANDROID_DOWNLOAD_URL: z
     .url()
     .default(
-      'https://bigai.xin/shengzhang/downloads/shengzhang-android-preview.apk?download=latest&version=0.1.6',
+      'https://bigai.xin/shengzhang/downloads/shengzhang-android-preview.apk?download=latest&version=0.2.0',
     ),
   APP_UPDATE_IOS_LATEST_VERSION: z
     .string()

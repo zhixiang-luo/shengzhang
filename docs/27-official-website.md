@@ -64,13 +64,13 @@
 当前下载入口：
 
 - 正式官网：`https://bigai.xin/shengzhang/`；
-- Android 内测：官网稳定入口 `/shengzhang/downloads/shengzhang-android-preview.apk?download=latest&version=0.1.6`；
+- Android 内测：官网稳定入口 `/shengzhang/downloads/shengzhang-android-preview.apk?download=latest&version=0.2.0`；
 - 全量版本索引：GitHub Releases；
 - 源码：`https://github.com/zhixiang-luo/shengzhang`。
 
 官网直接下载不要求 Expo 账户，适合把测试包发给没有 Expo 账号的用户。官网主文案和下载链接不展示版本号，服务器稳定路径始终指向最近一次需要重新安装的原生安装包；纯 JS 更新通过 EAS OTA 完成时，不改官网版本文案。GitHub Releases 继续使用 Tag 记录完整版本历史，但只有原生版本才必须附 APK。
 
-2026-10-23 已发布 GitHub Pre-release `v0.1.4-preview.1`，对应源码提交 `a04bbb6`，并附完整 APK。Release 使用面向用户的更新标题，Tag、版本号和安装包校验值保留在发布说明中，便于追溯而不把版本号扩散到官网主界面。
+2026-11-05 已发布 GitHub Pre-release `v0.2.0-preview.1`，并附完整 APK。Release 使用面向用户的更新标题，Tag、版本号和安装包校验值保留在发布说明中，便于追溯而不把版本号扩散到官网主界面。
 
 ## 6. 部署
 
@@ -86,9 +86,9 @@ python3 -m http.server 4174 -d deploy/site
 
 HTTPS 使用 Let’s Encrypt 证书，SAN 覆盖 `bigai.xin`、`www.bigai.xin`，有效期至 2027-01-26。`certbot.timer` 自动续期已通过 dry-run；阿里云安全组与 Ubuntu UFW 均已放行 443/TCP。官网 footer 展示 `京ICP备2026073107号` 并链接工信部备案系统。
 
-Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-android-preview.apk`，官网直接提供下载，不依赖 Expo 登录。当前稳定安装包为 `0.1.6 (16)`，文件大小 107,798,948 字节，SHA-256 为 `7289f328eff65b20235328c7b9c69d7016defe6c02096a35bfecb6a4b29c9a93`。旧版可直接覆盖安装并保留本地账本。
+Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-android-preview.apk`，官网直接提供下载，不依赖 Expo 登录。当前稳定安装包为 `0.2.0 (17)`，文件大小 107,955,328 字节，SHA-256 为 `684e0cf5b56099332664f158aa6752bf766e15571224315855363e93be988321`。旧版可直接覆盖安装并保留本地账本。
 
-首页主文案不展示版本号，下载链接使用 `?download=latest&version=0.1.6`，通过版本查询参数避免浏览器把旧 APK 当作同一资源继续使用；正式域名下公网响应 `200` 且 `Content-Length` 为 107,798,948 字节，服务器端 SHA-256 与构建产物一致。上一版 `0.1.4` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.4-preview.apk`。
+首页主文案不展示版本号，下载链接使用 `?download=latest&version=0.2.0`，通过版本查询参数避免浏览器把旧 APK 当作同一资源继续使用；正式域名下公网响应 `200` 且 `Content-Length` 为 107,955,328 字节，服务器端 SHA-256 与构建产物一致。上一版 `0.1.6` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.6-preview.apk`。
 
 ## 7. 验收基线
 
@@ -110,7 +110,7 @@ Android 内测包保存在服务器 `/opt/shengzhang/site/downloads/shengzhang-a
 3. 保持正式域名的证书续期、API/WebSocket 健康检查和路径迁移监控；
 4. 增加可单独分享的社交预览图与产品演示视频；
 5. 在不引入追踪的前提下，评估是否需要匿名下载来源统计；
-6. 月末回顾和分享卡上线后，再扩展对应官网章节。
+6. 月末回顾和分享卡已进入官网能力说明，后续用真机截图替换原型截图。
 
 ## 9. 首支宣传片
 
