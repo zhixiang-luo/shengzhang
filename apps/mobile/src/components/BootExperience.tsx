@@ -17,6 +17,7 @@ import {
   BOOT_INTRO_VERSION,
   BOOT_INTRO_VERSION_KEY,
   hasSeenCurrentBootIntro,
+  shouldPersistBootIntro,
 } from '../features/boot/bootState';
 import { BootScreen, type BootScreenMode } from './BootScreen';
 
@@ -98,13 +99,13 @@ export function BootExperience({ children }: { children: ReactNode }) {
   const overlayVisible = Boolean(overlayMode) && !overlayDismissed;
 
   useEffect(() => {
-    if (hasSeenIntro !== false) return;
+    if (!shouldPersistBootIntro(fullFinished)) return;
     void SecureStore.setItemAsync(BOOT_INTRO_VERSION_KEY, String(BOOT_INTRO_VERSION)).catch(
       () => {
         // If storage is unavailable, the animation may repeat but startup remains usable.
       },
     );
-  }, [hasSeenIntro]);
+  }, [fullFinished]);
 
   useEffect(() => {
     if (contentReady && !overlayMode) hideNativeSplash();

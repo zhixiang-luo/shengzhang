@@ -1,11 +1,13 @@
 import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
+import type { AppUpdatePolicyConfig } from '@shengzhang/contracts';
 import Fastify, { type FastifyServerOptions } from 'fastify';
 
 import { AnalyticsEventStore } from './analytics/event-store.js';
 import { loadEnvironment } from './config.js';
 import { createVoiceProvider } from './providers/factory.js';
 import { analyticsRoutes } from './routes/analytics.js';
+import { appUpdateRoutes } from './routes/app-update.js';
 import { healthRoutes } from './routes/health.js';
 import { voiceRoutes } from './routes/voice.js';
 import {
@@ -16,6 +18,7 @@ import { InMemoryDailyVoiceQuota } from './security/voice-quota.js';
 
 type AppDependencies = {
   voiceAccessGuard?: VoiceAccessGuard;
+  appUpdatePolicy?: AppUpdatePolicyConfig;
 };
 
 export function buildApp(
@@ -60,6 +63,21 @@ export function buildApp(
   });
 
   app.register(healthRoutes);
+  app.register(appUpdateRoutes, {
+    policy:
+      dependencies.appUpdatePolicy ?? {
+        android: {
+          latestVersion: environment.APP_UPDATE_ANDROID_LATEST_VERSION,
+          minimumSupportedVersion: environment.APP_UPDATE_ANDROID_MINIMUM_VERSION,
+          downloadUrl: environment.APP_UPDATE_ANDROID_DOWNLOAD_URL,
+        },
+        ios: {
+          latestVersion: environment.APP_UPDATE_IOS_LATEST_VERSION,
+          minimumSupportedVersion: environment.APP_UPDATE_IOS_MINIMUM_VERSION,
+          downloadUrl: environment.APP_UPDATE_IOS_DOWNLOAD_URL ?? null,
+        },
+      },
+  });
   app.register(analyticsRoutes, {
     enabled: environment.ANALYTICS_ENABLED,
     store: new AnalyticsEventStore({

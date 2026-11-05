@@ -2,7 +2,7 @@
 
 ## 1. 当前能力
 
-App `0.1.4` 已接入 EAS Update：
+App `0.1.3` 及更高版本已接入 EAS Update；`0.1.6` 预览版在兼容更新之外增加了原生安装包更新策略：
 
 - `expo-updates` 原生更新客户端
 - 启动自动检查
@@ -12,6 +12,7 @@ App `0.1.4` 已接入 EAS Update：
 - 设置页手动检查更新
 - preview / production 独立更新通道
 - `runtimeVersion` 使用 `appVersion`
+- 安装包最低支持版本与推荐更新由 `GET /v1/app/update-policy` 下发
 
 Expo Go 会直接加载 Metro，不支持应用内更新；设置页会显示“Expo Go 预览”。
 
@@ -35,12 +36,12 @@ Expo Go 会直接加载 Metro，不支持应用内更新；设置页会显示“
 
 ## 3. 用户流程
 
-1. App 启动后检查当前 channel 是否有兼容更新。
-2. 有更新时后台下载。
-3. 下载完成后显示“新版本已准备好”。
-4. 用户可立即重启，或稍后继续使用。
-5. 已下载更新最迟在下次冷启动时生效。
-6. 检查或下载失败时继续使用当前版本，不影响本地账本。
+1. App 启动后并行检查 EAS channel 与服务端安装包策略。
+2. 有兼容的 JS/TS 更新时后台自动下载；下载完成后提示立即重启或稍后生效。
+3. 当前安装包低于最低支持版本时，显示不可关闭的原生更新门禁，并提供官网 APK 或商店入口。
+4. 当前安装包仍受支持、但低于最新稳定版时，显示可稍后处理的安装包更新提示。
+5. Android 不允许普通 App 静默安装 APK，因此原生更新仍需要用户下载并确认覆盖安装；本地 SQLite 账本会保留。
+6. 检查、下载或策略接口失败时继续使用当前版本，不影响离线记账。
 
 ## 4. 首次切换要求
 
@@ -89,7 +90,7 @@ npx eas-cli@latest build --platform android --profile preview
 
 - JS 紧急回滚：重新发布上一个稳定提交到同一 channel。
 - 原生回滚：发布包含修复的新二进制，不依赖 OTA 降级原生代码。
-- `minimumVersion` API 强制升级将在公网 API 域名确定后接入。
+- 安装包最低支持版本由服务端环境变量 `APP_UPDATE_ANDROID_MINIMUM_VERSION` / `APP_UPDATE_IOS_MINIMUM_VERSION` 控制；只有存在有效官方下载地址时才允许强制更新。
 
 ## 8. 版本展示与分发策略
 
@@ -226,3 +227,17 @@ https://expo.dev/artifacts/eas/1aU4s3uYxQBdl0a-G2cH09Unpe0YdNFWVOPpa7I3v5A.apk
 - 本地 APK 下载完成，`unzip -t` 完整性检查通过。
 - `assets/app.config` 已确认版本为 `0.1.5`，runtime 为 `0.1.5`，包名为 `com.shengzhang.ledger`。
 - 当前仅完成候选构建；官网稳定下载文件和 GitHub Release 仍保留 `0.1.4`，待 Android 真机确认首装入场、冷启动策略、分类图标选择器和摘要卡装饰后再替换。
+
+## 13. 双轨更新实现
+
+2026-11-05 已完成双轨更新代码、部署与公网验证：
+
+- EAS Update：兼容 JS/TS 更新继续自动下载，支持“立即重启”和“稍后”。
+- 原生安装包策略：服务端按平台和当前版本返回 `none / optional / required`。
+- `optional` 显示可关闭的顶部提示；`required` 显示不可关闭的整页更新门禁。
+- 下载入口统一使用官网稳定 APK；iOS 未配置官方商店地址时不下发原生更新，避免死锁。
+- 更新检查异常不再直接展示底层 Java、网络或 Expo 错误；客户端会提示重试或从官网覆盖安装。
+- 首次安装入场动画改为在实际播放完成后才写入“已看过”；首次启动中途退出时，下次仍会播放。
+- `GET /v1/app/update-policy` 已部署到 `https://bigai.xin`；公网验证 `0.1.4` 返回 `none`、`0.1.3` 返回 `required`，iOS 在未配置商店地址时返回 `none`。
+
+服务端当前默认仍指向 `0.1.4`，避免在官网稳定 APK 尚未替换时把用户引向错误版本。发布新的稳定 APK 后，把 Android 的 latest 切到新版本；需要推荐更新时把 minimum 留在 `0.1.4`，需要强制更新时才同步提高 minimum。

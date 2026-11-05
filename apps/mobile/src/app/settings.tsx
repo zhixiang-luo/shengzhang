@@ -100,7 +100,11 @@ export default function SettingsScreen() {
                 ? undefined
                 : () => void updates.check(true)
             }
-            last={updates.status !== 'ready'}
+            last={
+              updates.status !== 'ready' &&
+              (!updates.nativeUpdate?.downloadUrl ||
+                updates.nativeUpdate.updateType === 'none')
+            }
           />
           {updates.status === 'ready' ? (
             <SettingRow
@@ -110,11 +114,25 @@ export default function SettingsScreen() {
               last
             />
           ) : null}
+          {updates.nativeUpdate?.downloadUrl &&
+          updates.nativeUpdate.updateType !== 'none' ? (
+            <SettingRow
+              label="安装包更新"
+              value={
+                updates.nativeUpdate.updateType === 'required'
+                  ? '必须更新'
+                  : '可更新'
+              }
+              onPress={() => void updates.openNativeUpdate()}
+              last
+            />
+          ) : null}
         </View>
         <Text style={styles.note}>
-          {updates.error ??
+          {updates.nativeError ??
+            updates.error ??
             (updates.info.enabled
-              ? `更新通道：${updates.info.channel ?? '未配置'}`
+              ? `兼容更新会自动下载；安装包更新需覆盖安装并保留账本。更新通道：${updates.info.channel ?? '未配置'}`
               : 'Expo Go 会直接加载开发服务器；独立安装包支持 OTA 更新。')}
         </Text>
 

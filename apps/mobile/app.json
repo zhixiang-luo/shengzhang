@@ -3,7 +3,7 @@
     "name": "声账",
     "slug": "shengzhang",
     "scheme": "shengzhang",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "runtimeVersion": {
       "policy": "appVersion"
     },

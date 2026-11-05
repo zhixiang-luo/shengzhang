@@ -1,5 +1,13 @@
+import {
+  appUpdatePolicyResponseSchema,
+  type AppUpdatePolicyResponse,
+} from '@shengzhang/contracts';
+import Constants from 'expo-constants';
+import { fetch } from 'expo/fetch';
 import * as Updates from 'expo-updates';
+import { Platform } from 'react-native';
 
+import { API_BASE_URL } from '../config/env';
 export type AppUpdateStatus =
   | 'idle'
   | 'checking'
@@ -43,4 +51,30 @@ export function getAppUpdateInfo() {
     createdAt: Updates.createdAt?.toISOString() ?? null,
     isEmbeddedLaunch: Updates.isEmbeddedLaunch,
   };
+}
+
+export async function checkNativeAppUpdate(): Promise<AppUpdatePolicyResponse | null> {
+  if (Platform.OS !== 'android' && Platform.OS !== 'ios') return null;
+  const currentVersion = Constants.expoConfig?.version;
+  if (!currentVersion) return null;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const query = new URLSearchParams({
+      platform: Platform.OS,
+      currentVersion,
+    });
+    const response = await fetch(`${API_BASE_URL}/v1/app/update-policy?${query}`, {
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    const payload: unknown = await response.json();
+    if (!response.ok) {
+      throw new Error(`Native update policy request failed: ${response.status}`);
+    }
+    return appUpdatePolicyResponseSchema.parse(payload);
+  } finally {
+    clearTimeout(timeout);
+  }
 }

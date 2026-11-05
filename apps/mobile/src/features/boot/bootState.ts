@@ -6,3 +6,7 @@ export function hasSeenCurrentBootIntro(value: string | null | undefined): boole
   const version = Number.parseInt(value, 10);
   return Number.isFinite(version) && version >= BOOT_INTRO_VERSION;
 }
+
+export function shouldPersistBootIntro(fullIntroFinished: boolean): boolean {
+  return fullIntroFinished;
+}

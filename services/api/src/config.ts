@@ -33,6 +33,28 @@ const environmentSchema = z.object({
   ANALYTICS_ENABLED: z.enum(['true', 'false']).default('true').transform((value) => value === 'true'),
   ANALYTICS_DATA_DIR: z.string().min(1).default('.analytics'),
   ANALYTICS_HASH_SALT: z.string().min(16).optional(),
+  APP_UPDATE_ANDROID_LATEST_VERSION: z
+    .string()
+    .regex(/^\d+\.\d+\.\d+$/)
+    .default('0.1.4'),
+  APP_UPDATE_ANDROID_MINIMUM_VERSION: z
+    .string()
+    .regex(/^\d+\.\d+\.\d+$/)
+    .default('0.1.4'),
+  APP_UPDATE_ANDROID_DOWNLOAD_URL: z
+    .url()
+    .default(
+      'https://bigai.xin/shengzhang/downloads/shengzhang-android-preview.apk?download=latest',
+    ),
+  APP_UPDATE_IOS_LATEST_VERSION: z
+    .string()
+    .regex(/^\d+\.\d+\.\d+$/)
+    .default('0.1.4'),
+  APP_UPDATE_IOS_MINIMUM_VERSION: z
+    .string()
+    .regex(/^\d+\.\d+\.\d+$/)
+    .default('0.1.4'),
+  APP_UPDATE_IOS_DOWNLOAD_URL: z.url().optional(),
 });
 
 export type Environment = z.infer<typeof environmentSchema>;

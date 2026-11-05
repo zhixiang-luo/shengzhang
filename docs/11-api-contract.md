@@ -38,6 +38,30 @@
 }
 ```
 
+## 2.1 应用更新策略
+
+`GET /v1/app/update-policy?platform=android&currentVersion=0.1.4`，无需鉴权。
+
+```json
+{
+  "platform": "android",
+  "currentVersion": "0.1.4",
+  "latestVersion": "0.1.5",
+  "minimumSupportedVersion": "0.1.4",
+  "updateType": "optional",
+  "downloadUrl": "https://bigai.xin/shengzhang/downloads/shengzhang-android-preview.apk?download=latest",
+  "title": "有新版本可选",
+  "message": "安装最新版本可使用新功能。覆盖安装会保留本地账本。"
+}
+```
+
+- `updateType=none`：当前安装包不低于最新稳定版，不提示。
+- `updateType=optional`：支持继续使用，但存在更新的原生安装包。
+- `updateType=required`：当前版本低于最低支持版本，客户端显示不可关闭的安装包更新门禁。
+- iOS 或 Android 未配置可用的官方下载地址时，服务端不会下发强制更新，避免用户被锁在无路可走的页面。
+- 该接口只决定原生安装包策略；兼容的 JS/TS 更新仍由 EAS Update 自动下载。
+- 接口失败不能阻塞本地账本；客户端继续使用当前版本并允许稍后重试。
+
 ## 3. 实时语音转写
 
 ### 主链路：WebSocket

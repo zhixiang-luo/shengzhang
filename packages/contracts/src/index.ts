@@ -38,7 +38,38 @@ export const backupMetadataSchema = z.object({
   checksum: z.string().min(1),
 });
 
+export const appUpdatePlatformSchema = z.enum(['android', 'ios']);
+export const appUpdateTypeSchema = z.enum(['none', 'optional', 'required']);
+
+export const appUpdatePolicyConfigSchema = z.object({
+  android: z.object({
+    latestVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+    minimumSupportedVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+    downloadUrl: z.url().nullable(),
+  }),
+  ios: z.object({
+    latestVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+    minimumSupportedVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+    downloadUrl: z.url().nullable(),
+  }),
+});
+
+export const appUpdatePolicyResponseSchema = z.object({
+  platform: appUpdatePlatformSchema,
+  currentVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+  latestVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+  minimumSupportedVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+  updateType: appUpdateTypeSchema,
+  downloadUrl: z.url().nullable(),
+  title: z.string().min(1).max(80),
+  message: z.string().min(1).max(240),
+});
+
 export type VoiceEntryPayload = z.infer<typeof voiceEntrySchema>;
 export type VoiceParseResponse = z.infer<typeof voiceParseResponseSchema>;
 export type VoiceTranscribeResponse = z.infer<typeof voiceTranscribeResponseSchema>;
 export type BackupMetadata = z.infer<typeof backupMetadataSchema>;
+export type AppUpdatePlatform = z.infer<typeof appUpdatePlatformSchema>;
+export type AppUpdateType = z.infer<typeof appUpdateTypeSchema>;
+export type AppUpdatePolicyConfig = z.infer<typeof appUpdatePolicyConfigSchema>;
+export type AppUpdatePolicyResponse = z.infer<typeof appUpdatePolicyResponseSchema>;
