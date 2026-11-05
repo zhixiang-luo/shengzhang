@@ -1,0 +1,42 @@
+# EAS only needs application source, workspace packages, and build metadata.
+.DS_Store
+node_modules/
+.pnpm-store/
+dist/
+build/
+.expo/
+.next/
+coverage/
+.cache/
+.analytics/
+
+# Local environment, credentials, native signing, and deployment state
+.env
+.env.*
+!.env.example
+.deploy/
+*.p8
+*.p12
+*.mobileprovision
+*.keystore
+*.jks
+*.key
+*.pem
+*.log
+*.tmp
+*.tsbuildinfo
+
+# Large non-runtime project materials
+design/
+docs/
+preview/
+prototype/
+deploy/
+services/api/testdata/
+
+# Native and editor output
+.idea/
+.vscode/
+ios/Pods/
+android/.gradle/
+.kotlin/
