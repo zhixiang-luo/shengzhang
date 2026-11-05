@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.0` Android 原生包已构建、发布到官网与 GitHub，并完成服务端更新策略切换。iOS 原生构建、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
+项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.0` Android 原生包已构建、发布到官网与 GitHub，并完成服务端更新策略切换与 preview OTA。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
 
 ## 已完成
 
@@ -135,7 +135,7 @@
 - `0.1.4` 安装包在构建时嵌入过临时 IP；当前 preview OTA 已把 API 切换到 `https://bigai.xin`。服务端继续保留 IP 的 `/v1/` 与 `/health`，用于兼容尚未接收 OTA 的旧安装。
 - Android `0.1.5` 原生候选包已通过 EAS Build 完成：构建 ID `250250ce-0722-40a7-af4e-d276ae4b61b9`，源码提交 `9c39483`，profile/channel 为 `preview`，版本 `0.1.5 (15)`，runtime `0.1.5`；APK 文件大小 109,937,553 字节，SHA-256 为 `0be61cd6aa907cac3ea563ae95dd860cfeefcbac0ce6dd88c543d178871f539b`，ZIP 完整性与嵌入版本配置检查均通过。
 - `0.1.5` 与 `0.1.6` 保留为历史候选；官网当前稳定 APK 为 `0.2.0`，GitHub 最新公开 Release 为 `v0.2.0-preview.1`。
-- `0.2.0` 安装包内嵌当前 JS 功能，但 runtime `0.2.0` 的 preview OTA 尚未单独发布。低于 `0.1.3` 的旧 APK 不含 `expo-updates`，必须覆盖安装一次。
+- runtime `0.2.0` 的 preview OTA 已发布：Update Group `da443e24-6536-41fa-8f6c-6027a5a8736d`，Android Update `01a1abef-539a-7a4a-a70b-7b95d851006f`，iOS Update `01a1abef-539a-71f1-b952-55e88b2bcd50`，源码提交 `12ea82c`，包含首次完整入场、后续进程冷启动快速入场、后台恢复不播放。低于 `0.1.3` 的旧 APK 不含 `expo-updates`，仍需覆盖安装一次。
 - 已实现并部署双轨更新策略：兼容 JS/TS 更新由 EAS 自动下载；服务端 `GET /v1/app/update-policy` 根据当前安装版本返回 `none / optional / required`，强制模式使用不可关闭门禁，推荐模式允许稍后处理。更新异常不再把底层异常原文直接展示给用户。公网已验证 `0.2.0 → none`、`0.1.6/0.1.4 → optional`、`0.1.3 → required`，API 发布目录为 `/opt/shengzhang/releases/20261105-1845`。
 - 启动动画写入“已看过”的时机已从动画开始改为完整播放结束后；如果首次启动中途退出，下一次不会误跳过动画。
 - 启动策略已从“只在首次安装播放”改为“首次完整、后续冷启动快速、后台恢复不播放”；移除了启动阶段每 50ms 更新一次计时的常驻状态，减少无意义重渲染。
@@ -186,7 +186,7 @@
 - `0.1.7` 的 Android/iOS 系统分享、文件选择器以及“导出 → 清空 → 恢复”真机闭环尚未验收。
 - `0.2.0` Android 原生构建已完成，但 PNG 清晰度、系统分享、取消行为、临时文件清理和 `react-native-view-shot` 真机可用性尚未验收；iOS 原生构建尚未完成。
 - iOS 内购、会员 entitlement、恢复购买、微信/支付宝 APP 支付均未实现。
-- Android `0.2.0` 预览包已替换官网稳定下载文件并发布 GitHub Pre-release；runtime `0.2.0` 的 preview OTA 和完整真机闭环仍未完成。
+- Android `0.2.0` 预览包已替换官网稳定下载文件并发布 GitHub Pre-release；runtime `0.2.0` 的 preview OTA 已发布，启动动画与 0.2.0 完整真机闭环仍待验收。
 - `download.bigai.xin` 目前仅验证 HTTP CDN，正式下载入口仍使用 `https://bigai.xin/...`，直到 CDN 自定义证书上传并完成 HTTPS 验收。
 - 语音失败恢复、单笔修正和首次引导已包含在 `0.2.0`，待 Android/iOS 真机回归。
 
@@ -197,7 +197,7 @@
 3. 在 Android/iOS 真机验证 `0.2.0`：空/非空月回顾、长文案、动态字体、PNG 清晰度、系统分享、取消分享和临时文件清理。
 4. 安装官网 `0.2.0 (17)` APK，完成数据安全、搜索、月度回顾和新增原生模块的真机回归。
 5. 在 Android/iOS 真机验证启动策略：首装完整入场、后续进程冷启动快速入场、后台恢复不播放入场，以及原生 Splash 到 React 首帧无跳变。
-6. 为 runtime `0.2.0` 发布对应 preview OTA，验证自动检查、强制门禁和异常提示。
+6. 在 Android/iOS 真机验证 runtime `0.2.0` preview OTA 的自动检查、下载重启、快速入场、强制门禁和异常提示。
 7. 从正式域名和 GitHub Release 分别下载 APK，核对同一哈希，并在 Android 真机验证覆盖安装后本地账本保留。
 8. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；完成 iOS 原生构建、双端真机矩阵与 12–15 人封闭试用。
 9. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
@@ -268,6 +268,9 @@ boot policy build: passed
 boot policy git diff --check: passed
 boot policy android export: passed
 boot policy ios export: passed
+runtime 0.2.0 preview OTA: da443e24-6536-41fa-8f6c-6027a5a8736d
+runtime 0.2.0 preview OTA platforms: android, ios
+runtime 0.2.0 preview OTA commit: 12ea82c2c88ac808510e117e3a79c84c04e7d50a
 cdn http download: HTTP 200, Content-Type application/vnd.android.package-archive
 cdn range benchmark: 0.70s vs origin 23.85s, SHA-256 matched
 voice eval: 200/200 exact, amount/type/category/date 100%

@@ -306,3 +306,27 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/986291b4
 - GitHub Pre-release `v0.2.0-preview.1` 已附带 APK。
 
 本版新增 `expo-document-picker` 与 `react-native-view-shot`，因此必须覆盖安装新的原生包。安装后应继续在 Android/iOS 真机验证 JSON 导出与恢复、CSV 导出、清空本机、文件选择、回顾 PNG 清晰度、系统分享和取消分享。
+
+## 16. Runtime `0.2.0` 启动动画 OTA
+
+2026-11-05 已为 `0.2.0` runtime 发布 preview OTA：
+
+| 项目 | 记录 |
+| --- | --- |
+| Channel / Environment | `preview` / `preview` |
+| Runtime Version | `0.2.0` |
+| Platform | Android、iOS |
+| Update Group | `da443e24-6536-41fa-8f6c-6027a5a8736d` |
+| Android Update | `01a1abef-539a-7a4a-a70b-7b95d851006f` |
+| iOS Update | `01a1abef-539a-71f1-b952-55e88b2bcd50` |
+| 源码提交 | `12ea82c2c88ac808510e117e3a79c84c04e7d50a` |
+
+本版只改变 JS/React Native 启动体验，不增加原生依赖，因此不需要重新构建 APK：
+
+- 首次安装播放完整 2.72 秒入场。
+- App 进程结束后再次启动播放 1.2 秒快速入场。
+- 仅从后台恢复不播放动画。
+- 完整入场播放结束后才持久化“已看过”；首次中途退出不会误跳过。
+- 移除了启动阶段每 50ms 更新一次计时的常驻状态，减少无意义重渲染。
+
+发布前门禁：typecheck、lint、build、`git diff --check`、Android/iOS Expo export 全部通过；domain 34、mobile 56、API 38，共 128 项测试通过。待 Android/iOS 真机验证首次安装、进程冷启动、后台恢复和 OTA 下载重启闭环。
