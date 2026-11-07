@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包已发布到官网、OSS + CDN、服务端更新策略和 GitHub Pre-release，runtime `0.2.1` preview OTA 也已上线。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
+项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包已发布到官网、OSS + CDN、服务端更新策略和 GitHub Pre-release，runtime `0.2.1` preview OTA `810cd59c` 已修复生产 API 地址、反馈错误提示和用户反馈的日期示例。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
 
 ## 已完成
 
@@ -113,6 +113,9 @@
 - `POST /v1/feedback` 使用严格 Zod 契约、16 KiB 请求上限、单 IP 每 10 分钟 5 条/每日 30 条和全局每日 500 条限制；重复 `clientFeedbackId` 即使跨日期重试也只保存一份。
 - 反馈私有收件箱位于 `/opt/shengzhang/shared/reports/.feedback`，按北京时间日期保存独立 JSON 文件，目录/文件权限分别为 `0700`/`0600`；安装 ID 只保存加盐 SHA-256，正文和联系方式不进入普通 API 日志或匿名统计。
 - 日报新增反馈总数与类型分布，只显示计数；服务器每日 00:35 自动清理超过 180 天的反馈目录。
+- 修复匿名反馈 OTA 的发布环境缺口：生产 Bundle 未注入 `EXPO_PUBLIC_API_BASE_URL` 时也默认 `https://bigai.xin`，Android/iOS HBC 中只保留正式域名，不再包含 loopback 或局域网地址。
+- 反馈详细描述改为更明确的“语音说‘昨天午饭 25’，但账单日期显示成了今天”，并补充“发生了什么、原本期望怎样”的填写提示；网络失败不再向用户展示底层 `Network request failed`。
+- 为“昨天午饭 25”补服务端相对日期和移动端时间戳保留回归测试；公网 API 返回日期为 `2026-11-06`，没有落在当天 `2026-11-07`。
 - 官网下载区与 GitHub `v0.2.1-preview.1` 发布说明已同步匿名反馈、相对日期修复和“已安装 0.2.1 无需重装 APK”的 OTA 指引。
 - 服务器已把新版日报入口安装到 `/opt/shengzhang/shared/reports/bin/daily-ops-report.sh`，可生成北京时间前一日的 `server + analytics + feedback` Markdown 简报，并写入 `/opt/shengzhang/shared/reports/`；cron 已切换到该入口。
 - Codex 心跳自动化 `声账每日运营简报` 已启用，每天北京时间 08:00 运行只读检查；异常时提示服务状态、磁盘/内存、错误日志和产品数据趋势。
@@ -228,6 +231,7 @@
 11. 修复真人评测暴露的 P0/P1 问题，冻结内测候选版本。
 12. 微信登录、云备份和支付继续留在外部依赖 backlog；Apple 账号就绪后先评估 iOS 内购，不用等待微信。
 13. 在 Android/iOS 真机验证设置入口、反馈表单键盘避让、失败重试、成功编号和关闭诊断信息后的请求载荷。
+14. 在已安装 `0.2.1 (18)` 的 Android 真机接收 OTA `810cd59c`，分别提交一条“功能建议”和语音“昨天午饭 25”，确认反馈成功编号与账本“昨天”分组。
 
 ## 已知风险
 
@@ -328,9 +332,21 @@ feedback daily summary: counts/type distribution only
 feedback release deployment: /opt/shengzhang/releases/20261107-215526
 feedback release health: HTTP 200, status=ok
 feedback retention cron: daily 00:35 Asia/Shanghai, 180-day cutoff
-feedback preview OTA: 64610999-a11e-4684-8147-3d62561286d7, runtime 0.2.1, android + ios
+feedback preview OTA: 64610999-a11e-4684-8147-3d62561286d7, runtime 0.2.1, android + ios (superseded)
 feedback official site copy: deployed and verified
 feedback github release notes: updated, APK unchanged
+feedback regression typecheck: passed
+feedback regression lint: passed
+feedback regression tests: domain 34 + mobile 68 + api 60 = 162 passed
+feedback regression api build: passed
+feedback regression android export: passed, only https://bigai.xin in HBC
+feedback regression ios export: passed, only https://bigai.xin in HBC
+feedback regression git diff --check: passed
+feedback regression public date: 昨天午饭 25 -> 2026-11-06, yesterday matched
+feedback regression public submit: HTTP 202 with valid UUID
+feedback regression health: HTTP 200, status=ok
+feedback fix preview OTA: 810cd59c-0666-4c9e-b4e7-c5d4402b230a, runtime 0.2.1, android + ios
+feedback fix preview OTA commit: 5130e2f62d9795a6d2bd845f914f2c652e0d8d0d
 boot policy typecheck: passed
 boot policy lint: passed
 boot policy tests: domain 34 + mobile 56 + api 38 = 128 passed

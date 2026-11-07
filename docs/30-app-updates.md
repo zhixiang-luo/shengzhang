@@ -423,8 +423,32 @@ OTA 只负责后续兼容的 JS/TS 更新与在线更新清单。原生启动图
 | Source Base Commit | `6c0b223c`（发布时工作区变更尚未提交） |
 | EAS Dashboard | `https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/updates/64610999-a11e-4684-8147-3d62561286d7` |
 
-同一版本发布前门禁为 typecheck、lint、API build、Android/iOS Expo export 和 `git diff --check` 全部通过；domain 34、mobile 68、API 60，共 162 项测试通过。
+该 OTA 已由 21 节的修复版取代。上一版发布时使用的工作区默认 API 回退值只适合本地开发；用户测得语音或反馈请求可能无法连接正式服务。
 
 公网验收覆盖匿名提交、同 ID 幂等重试、非法内容、16 KiB 请求上限、安装 ID 哈希、日志隐私和日报计数。测试反馈在验证后从私有收件箱删除，没有保留用户内容。
 
 官网下载区已同步说明本版能力；GitHub `v0.2.1-preview.1` 发布说明也已更新，并明确“已安装 `0.2.1 (18)` 的设备不需要重新下载 APK”。APK 文件、Tag 和附件均保持不变。
+
+## 21. Runtime `0.2.1` 反馈提交修复 OTA
+
+2026-11-07 发布反馈修复版，现有 `0.2.1 (18)` 安装可直接通过 OTA 更新，不需要重装 APK。
+
+| 项目 | 记录 |
+| --- | --- |
+| Channel / Environment | `preview` / `preview` |
+| Runtime Version | `0.2.1` |
+| Platform | Android、iOS |
+| Update Group | `810cd59c-0666-4c9e-b4e7-c5d4402b230a` |
+| Android Update | `01a1b65e-cc48-75e7-8652-1d0b97002255` |
+| iOS Update | `01a1b65e-cc48-741f-b8d8-93d1b6f1c870` |
+| 源码提交 | `5130e2f62d9795a6d2bd845f914f2c652e0d8d0d` |
+| EAS Dashboard | `https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/updates/810cd59c-0666-4c9e-b4e7-c5d4402b230a` |
+
+本版修复：
+
+- 生产 Bundle 在未注入环境变量时也默认连接 `https://bigai.xin`，不再包含 loopback 或开发机局域网 API 地址。
+- “功能建议”等反馈在网络失败时显示可重试的人话提示，服务端结构化错误仍然保留。
+- 详细描述示例改为“语音说‘昨天午饭 25’，但账单日期显示成了今天”，并提示用户说明实际发生什么、原本期望怎样。
+- 为“昨天午饭 25”增加服务端日期锚定和移动端时间戳保留回归测试。
+
+同一版本发布前门禁为 typecheck、lint、API build、Android/iOS Expo export 和 `git diff --check` 全部通过；domain 34、mobile 68、API 60，共 162 项测试通过。Android/iOS 发布 Bundle 均已确认只包含正式 API 域名 `https://bigai.xin`。
