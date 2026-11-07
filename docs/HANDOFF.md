@@ -113,6 +113,7 @@
 - `POST /v1/feedback` 使用严格 Zod 契约、16 KiB 请求上限、单 IP 每 10 分钟 5 条/每日 30 条和全局每日 500 条限制；重复 `clientFeedbackId` 即使跨日期重试也只保存一份。
 - 反馈私有收件箱位于 `/opt/shengzhang/shared/reports/.feedback`，按北京时间日期保存独立 JSON 文件，目录/文件权限分别为 `0700`/`0600`；安装 ID 只保存加盐 SHA-256，正文和联系方式不进入普通 API 日志或匿名统计。
 - 日报新增反馈总数与类型分布，只显示计数；服务器每日 00:35 自动清理超过 180 天的反馈目录。
+- 官网下载区与 GitHub `v0.2.1-preview.1` 发布说明已同步匿名反馈、相对日期修复和“已安装 0.2.1 无需重装 APK”的 OTA 指引。
 - 服务器已把新版日报入口安装到 `/opt/shengzhang/shared/reports/bin/daily-ops-report.sh`，可生成北京时间前一日的 `server + analytics + feedback` Markdown 简报，并写入 `/opt/shengzhang/shared/reports/`；cron 已切换到该入口。
 - Codex 心跳自动化 `声账每日运营简报` 已启用，每天北京时间 08:00 运行只读检查；异常时提示服务状态、磁盘/内存、错误日志和产品数据趋势。
 - 2026-11-05 已部署服务器端运维告警：`/opt/shengzhang/ops/ops-alert.sh` 每 5 分钟检查 API、Nginx、`/health`、磁盘、可用内存、系统负载、ECS 网络收发吞吐和最近 15 分钟 API error 日志；异常按 1 小时（紧急）或 6 小时（预警）冷却重发，恢复时发送恢复通知。当前 2 vCPU/约 1.7GB 内存的服务器把出网预警/紧急阈值暂设为 2.5/4.0 Mbps，触发后需要结合实际公网带宽和火山并发额度复核。
@@ -328,6 +329,8 @@ feedback release deployment: /opt/shengzhang/releases/20261107-215526
 feedback release health: HTTP 200, status=ok
 feedback retention cron: daily 00:35 Asia/Shanghai, 180-day cutoff
 feedback preview OTA: 64610999-a11e-4684-8147-3d62561286d7, runtime 0.2.1, android + ios
+feedback official site copy: deployed and verified
+feedback github release notes: updated, APK unchanged
 boot policy typecheck: passed
 boot policy lint: passed
 boot policy tests: domain 34 + mobile 56 + api 38 = 128 passed

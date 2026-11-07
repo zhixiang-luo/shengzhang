@@ -424,3 +424,5 @@ OTA 只负责后续兼容的 JS/TS 更新与在线更新清单。原生启动图
 同一版本发布前门禁为 typecheck、lint、API build、Android/iOS Expo export 和 `git diff --check` 全部通过；domain 34、mobile 61、API 59，共 154 项测试通过。
 
 公网验收覆盖匿名提交、同 ID 幂等重试、非法内容、16 KiB 请求上限、安装 ID 哈希、日志隐私和日报计数。测试反馈在验证后从私有收件箱删除，没有保留用户内容。
+
+官网下载区已同步说明本版能力；GitHub `v0.2.1-preview.1` 发布说明也已更新，并明确“已安装 `0.2.1 (18)` 的设备不需要重新下载 APK”。APK 文件、Tag 和附件均保持不变。
