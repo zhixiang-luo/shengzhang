@@ -60,6 +60,8 @@ EXPO_NO_DOTENV=1 EXPO_PUBLIC_API_BASE_URL=https://bigai.xin \
   --message "修复：更新说明"
 ```
 
+发布时仍必须显式传入生产 API；移动端的兜底默认值同样是 `https://bigai.xin`，禁止把 `127.0.0.1` 或开发机局域网 IP 作为发布包默认值。
+
 Production：
 
 ```bash
@@ -421,7 +423,7 @@ OTA 只负责后续兼容的 JS/TS 更新与在线更新清单。原生启动图
 | Source Base Commit | `6c0b223c`（发布时工作区变更尚未提交） |
 | EAS Dashboard | `https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/updates/64610999-a11e-4684-8147-3d62561286d7` |
 
-同一版本发布前门禁为 typecheck、lint、API build、Android/iOS Expo export 和 `git diff --check` 全部通过；domain 34、mobile 61、API 59，共 154 项测试通过。
+同一版本发布前门禁为 typecheck、lint、API build、Android/iOS Expo export 和 `git diff --check` 全部通过；domain 34、mobile 68、API 60，共 162 项测试通过。
 
 公网验收覆盖匿名提交、同 ID 幂等重试、非法内容、16 KiB 请求上限、安装 ID 哈希、日志隐私和日报计数。测试反馈在验证后从私有收件箱删除，没有保留用户内容。
 

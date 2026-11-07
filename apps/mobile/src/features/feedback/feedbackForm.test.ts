@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  FEEDBACK_DESCRIPTION_PLACEHOLDER,
+  FeedbackRequestError,
   buildFeedbackSubmission,
+  feedbackFailureMessage,
   validateFeedbackInput,
 } from './feedbackForm';
 
@@ -69,5 +72,29 @@ describe('feedback form', () => {
       ok: false,
       error: '反馈内容不能超过 1000 个字',
     });
+  });
+
+  it('shows a concrete, easy-to-recognize issue example', () => {
+    expect(FEEDBACK_DESCRIPTION_PLACEHOLDER).toContain(
+      '语音说“昨天午饭 25”，但账单日期显示成了今天',
+    );
+  });
+
+  it('turns network failures into an actionable message', () => {
+    expect(feedbackFailureMessage(new Error('Network request failed'))).toBe(
+      '网络连接不可用，请检查网络后重试。',
+    );
+    expect(feedbackFailureMessage(new TypeError('Failed to fetch'))).toBe(
+      '网络连接不可用，请检查网络后重试。',
+    );
+  });
+
+  it('preserves structured server errors and timeout messages', () => {
+    expect(feedbackFailureMessage(new FeedbackRequestError('反馈太频繁，请稍后再试。'))).toBe(
+      '反馈太频繁，请稍后再试。',
+    );
+    const timeout = new Error('aborted');
+    timeout.name = 'AbortError';
+    expect(feedbackFailureMessage(timeout)).toBe('发送超时了，请检查网络后重试。');
   });
 });

@@ -11,6 +11,7 @@ import { Platform } from 'react-native';
 import { API_BASE_URL } from '../config/env';
 import {
   buildFeedbackSubmission,
+  FeedbackRequestError,
   validateFeedbackInput,
 } from '../features/feedback/feedbackForm';
 import { getInstallationId } from './installationId';
@@ -66,7 +67,7 @@ export async function submitFeedback(
       | FeedbackSubmissionResponse
       | { error?: { message?: string } };
     if (!response.ok) {
-      throw new Error(
+      throw new FeedbackRequestError(
         'error' in body && body.error?.message
           ? body.error.message
           : '反馈暂时没有发送成功，请稍后重试。',

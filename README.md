@@ -7,7 +7,7 @@
   <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-292624?logo=expo&logoColor=white" />
   <img alt="React Native 0.88" src="https://img.shields.io/badge/React_Native-0.88-61DAFB?logo=react&logoColor=111111" />
   <img alt="TypeScript 6" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
-  <img alt="Tests 154" src="https://img.shields.io/badge/tests-154_passed-63795E" />
+  <img alt="Tests 162" src="https://img.shields.io/badge/tests-162_passed-63795E" />
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-E89A96" /></a>
 </p>
 
@@ -93,7 +93,7 @@
 - **隐私优先产品观测**：匿名统计激活、留存、功能渗透、语音时延与失败原因，不含金额、分类、备注、录音和转写正文。
 - **匿名反馈闭环**：站内反馈不要求登录，支持选填联系方式；正文进入私有收件箱，日报只统计数量和类型。
 - **确定性月度回顾**：所有回顾事实由本地账单聚合生成，不让模型编造金额、分类或趋势；分享卡默认隐藏具体账目。
-- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 154 项自动化测试。
+- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 162 项自动化测试。
 
 ### 架构概览
 
@@ -116,7 +116,7 @@ flowchart LR
 | --- | --- |
 | TypeScript 严格检查 | 通过 |
 | ESLint | 通过 |
-| 自动化测试 | 154 / 154 通过 |
+| 自动化测试 | 162 / 162 通过 |
 | Expo Doctor | 20 / 20 通过 |
 | 中文 TTS 语音评测 | 200 / 200 通过 |
 | 松手到结构化完成 | P50 1.68s / P95 2.20s |

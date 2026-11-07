@@ -11,9 +11,30 @@ type ValidationInput = {
   contact: string;
 };
 
+export const FEEDBACK_DESCRIPTION_PLACEHOLDER =
+  '例如：语音说“昨天午饭 25”，但账单日期显示成了今天。';
+
+export class FeedbackRequestError extends Error {
+  override name = 'FeedbackRequestError';
+}
+
 export type FeedbackValidationResult =
   | { ok: true; message: string; contact: string | null }
   | { ok: false; error: string };
+
+export function feedbackFailureMessage(error: unknown): string {
+  if (error instanceof Error && error.name === 'AbortError') {
+    return '发送超时了，请检查网络后重试。';
+  }
+  if (error instanceof FeedbackRequestError) return error.message;
+  if (
+    error instanceof Error &&
+    /network request failed|failed to fetch|fetch failed|network error/i.test(error.message)
+  ) {
+    return '网络连接不可用，请检查网络后重试。';
+  }
+  return '反馈暂时没有发送成功，请稍后重试。';
+}
 
 export function validateFeedbackInput(input: ValidationInput): FeedbackValidationResult {
   const message = input.message.trim();

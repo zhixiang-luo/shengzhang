@@ -19,6 +19,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BrandMark } from '../components/BrandMark';
 import { Icon } from '../components/Icon';
 import {
+  FEEDBACK_DESCRIPTION_PLACEHOLDER,
+  feedbackFailureMessage,
   validateFeedbackInput,
 } from '../features/feedback/feedbackForm';
 import {
@@ -103,13 +105,7 @@ export default function FeedbackScreen() {
         feedbackType: type,
         reason: caught instanceof Error && caught.name === 'AbortError' ? 'timeout' : 'connection',
       });
-      setError(
-        caught instanceof Error && caught.name === 'AbortError'
-          ? '发送超时了，请检查网络后重试。'
-          : caught instanceof Error
-            ? caught.message
-            : '反馈暂时没有发送成功，请稍后重试。',
-      );
+      setError(feedbackFailureMessage(caught));
     } finally {
       setSubmitting(false);
     }
@@ -227,7 +223,7 @@ export default function FeedbackScreen() {
                 setMessage(value);
                 setError(null);
               }}
-              placeholder="例如：刚才说“午饭 25”时，识别到了金额，但时间显示成了今天。"
+              placeholder={FEEDBACK_DESCRIPTION_PLACEHOLDER}
               placeholderTextColor={colors.inkTertiary}
               style={styles.messageInput}
               textAlignVertical="top"
@@ -235,6 +231,9 @@ export default function FeedbackScreen() {
             />
             <Text style={styles.counter}>{message.length} / 1000</Text>
           </View>
+          <Text style={styles.fieldHint}>
+            写清楚发生了什么、你原本期望怎样，会更容易定位。
+          </Text>
 
           <Text style={styles.sectionLabel}>联系方式 · 选填</Text>
           <View style={styles.fieldCard}>

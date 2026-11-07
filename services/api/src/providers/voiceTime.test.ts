@@ -54,6 +54,17 @@ describe('voice time expression', () => {
     ).toBe('2026-11-06T02:15:30.000Z');
   });
 
+  it('anchors the reported “昨天午饭 25” case to yesterday', () => {
+    expect(
+      normalizeVoiceOccurredAt({
+        transcript: '昨天午饭 25',
+        occurredAt: '2026-11-07T02:15:30.000Z',
+        nowIso: '2026-11-07T02:15:30.000Z',
+        timezone: 'Asia/Shanghai',
+      }),
+    ).toBe('2026-11-06T02:15:30.000Z');
+  });
+
   it('uses the day before yesterday when the model returns the current date', () => {
     expect(
       normalizeVoiceOccurredAt({
