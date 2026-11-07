@@ -8,14 +8,21 @@ notifier="${OPS_NOTIFIER:-/opt/shengzhang/ops/ops-notify.sh}"
 alert_state_dir="${OPS_ALERT_STATE_DIR:-/opt/shengzhang/ops/alert-state}"
 alerts_env="${OPS_ALERT_ENV_FILE:-/opt/shengzhang/ops/alerts.env}"
 alert_log="${OPS_ALERT_LOG:-/opt/shengzhang/ops/ops-alerts.log}"
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+analytics_report_bin="${ANALYTICS_REPORT_BIN:-${script_dir}/analytics-report.sh}"
+feedback_report_bin="${FEEDBACK_REPORT_BIN:-${script_dir}/feedback-report.sh}"
 mkdir -p "$report_directory"
 
 report_tmp="$(mktemp)"
 trap 'rm -f "$report_tmp"' EXIT
 
 analytics_output="$(
-  /opt/shengzhang/bin/analytics-report.sh "--date=${report_date}" 2>&1 \
+  "$analytics_report_bin" "--date=${report_date}" 2>&1 \
     || printf 'ANALYTICS_REPORT_FAILED\n'
+)"
+feedback_output="$(
+  "$feedback_report_bin" "--date=${report_date}" 2>&1 \
+    || printf 'FEEDBACK_REPORT_FAILED\n'
 )"
 active_users="$(
   printf '%s\n' "$analytics_output" \
@@ -101,6 +108,12 @@ fi
   echo
   echo '```text'
   printf '%s\n' "$analytics_output"
+  echo '```'
+  echo
+  echo "## 改进与反馈"
+  echo
+  echo '```text'
+  printf '%s\n' "$feedback_output"
   echo '```'
   echo
   echo "## 错误日志"

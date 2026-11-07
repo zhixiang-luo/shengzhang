@@ -68,6 +68,9 @@
 | `data_csv_exported` | 成功分享 CSV | 无账单数量或内容 |
 | `data_backup_restored` | JSON 恢复成功 | 无账单数量或内容 |
 | `local_ledger_cleared` | 清空本机账本成功 | 无账单数量或内容 |
+| `feedback_opened` | 打开改进与反馈页 | 平台、App 版本 |
+| `feedback_submitted` | 反馈提交成功 | 反馈类型 |
+| `feedback_failed` | 反馈提交失败 | 反馈类型、固定失败原因 |
 
 ## 4. 指标口径
 
@@ -84,6 +87,7 @@
 - 搜索使用：统计打开搜索页与提交筛选的独立安装数和事件次数；不上报搜索词、金额、日期、分类名或结果内容。
 - 回顾使用：统计打开回顾、打开预览、调起系统分享的独立安装数和事件次数；不上报金额、分类名、趋势值、日期或图片内容。
 - 数据安全使用：分别统计导出、CSV、恢复和清空的独立安装数与次数；不上报文件内容、金额或分类。
+- 反馈使用：统计打开、提交成功和提交失败；只上报反馈类型和固定失败原因，不上报正文、联系方式或反馈编号。
 - 会话时长：`app_backgrounded.durationMs` 的截断值，仅用于平均使用时长。
 - 语音质量：完成/保存率、客户端结构化耗时 P50/P95 和失败原因分布。
 
@@ -119,7 +123,7 @@ ANALYTICS_DATA_DIR=/opt/shengzhang/shared/analytics \
 服务器每日运营脚本：
 
 ```bash
-/opt/shengzhang/bin/daily-ops-report.sh
+/opt/shengzhang/shared/reports/bin/daily-ops-report.sh
 ```
 
 默认统计北京时间前一日，同时检查 Nginx、API、健康接口、磁盘、内存和错误日志，并把 Markdown 报告写入 `/opt/shengzhang/shared/reports/`。
@@ -134,4 +138,5 @@ Codex 每日自动化 `声账每日运营简报` 会在北京时间 08:00 调用
 - `ANALYTICS_HASH_SALT` 只存在于服务端，并应与代码仓库隔离。
 - 统计接口按 IP 限流，单次最多提交 20 个事件。
 - 建议每 90–180 天清理原始 JSONL，只保留聚合报告。
+- 改进与反馈属于用户内容，不使用本统计协议；独立保存在私有反馈目录并默认保留 180 天。
 - 后续数据量增大后迁移到 PostgreSQL/ClickHouse 或自托管 Umami，但继续保持事件白名单。

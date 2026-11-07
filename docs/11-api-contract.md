@@ -233,14 +233,52 @@ Bearer 鉴权，成功返回 `204`，不删除本地账本。
 - 不支持金额、分类名、备注、日期、图片内容或分享目标属性。
 - 成功写入返回 `202 {"accepted": 1}`；格式错误返回 `400 INVALID_ANALYTICS_EVENT`，限流返回 `429 ANALYTICS_RATE_LIMITED`。
 
-## 8. 超时与重试
+## 8. 改进与反馈
+
+`POST /v1/feedback`，无需登录。
+
+```json
+{
+  "clientFeedbackId": "6fd41cf0-83d7-4d5b-a6ab-d9c87322ed14",
+  "installationId": "local-installation-id",
+  "type": "voice",
+  "message": "语音完成后时间显示不对",
+  "contact": null,
+  "diagnostics": {
+    "appVersion": "0.2.1",
+    "platform": "android",
+    "osVersion": "15",
+    "locale": "zh-CN",
+    "currentRoute": "feedback"
+  }
+}
+```
+
+- `type` 只允许 `feature / usage / voice / ledger / privacy / other`。
+- `message` 去除首尾空白后为 10–1000 字；`contact` 选填且最多 200 字。
+- `clientFeedbackId` 是 UUID，用作幂等键；重复请求返回同一反馈编号。
+- 请求体上限 16 KiB；未知字段直接拒绝。
+- 成功返回 `202`：
+
+```json
+{
+  "referenceCode": "FB-20261107-A1B2C3",
+  "createdAt": "2026-11-07T14:30:00.000Z"
+}
+```
+
+- 单 IP 每 10 分钟最多 5 条、每日最多 30 条；全服务器每日最多 500 条。
+- 服务端只保存安装 ID 的加盐哈希；反馈正文和联系方式不进入普通日志。
+- 反馈正文不是匿名产品事件，不能提交到 `/v1/analytics/events`。
+
+## 9. 超时与重试
 
 - 客户端普通 API 超时 15 秒；语音 65 秒。
 - `GET` 可指数退避重试；语音和备份上传只在用户主动点击或后台策略允许时重试。
 - 4xx 不自动重试；401 先尝试一次单飞刷新。
 - 备份失败不阻塞账本写入。
 
-## 9. 契约维护
+## 10. 契约维护
 
 `packages/contracts` 是 DTO 的代码事实源。更改顺序：
 

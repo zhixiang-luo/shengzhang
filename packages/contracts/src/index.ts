@@ -28,6 +28,47 @@ export const voiceTranscribeResponseSchema = z.object({
   latencyMs: z.number().int().nonnegative(),
 });
 
+export const feedbackTypeSchema = z.enum([
+  'feature',
+  'usage',
+  'voice',
+  'ledger',
+  'privacy',
+  'other',
+]);
+
+export const feedbackDiagnosticsSchema = z
+  .object({
+    appVersion: z.string().trim().min(1).max(32),
+    platform: z.enum(['android', 'ios']),
+    osVersion: z.string().trim().min(1).max(40),
+    locale: z.string().trim().min(1).max(40),
+    currentRoute: z.string().trim().min(1).max(60),
+    errorCode: z.string().trim().min(1).max(120).nullable().optional(),
+    requestId: z.string().trim().min(1).max(200).nullable().optional(),
+  })
+  .strict();
+
+export const feedbackSubmissionSchema = z
+  .object({
+    clientFeedbackId: z.uuid(),
+    installationId: z.string().min(16).max(200),
+    type: feedbackTypeSchema,
+    message: z.string().trim().min(10).max(1000),
+    contact: z.string().trim().min(1).max(200).nullable().optional(),
+    diagnostics: feedbackDiagnosticsSchema.optional(),
+  })
+  .strict();
+
+export const feedbackSubmissionResponseSchema = z.object({
+  referenceCode: z.string().regex(/^FB-\d{8}-[A-F0-9]{6}$/),
+  createdAt: z.iso.datetime({ offset: true }),
+});
+
+export type FeedbackType = z.infer<typeof feedbackTypeSchema>;
+export type FeedbackSubmission = z.infer<typeof feedbackSubmissionSchema>;
+export type FeedbackSubmissionResponse = z.infer<typeof feedbackSubmissionResponseSchema>;
+
 export const backupMetadataSchema = z.object({
   id: z.uuid(),
   schemaVersion: z.number().int().positive(),

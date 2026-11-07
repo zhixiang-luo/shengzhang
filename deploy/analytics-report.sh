@@ -7,4 +7,6 @@ source /opt/shengzhang/shared/.env
 set +a
 
 cd /opt/shengzhang/current
-pnpm --filter @shengzhang/api analytics:report -- "$@"
+DOTENV_CONFIG_QUIET=true
+export DOTENV_CONFIG_QUIET
+pnpm --silent --filter @shengzhang/api analytics:report -- "$@"

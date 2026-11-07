@@ -1,3 +1,4 @@
+import type { FeedbackType } from '@shengzhang/contracts';
 import Constants from 'expo-constants';
 import { fetch } from 'expo/fetch';
 import * as SecureStore from 'expo-secure-store';
@@ -32,12 +33,16 @@ export type AnalyticsEventName =
   | 'data_backup_exported'
   | 'data_backup_restored'
   | 'data_csv_exported'
-  | 'local_ledger_cleared';
+  | 'local_ledger_cleared'
+  | 'feedback_opened'
+  | 'feedback_submitted'
+  | 'feedback_failed';
 
 type AnalyticsProperties = {
   entryCount?: number;
   durationMs?: number;
   filterCount?: number;
+  feedbackType?: FeedbackType;
   reason?:
     | 'cancelled'
     | 'permission'

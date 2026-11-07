@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索和确定性月度回顾已可用；`0.2.1` Android 原生包已发布到官网、OSS + CDN、服务端更新策略和 GitHub Pre-release，runtime `0.2.1` preview OTA 也已上线。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
+项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包已发布到官网、OSS + CDN、服务端更新策略和 GitHub Pre-release，runtime `0.2.1` preview OTA 也已上线。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
 
 ## 已完成
 
@@ -109,7 +109,11 @@
 - 已接入隐私优先的第一方匿名统计：官网访问/下载、App 启动、语音开始/完成/保存/撤销/取消/失败、手动新增/编辑/删除、统计、分类和设置事件。事件只包含固定名称、平台、版本、条数、耗时和错误原因；金额、分类名、备注、转写和录音不上报。
 - 匿名安装 ID 在服务端使用私有 Salt 哈希后写入按日 JSONL；设置页提供“匿名使用统计”关闭开关，官网遵循 DNT/GPC。
 - 已增加 `pnpm --filter @shengzhang/api analytics:report` 报告脚本，可查看独立下载访客、活跃安装、启动频率、语音成功率、累计新增账单和每日趋势。
-- 服务器已安装 `/opt/shengzhang/bin/daily-ops-report.sh`，可生成北京时间前一日的 `server + analytics` Markdown 简报，并写入 `/opt/shengzhang/shared/reports/`。
+- 已实现匿名站内“改进与反馈”：设置页入口、六类反馈、10–1000 字描述、选填联系方式和可关闭诊断信息；提交失败保留输入，重试复用同一幂等键。
+- `POST /v1/feedback` 使用严格 Zod 契约、16 KiB 请求上限、单 IP 每 10 分钟 5 条/每日 30 条和全局每日 500 条限制；重复 `clientFeedbackId` 即使跨日期重试也只保存一份。
+- 反馈私有收件箱位于 `/opt/shengzhang/shared/reports/.feedback`，按北京时间日期保存独立 JSON 文件，目录/文件权限分别为 `0700`/`0600`；安装 ID 只保存加盐 SHA-256，正文和联系方式不进入普通 API 日志或匿名统计。
+- 日报新增反馈总数与类型分布，只显示计数；服务器每日 00:35 自动清理超过 180 天的反馈目录。
+- 服务器已把新版日报入口安装到 `/opt/shengzhang/shared/reports/bin/daily-ops-report.sh`，可生成北京时间前一日的 `server + analytics + feedback` Markdown 简报，并写入 `/opt/shengzhang/shared/reports/`；cron 已切换到该入口。
 - Codex 心跳自动化 `声账每日运营简报` 已启用，每天北京时间 08:00 运行只读检查；异常时提示服务状态、磁盘/内存、错误日志和产品数据趋势。
 - 2026-11-05 已部署服务器端运维告警：`/opt/shengzhang/ops/ops-alert.sh` 每 5 分钟检查 API、Nginx、`/health`、磁盘、可用内存、系统负载、ECS 网络收发吞吐和最近 15 分钟 API error 日志；异常按 1 小时（紧急）或 6 小时（预警）冷却重发，恢复时发送恢复通知。当前 2 vCPU/约 1.7GB 内存的服务器把出网预警/紧急阈值暂设为 2.5/4.0 Mbps，触发后需要结合实际公网带宽和火山并发额度复核。
 - 新增 `.github/workflows/production-health.yml` 作为独立外部看门狗：随 `0.2.1` 发布提交进入默认分支后，GitHub 每 5 分钟访问公网 `/health`，在整台 ECS 或本机监控失联时创建运维 Issue 并发送邮件，恢复后关闭 Issue 并发送恢复邮件；邮件凭据复用 GitHub Actions Secrets。
@@ -184,8 +188,9 @@
 - Android `0.2.1` 原生包已完成：EAS Build `e0c11c47-ae73-46ae-88c8-474168672227`，源码提交 `e979a05`，版本 `0.2.1 (18)`，runtime `0.2.1`，大小 107,723,132 字节，SHA-256 `dbbf5f3f8657895ea2fa2ef9c686b959023a0a6bd56ed57056e17dac1b5fe084`。
 - `0.2.1` 原生启动图已替换为横向字标和声波，移除粉红圆盘与小猪；React 首帧从同一字标展开，并保留首次完整、进程冷启动快速、后台恢复不播放的三档策略。
 - `0.2.1` APK 的版本、包名、runtime、ZIP 完整性、Signature v2 与签名证书一致性均已检查；与 `0.2.0` 使用相同证书，可覆盖安装并保留本地账本。
+- 修复语音相对日期和宽泛时段被模型误判的问题：服务端现在根据客户端时区和解析时刻，确定性锚定“今天/今晚”“昨天/昨晚”“前天”的日期；无具体钟点时，“上午/中午/下午”分别使用 10:00/12:00/15:00 作为代表性落账时间，用户说出“四点半”等精确时刻时仍以具体时刻为准；一句话含多个不同日期时不会把其中一个日期错误套用到整批账单。
 - OSS/CDN 已切换到 `releases/shengzhang-0.2.1-preview.apk`；完整下载大小和 SHA-256 与本地构建逐字节一致。
-- 官网已切换到 `0.2.1` CDN 下载入口，页面主文案不突出版本号；API 已部署到 `/opt/shengzhang/releases/20261106-000115`，公网策略为 `0.2.1 → none`、`0.2.0/0.1.6/0.1.4 → optional`、`0.1.3 → required`，`/health` 正常。
+- 官网已切换到 `0.2.1` CDN 下载入口，页面主文案不突出版本号；API 已部署到 `/opt/shengzhang/releases/20261107-213930`，公网策略为 `0.2.1 → none`、`0.2.0/0.1.6/0.1.4 → optional`、`0.1.3 → required`，`/health` 正常。
 - 服务器 5 分钟巡检日志已增加 10 MiB 轮转与 5 份保留；GitHub 外部看门狗工作流升级到固定 Ubuntu 24.04 与 `actions/checkout@v7`，待提交到默认分支后生效。
 - GitHub Pre-release `v0.2.1-preview.1` 已发布并附带 APK；公开 API 返回资源状态 `uploaded`、大小 107,723,132 字节。
 - runtime `0.2.1` preview OTA 已发布到 Android/iOS：Update Group `5ee8d355-e8a9-465e-bd52-3e1b6d3c3edb`，Android `01a1ac78-a9ed-7882-b262-fc1b0995adfb`，iOS `01a1ac78-a9ed-7263-9dde-2a7c67132e87`，源码提交 `9bb75e9`。
@@ -205,6 +210,7 @@
 - Android `0.2.1` 已替换官网稳定下载文件，GitHub Pre-release 和 runtime `0.2.1` preview OTA 均已发布；启动动画与 0.2.1 完整真机闭环仍待验收。
 - 服务器旧 `/downloads/` 路径仍返回旧安装包，仅用于短时兼容；官网与 App 更新接口不再把它作为稳定入口。待旧安装升级率足够高后再下线。
 - 语音失败恢复、单笔修正和首次引导已包含在 `0.2.0`，待 Android/iOS 真机回归。
+- 反馈首版不包含截图/文件附件、用户可见工单状态、站内回复和自动邮件通知；这些在主路径数据证明有需要后再做。
 
 ## 下一步最小任务
 
@@ -220,6 +226,7 @@
 10. 用真实供应商账单补齐成本看板的 DeepSeek、网关和存储成本。
 11. 修复真人评测暴露的 P0/P1 问题，冻结内测候选版本。
 12. 微信登录、云备份和支付继续留在外部依赖 backlog；Apple 账号就绪后先评估 iOS 内购，不用等待微信。
+13. 在 Android/iOS 真机验证设置入口、反馈表单键盘避让、失败重试、成功编号和关闭诊断信息后的请求载荷。
 
 ## 已知风险
 
@@ -240,6 +247,7 @@
 - `0.2.0` 分享卡依赖新增原生模块，必须重新构建和覆盖安装；旧 APK 即使收到同 runtime OTA 也不能安全获得该能力。
 - `expo-sharing` 无法可靠判断用户是否最终发送或取消系统分享，因此运营报告只能把“打开分享面板”当作传播意向，不能当作完成分享。
 - `0.2.1` 修改了原生启动图，旧安装无法通过同 runtime OTA 获得；用户必须覆盖安装新的 APK，本地 SQLite 账本不受影响。
+- 反馈收件箱当前是单机私有 JSON 存储，适合内测和早期访问量；扩容到多 API 实例前需要迁移到数据库或对象存储。
 - `pnpm audit --prod` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 两项高危告警；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。宣传片工程自身 `npm audit` 为 0。
 
 ## 最近验证
@@ -293,6 +301,33 @@ ios export: passed
 0.2.1 github release asset: 107723132 bytes
 0.2.1 preview OTA: 5ee8d355-e8a9-465e-bd52-3e1b6d3c3edb, runtime 0.2.1, android + ios
 0.2.1 preview OTA commit: 9bb75e98ab449fdfcef1dbf3158955247fd77916
+relative date fix targeted test: passed
+relative date fix typecheck: passed
+relative date fix lint: passed
+relative date fix tests: domain 34 + mobile 58 + api 50 = 142 passed
+relative date fix git diff --check: passed
+relative date fix api build: passed
+relative date fix release deployment: /opt/shengzhang/releases/20261107-213930
+relative date fix health: HTTP 200, status=ok
+relative date fix public batch: 昨天 10:00 + 前天 15:00 matched
+relative date fix public exact clock: 昨天下午四点半 -> 昨天 16:30 matched
+feedback typecheck: passed
+feedback lint: passed
+feedback tests: domain 34 + mobile 61 + api 59 = 154 passed
+feedback api build: passed
+feedback android export: passed
+feedback ios export: passed
+feedback git diff --check: passed
+feedback public submit: HTTP 202
+feedback public duplicate: same reference, one stored record
+feedback public invalid: HTTP 400
+feedback public oversize: HTTP 413
+feedback privacy: hashed install id only, file 0600 / dir 0700, body absent from API logs
+feedback daily summary: counts/type distribution only
+feedback release deployment: /opt/shengzhang/releases/20261107-215526
+feedback release health: HTTP 200, status=ok
+feedback retention cron: daily 00:35 Asia/Shanghai, 180-day cutoff
+feedback preview OTA: 64610999-a11e-4684-8147-3d62561286d7, runtime 0.2.1, android + ios
 boot policy typecheck: passed
 boot policy lint: passed
 boot policy tests: domain 34 + mobile 56 + api 38 = 128 passed

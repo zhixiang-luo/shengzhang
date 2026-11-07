@@ -172,6 +172,8 @@ cp .env.example .env
 | `ANALYTICS_ENABLED` | 是否接收匿名产品事件 | 默认开启 |
 | `ANALYTICS_DATA_DIR` | 统计 JSONL 私有目录 | 生产必须指向持久目录 |
 | `ANALYTICS_HASH_SALT` | 匿名 ID 哈希盐 | 生产必须配置且只放服务端 |
+| `FEEDBACK_DATA_DIR` | 反馈 JSON 私有目录 | 生产使用 `/opt/shengzhang/shared/reports/.feedback` |
+| `FEEDBACK_HASH_SALT` | 反馈安装 ID 哈希盐 | 生产必须配置且只放服务端 |
 | `EXPO_PUBLIC_API_BASE_URL` | 移动端 API 地址 | 真机测试 |
 | `EXPO_PUBLIC_ANALYTICS_ENABLED` | 构建时统计总开关 | 默认开启 |
 

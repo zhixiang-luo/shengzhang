@@ -48,4 +48,40 @@ describe('analytics API', () => {
     expect(JSON.stringify(events)).not.toContain('anonymous-installation-id');
     await app.close();
   });
+
+  it('accepts feedback outcome events without feedback text or contact fields', async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), 'shengzhang-analytics-api-'));
+    directories.push(directory);
+    process.env.ANALYTICS_DATA_DIR = directory;
+    process.env.ANALYTICS_HASH_SALT = 'test-only-analytics-salt';
+    const app = buildApp();
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/v1/analytics/events',
+      payload: {
+        anonymousId: 'anonymous-installation-id',
+        events: [
+          {
+            name: 'feedback_submitted',
+            occurredAt: new Date().toISOString(),
+            properties: {
+              platform: 'android',
+              appVersion: '0.2.1',
+              feedbackType: 'voice',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(response.statusCode).toBe(202);
+    const events = await readAnalyticsEvents(directory);
+    expect(events[0]?.properties).toEqual({
+      platform: 'android',
+      appVersion: '0.2.1',
+      feedbackType: 'voice',
+    });
+    await app.close();
+  });
 });

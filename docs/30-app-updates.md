@@ -405,3 +405,22 @@ https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/e0c11c47
 本次第一次上传在 Expo 资产存储建立 TLS 连接时中断，Bundle 已成功生成；复用同一 `apps/mobile/dist` 产物并通过 `--skip-bundler` 重试后上传完成，没有重新打包或改变提交。
 
 OTA 只负责后续兼容的 JS/TS 更新与在线更新清单。原生启动图已经固化在 APK 内，因此新用户或旧版用户仍需先覆盖安装 `0.2.1 (18)` APK，之后才能接收 runtime `0.2.1` 的后续 OTA。
+
+## 20. Runtime `0.2.1` 匿名反馈 OTA
+
+2026-11-07 已为现有 `0.2.1 (18)` 安装发布仅 OTA 的匿名反馈更新。本版没有新增原生依赖、权限、图标或 runtime 变化，因此不需要重新下载 APK；设置页会新增“帮助与反馈 → 改进与反馈”。
+
+| 项目 | 记录 |
+| --- | --- |
+| Channel / Environment | `preview` / `preview` |
+| Runtime Version | `0.2.1` |
+| Platform | Android、iOS |
+| Update Group | `64610999-a11e-4684-8147-3d62561286d7` |
+| Android Update | `01a1b64f-b332-7e7a-aac9-13843c7ce961` |
+| iOS Update | `01a1b64f-b332-7424-8f34-2166216d1df3` |
+| Source Base Commit | `6c0b223c`（发布时工作区变更尚未提交） |
+| EAS Dashboard | `https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/updates/64610999-a11e-4684-8147-3d62561286d7` |
+
+同一版本发布前门禁为 typecheck、lint、API build、Android/iOS Expo export 和 `git diff --check` 全部通过；domain 34、mobile 61、API 59，共 154 项测试通过。
+
+公网验收覆盖匿名提交、同 ID 幂等重试、非法内容、16 KiB 请求上限、安装 ID 哈希、日志隐私和日报计数。测试反馈在验证后从私有收件箱删除，没有保留用户内容。

@@ -33,6 +33,8 @@ const environmentSchema = z.object({
   ANALYTICS_ENABLED: z.enum(['true', 'false']).default('true').transform((value) => value === 'true'),
   ANALYTICS_DATA_DIR: z.string().min(1).default('.analytics'),
   ANALYTICS_HASH_SALT: z.string().min(16).optional(),
+  FEEDBACK_DATA_DIR: z.string().min(1).default('.feedback'),
+  FEEDBACK_HASH_SALT: z.string().min(16).optional(),
   APP_UPDATE_ANDROID_LATEST_VERSION: z
     .string()
     .regex(/^\d+\.\d+\.\d+$/)

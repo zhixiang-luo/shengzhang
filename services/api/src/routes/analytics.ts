@@ -1,6 +1,8 @@
 import type { FastifyPluginAsync, FastifyReply } from 'fastify';
 import { z } from 'zod';
 
+import { feedbackTypeSchema } from '@shengzhang/contracts';
+
 import {
   ANALYTICS_EVENT_NAMES,
   type AnalyticsEventStore,
@@ -16,6 +18,7 @@ const propertiesSchema = z
     entryCount: z.number().int().min(0).max(5).optional(),
     durationMs: z.number().int().min(0).max(43_200_000).optional(),
     filterCount: z.number().int().min(0).max(7).optional(),
+    feedbackType: feedbackTypeSchema.optional(),
     reason: z
       .enum([
         'cancelled',

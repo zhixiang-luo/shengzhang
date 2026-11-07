@@ -5,9 +5,11 @@ import Fastify, { type FastifyServerOptions } from 'fastify';
 
 import { AnalyticsEventStore } from './analytics/event-store.js';
 import { loadEnvironment } from './config.js';
+import { FeedbackStore } from './feedback/feedback-store.js';
 import { createVoiceProvider } from './providers/factory.js';
 import { analyticsRoutes } from './routes/analytics.js';
 import { appUpdateRoutes } from './routes/app-update.js';
+import { feedbackRoutes } from './routes/feedback.js';
 import { healthRoutes } from './routes/health.js';
 import { voiceRoutes } from './routes/voice.js';
 import {
@@ -83,6 +85,13 @@ export function buildApp(
     store: new AnalyticsEventStore({
       directory: environment.ANALYTICS_DATA_DIR,
       hashSalt: environment.ANALYTICS_HASH_SALT ?? 'development-only-analytics-salt',
+    }),
+    limiter: new InMemoryFixedWindowRateLimiter(),
+  });
+  app.register(feedbackRoutes, {
+    store: new FeedbackStore({
+      directory: environment.FEEDBACK_DATA_DIR,
+      hashSalt: environment.FEEDBACK_HASH_SALT ?? 'development-only-feedback-salt',
     }),
     limiter: new InMemoryFixedWindowRateLimiter(),
   });

@@ -33,6 +33,9 @@ export const ANALYTICS_EVENT_NAMES = [
   'data_backup_restored',
   'data_csv_exported',
   'local_ledger_cleared',
+  'feedback_opened',
+  'feedback_submitted',
+  'feedback_failed',
 ] as const;
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
@@ -43,6 +46,14 @@ export type AnalyticsEventProperties = {
   entryCount?: number | undefined;
   durationMs?: number | undefined;
   filterCount?: number | undefined;
+  feedbackType?:
+    | 'feature'
+    | 'usage'
+    | 'voice'
+    | 'ledger'
+    | 'privacy'
+    | 'other'
+    | undefined;
   reason?:
     | 'cancelled'
     | 'permission'

@@ -27,6 +27,7 @@
 - [官网首版与发布说明](./27-official-website.md)
 - [开源项目运营边界](./28-open-source-operations.md)
 - [隐私优先的产品统计](./29-privacy-first-analytics.md)
+- [改进与反馈](./34-feedback-and-support.md)
 
 ## 技术与工程
 
@@ -64,6 +65,7 @@
 | 产品事件、匿名统计与报告口径 | `docs/29-privacy-first-analytics.md` |
 | 账单搜索规则与边界 | `docs/32-ledger-search.md` |
 | 月度回顾和分享卡隐私边界 | `docs/33-monthly-review.md` |
+| 改进与反馈、存储和运营边界 | `docs/34-feedback-and-support.md` |
 | 技术与目录 | `docs/09`–`docs/12` |
 | 工程与发布流程 | `docs/13`–`docs/15` |
 | 视觉令牌 | `design/tokens/design-tokens.json` |

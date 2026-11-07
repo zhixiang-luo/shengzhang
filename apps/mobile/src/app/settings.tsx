@@ -98,6 +98,16 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <Text style={styles.sectionLabel}>帮助与反馈</Text>
+        <View style={styles.group}>
+          <SettingRow
+            label="改进与反馈"
+            value="问题或建议"
+            onPress={() => router.push('/feedback')}
+            last
+          />
+        </View>
+
         <Text style={styles.sectionLabel}>应用更新</Text>
         <View style={styles.group}>
           <SettingRow

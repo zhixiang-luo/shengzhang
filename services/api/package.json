@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
     "analytics:report": "tsx scripts/analytics-report.ts",
+    "feedback:report": "tsx scripts/feedback-report.ts",
     "voice:cost": "tsx scripts/voice-cost-dashboard.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
