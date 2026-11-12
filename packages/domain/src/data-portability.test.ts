@@ -89,6 +89,22 @@ describe('backup documents', () => {
     expect(parseBackupDocument(document)).toEqual(document);
   });
 
+  it('round trips a screen-captured transaction', () => {
+    const screenTransaction = { ...transactions[0]!, source: 'screen' as const };
+    const document = buildBackupDocument({
+      exportedAt: '2026-11-12T10:30:00.000Z',
+      appVersion: '0.3.0',
+      data: {
+        categories,
+        transactions: [screenTransaction],
+        voiceBatches,
+        appSettings: [],
+      },
+    });
+
+    expect(parseBackupDocument(document).data.transactions[0]?.source).toBe('screen');
+  });
+
   it('rejects unsupported versions, count mismatches, and checksum corruption', () => {
     const document = buildBackupDocument({
       exportedAt: '2026-11-05T08:00:00.000Z',
@@ -162,6 +178,22 @@ describe('CSV export', () => {
 
     expect(csv.startsWith('\uFEFF日期,时间,类型,金额,一级分类,二级分类,备注,来源')).toBe(true);
     expect(csv).toContain('"包子,豆浆"');
+  });
+
+  it('labels a screen-captured transaction as screen recognition', () => {
+    const csv = buildTransactionsCsv([
+      {
+        occurredAt: '2026-11-05T04:00:00.000Z',
+        type: 'expense',
+        amountMinor: 2500,
+        categoryName: '餐饮',
+        subcategoryName: null,
+        note: '',
+        source: 'screen',
+      },
+    ]);
+
+    expect(csv).toContain('屏幕识别');
   });
 
   it('neutralizes spreadsheet formulas without hiding the original text', () => {

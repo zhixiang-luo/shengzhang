@@ -41,7 +41,7 @@ export const transactions = sqliteTable(
     subcategoryId: text('subcategory_id'),
     occurredAt: text('occurred_at').notNull(),
     note: text('note').notNull().default(''),
-    source: text('source', { enum: ['voice', 'manual'] }).notNull(),
+    source: text('source', { enum: ['voice', 'manual', 'screen'] }).notNull(),
     voiceBatchId: text('voice_batch_id'),
     voiceEntryIndex: integer('voice_entry_index'),
     createdAt: text('created_at').notNull(),

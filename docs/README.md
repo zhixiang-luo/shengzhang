@@ -45,6 +45,7 @@
 - [本地数据备份与恢复](./31-local-data-portability.md)
 - [账单搜索](./32-ledger-search.md)
 - [月度回顾与隐私分享卡](./33-monthly-review.md)
+- [Android 付款页快捷记账](./35-payment-screen-capture.md)
 
 ## 决策与交接
 
@@ -66,6 +67,7 @@
 | 账单搜索规则与边界 | `docs/32-ledger-search.md` |
 | 月度回顾和分享卡隐私边界 | `docs/33-monthly-review.md` |
 | 改进与反馈、存储和运营边界 | `docs/34-feedback-and-support.md` |
+| 付款页快捷记账、OCR 和屏幕数据边界 | `docs/35-payment-screen-capture.md` |
 | 技术与目录 | `docs/09`–`docs/12` |
 | 工程与发布流程 | `docs/13`–`docs/15` |
 | 视觉令牌 | `design/tokens/design-tokens.json` |

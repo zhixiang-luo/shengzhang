@@ -3,7 +3,7 @@
     "name": "声账",
     "slug": "shengzhang",
     "scheme": "shengzhang",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -25,6 +25,7 @@
     },
     "android": {
       "package": "com.shengzhang.ledger",
+      "minSdkVersion": 30,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "monochromeImage": "./assets/monochrome-icon.png",

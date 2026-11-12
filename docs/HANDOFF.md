@@ -4,7 +4,16 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾与 M9 数据安全并行阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包已发布到官网、OSS + CDN、服务端更新策略和 GitHub Pre-release，runtime `0.2.1` preview OTA `810cd59c` 已修复生产 API 地址、反馈错误提示和用户反馈的日期示例。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付已转为外部依赖 backlog，不阻塞免费本地首发。
+项目处于 **M5 质量验证、M8 月末回顾、M9 数据安全与 `0.3.0` 原生能力收口阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包仍是公开稳定版本，官网、OSS + CDN、服务端更新策略和 GitHub Pre-release 均未切换到 `0.3.0`。当前 `feature/screen-bill-capture` 分支已实现 Android 11+ 付款页快捷记账、SQLite migration v3 和语音缺金额逐笔补齐，类型检查、Lint、251 项测试与 Android/iOS bundle 导出通过；EAS 原生 APK、真机权限/读屏/OCR/幂等/撤销验收尚未完成。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付继续留在外部依赖 backlog。
+
+## 0.3.0 当前分支状态
+
+- 本地实现：Quick Settings Tile、AccessibilityService、微信/支付宝白名单、文本优先识别、ML Kit 中文 OCR 兜底、私有短期草稿、可编辑确认卡、原地 8 秒撤销。
+- 数据：`TransactionSource` 已扩展为 `voice | manual | screen`；SQLite v3 重建表并保留原数据、外键和索引；`captureId` 作为账单主键保证幂等；JSON 备份和 CSV 支持“屏幕识别”。
+- 语音修复：部分条目缺金额时只打开补齐面板，补齐后沿用同一 `requestId` 单事务入账；逗号小数、万、第三位小数和表达式不会被静默改写。
+- 自动化门禁：Node 22.19.0 下 typecheck、lint、251 项测试、Android/iOS Expo export 和 `git diff --check` 通过。
+- 未完成边界：当前机器缺少 Java/JDK 与 Android SDK，未生成 `0.3.0` APK；没有 Android 真机验收，也没有 iOS App Intent/快捷指令实现。
+- 发布边界：公开下载仍是 `0.2.1`；`0.3.0` 原生模块不能通过 Expo Go 或同 runtime OTA 获得，完成原生构建和真机验收前不得宣称可发布。
 
 ## 已完成
 
@@ -198,9 +207,16 @@
 - 服务器 5 分钟巡检日志已增加 10 MiB 轮转与 5 份保留；GitHub 外部看门狗工作流升级到固定 Ubuntu 24.04 与 `actions/checkout@v7`，待提交到默认分支后生效。
 - GitHub Pre-release `v0.2.1-preview.1` 已发布并附带 APK；公开 API 返回资源状态 `uploaded`、大小 107,723,132 字节。
 - runtime `0.2.1` preview OTA 已发布到 Android/iOS：Update Group `5ee8d355-e8a9-465e-bd52-3e1b6d3c3edb`，Android `01a1ac78-a9ed-7882-b262-fc1b0995adfb`，iOS `01a1ac78-a9ed-7263-9dde-2a7c67132e87`，源码提交 `9bb75e9`。
+- 缺金额补齐面板（2026-11-11 初版，后续门禁结果已覆盖）：一句话里任何一笔没听到金额时，不再整批报错，而是弹出底部面板“还差一个金额”（缺多笔为“还差 N 个金额”）。面板按说话顺序列出整批，已有金额只读，只给缺金额的条目一个金额输入框；补齐后点“确认入账”，整批沿用同一 `requestId` 以单事务写入，并进入原有“已记好 N 笔”结果卡与 8 秒整批撤销；点“放弃”则整批不保存，转写不保留。金额输入由 `parseAmountInput` 严格解析为整数分，不做静默改写。一批只能决定一次，面板打开期间忽略新的录音。尚未进行真机验收。
+- `0.3.0` 付款页快捷记账已落盘：新增本地 Expo Module `packages/screen-capture`、Android Quick Settings Tile、AccessibilityService、微信/支付宝白名单文本读取、Android 11+ 无障碍截图、ML Kit 中文 OCR、私有草稿 5 分钟 TTL、`shengzhang://screen-capture` 与设置 Deep Link。确认卡支持金额、收支、两级分类、时间和备注编辑，保存后同卡撤销；`/screen-capture?demo=1` 只预览不写账本。
+- SQLite v3 已实现：`transactions.source` CHECK 扩展为 `voice/manual/screen`，迁移在 `BEGIN IMMEDIATE` 中重建表并复制旧数据、外键与索引；屏幕账单以 `captureId` 为主键，重复提交返回已有 ID。JSON 备份和 CSV 已支持 `screen`。
+- `0.3.0` 当前全仓门禁通过：typecheck、lint、domain 101 + mobile 90 + API 60 = 251 项测试、Android Expo export（2178 modules，HBC 约 5.8 MB）、iOS Expo export（2182 modules，HBC 约 5.8 MB）和 `git diff --check`。Expo Doctor 为 18/20，两项失败是当前环境无法访问 `exp.host` / React Native Directory 的在线检查，不是已确认的代码故障。
 
 ## 当前未实现
 
+- `0.3.0` 尚未执行 EAS Android 原生构建；当前机器没有 Java/JDK 和 Android SDK，不能本地编译 Kotlin/Gradle 或生成 APK。
+- 付款页快捷记账尚未做 Android 真机验收：无障碍开启、磁贴添加、微信/支付宝读屏、文本足够时不截图、OCR 兜底、小屏加键盘、同草稿重复保存、同卡撤销、草稿清理和 v3 升级都待验证。
+- iOS 付款页路线尚未实现；后续只能走用户主动运行快捷指令截图，再交给 App Intent/确认卡，不承诺 Android 式静默读屏。
 - 真人噪声/口音语料、iPhone/Android 中低端矩阵和 7 天封闭试用。
 - 宣传片仍使用原型截图，尚未替换为正式内测 APK 的真机录屏或设备截图。
 - 微信移动端登录：外部依赖 backlog，等 Apple/Android 发布路径和开放平台实际主体能力确认。
@@ -215,8 +231,20 @@
 - 服务器旧 `/downloads/` 路径仍返回旧安装包，仅用于短时兼容；官网与 App 更新接口不再把它作为稳定入口。待旧安装升级率足够高后再下线。
 - 语音失败恢复、单笔修正和首次引导已包含在 `0.2.0`，待 Android/iOS 真机回归。
 - 反馈首版不包含截图/文件附件、用户可见工单状态、站内回复和自动邮件通知；这些在主路径数据证明有需要后再做。
+- 缺金额补齐面板未经 Android/iOS 真机验证：键盘避让与小屏布局、自动聚焦、遮罩与返回键、iOS 小数键盘没有回车键时的收起方式、补金额 → 确认 → 结果卡 → 撤销的完整闭环；也未发布 OTA。`docs/08-acceptance-criteria.md` 的“缺金额时不落账，补齐后可保存”待真机验证后再勾选。
+- 真实语音模型对“几笔有金额、一笔没金额”的混合句是否会漏掉没金额的那一笔、或自行补金额，尚未验证：评测集 10 条缺金额样本都是单笔句子，服务端提示词未改。2026-11-11 一次真机实测返回了三笔且第 3 笔缺金额，只是单个样本。
+- 放弃补金额没有单独埋点：`voice_completed` 在结构化成功时记录，`voice_saved` 在写入时记录，两者之差只能近似未保存的批次；要区分需同时改客户端原因枚举、`services/api` 埋点白名单和 `docs/29`。待补金额的批次只在内存中，进程被系统回收会丢失，转写不保留。
 
 ## 下一步最小任务
+
+### 0.3.0 付款页快捷记账
+
+1. 在具备 Java/JDK、Android SDK 或 EAS 云端凭据的环境执行 preview Android 原生构建，生成 `0.3.0` APK。
+2. 在 Android 11+ 真机完成无障碍授权、控制中心磁贴添加、微信/支付宝付款成功页读取和目标窗口白名单验证。
+3. 分别验证“文本已有可信金额不截图”和“文本不足时 OCR 兜底”，记录识别字段、耗时、失败页面与手动补全体验。
+4. 验证金额、收支、一级/二级分类、时间、备注修改；同一草稿重复确认只入账一次；保存后 8 秒撤销；取消、保存、过期和下次启动后截图为空。
+5. 用包含旧版 `voice/manual` 数据的安装升级到 `0.3.0`，确认账本、分类、语音批次和软删除记录完整，CSV/JSON 往返包含“屏幕识别”。
+6. 完成以上门禁后再决定是否发布新的 preview 原生包；在此之前 README、官网和应用下载继续以 `0.2.1` 为公开稳定版本。
 
 1. 在 Android/iOS 真机验证 `0.1.7`：数据安全页布局、JSON/CSV 系统分享、文件选择与导入、覆盖确认、清空二次确认和“导出 → 清空 → 恢复”完整闭环。
 2. 在 Android/iOS 真机验证 `0.1.8`：日期选择 Sheet、日期单独清除、搜索与金额输入垂直居中、中文输入法、键盘避让、窄屏筛选面板、5000 笔账单搜索响应和结果进入编辑。
@@ -232,6 +260,9 @@
 12. 微信登录、云备份和支付继续留在外部依赖 backlog；Apple 账号就绪后先评估 iOS 内购，不用等待微信。
 13. 在 Android/iOS 真机验证设置入口、反馈表单键盘避让、失败重试、成功编号和关闭诊断信息后的请求载荷。
 14. 在已安装 `0.2.1 (18)` 的 Android 真机接收 OTA `810cd59c`，分别提交一条“功能建议”和语音“昨天午饭 25”，确认反馈成功编号与账本“昨天”分组。
+15. 在 Android 真机验证缺金额补齐：说“早饭十二，打车三十，买书”，确认弹出面板且只需补“买书”一笔、确认后三笔一起入账、8 秒内撤销整批恢复；再验证放弃、点遮罩（键盘弹出时先收键盘）、返回键、小屏加键盘时的布局，以及输入 `12,5`、`1.2万` 时给出提示且“确认入账”保持禁用。
+16. 用同一句话在真机连说 10 次，记录每次是弹出面板、只记了两笔，还是第三笔被补了金额；出现漏记或猜金额就补充评测样本并调整服务端提示词。
+17. 以上通过后发布 preview OTA（本次只有 JS 改动，没有新增原生模块），并勾选 `docs/08-acceptance-criteria.md` 对应项。
 
 ## 已知风险
 
@@ -347,6 +378,15 @@ feedback regression public submit: HTTP 202 with valid UUID
 feedback regression health: HTTP 200, status=ok
 feedback fix preview OTA: 810cd59c-0666-4c9e-b4e7-c5d4402b230a, runtime 0.2.1, android + ios
 feedback fix preview OTA commit: 5130e2f62d9795a6d2bd845f914f2c652e0d8d0d
+0.3.0 typecheck: passed
+0.3.0 lint: passed
+0.3.0 tests: domain 101 + mobile 90 + api 60 = 251 passed
+0.3.0 android export: passed (2178 modules, HBC about 5.8 MB)
+0.3.0 ios export: passed (2182 modules, HBC about 5.8 MB)
+0.3.0 git diff --check: passed
+0.3.0 expo-doctor: 18/20, two network-dependent checks unavailable
+0.3.0 native apk: not built
+0.3.0 android device acceptance: not run
 boot policy typecheck: passed
 boot policy lint: passed
 boot policy tests: domain 34 + mobile 56 + api 38 = 128 passed

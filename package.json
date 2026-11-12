@@ -1,6 +1,6 @@
 {
   "name": "shengzhang",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "声账 · 一句话语音记账",
   "packageManager": "pnpm@11.25.0",

@@ -2,11 +2,11 @@
 
 ## 1. 文档信息
 
-- 状态：MVP 技术基线
-- 适用版本：0.1.x
-- 最后确认：2026-10-19
+- 状态：MVP 技术基线（含 0.3.0 付款页快捷记账）
+- 适用版本：0.3.x
+- 最后确认：2026-11-12
 - 上游事实来源：`01-prd.md`、`03-user-flows.md`、`05-voice-accounting.md`、`06-account-and-backup.md`
-- 实现入口：`apps/mobile`、`services/api`、`packages/contracts`、`packages/domain`
+- 实现入口：`apps/mobile`、`services/api`、`packages/contracts`、`packages/domain`、`packages/screen-capture`
 
 本文档回答“怎么实现”，产品范围和交互细节仍以 PRD 与专项规格为准。技术选型发生变化时，必须新增或修改本文的 ADR，并同步 `docs/HANDOFF.md`。
 
@@ -23,6 +23,7 @@
 │      ├── feature services ──> domain rules                       │
 │      ├── SQLite repository ──> 本地账本（主数据源）                │
 │      ├── expo-audio ──> 录音 ──> 语音网关                         │
+│      ├── 本地 Expo Module ──> Android 磁贴 / 无障碍 / 端侧 OCR      │
 │      ├── SecureStore ──> 登录令牌                                  │
 │      └── 文件导出 / 恢复                                           │
 └───────────────┬───────────────────────────────┬──────────────────┘
@@ -48,6 +49,7 @@
 5. 微信登录只用于建立云备份归属；MVP 的云端是快照备份，不是实时同步。
 6. 服务端使用 Fastify、PostgreSQL 和私有对象存储，按账号隔离数据。
 7. 服务端和客户端共用 `packages/contracts` 的边界 schema，避免接口字段漂移。
+8. Android 付款页快捷记账采用用户主动触发的本地原生模块；文本优先、OCR 兜底，不常驻监听屏幕，也不把截图或 OCR 正文交给服务端。
 
 ## 3. 技术栈
 
@@ -68,6 +70,7 @@
 | 分类排序 | react-native-reorderable-list | 兼容 Fabric、Gesture Handler 与 Reanimated，支持分组内拖拽；辅助功能保留上移/下移语义 |
 | 导出与导入 | expo-file-system + expo-sharing + expo-document-picker | JSON 备份、CSV 导出、系统文件选择和分享 |
 | 触觉 | expo-haptics | 录音开始、成功和错误反馈 |
+| Android 付款页识别 | 本地 Expo Module + Kotlin + ML Kit | Quick Settings Tile、AccessibilityService、端侧中文 OCR；最低 API 30 |
 
 Expo Go 可用于早期界面开发；微信 SDK、正式签名和商店构建必须使用 development build 或 EAS Build。
 
@@ -110,6 +113,7 @@ apps/mobile/
 
 packages/contracts/        Zod DTO、接口响应、备份格式
 packages/domain/           金额、账单、分类、语音批次等纯规则
+packages/screen-capture/  Android 磁贴、无障碍读取、短期草稿和端侧 OCR
 
 services/api/
   src/routes/              HTTP 路由
@@ -179,7 +183,7 @@ transactions
   subcategory_id TEXT NULL REFERENCES categories(id)
   occurred_at TEXT NOT NULL
   note TEXT NOT NULL DEFAULT ''
-  source TEXT CHECK(source IN ('voice','manual'))
+  source TEXT CHECK(source IN ('voice','manual','screen'))
   voice_batch_id TEXT NULL REFERENCES voice_batches(request_id)
   voice_entry_index INTEGER NULL
   created_at TEXT NOT NULL
@@ -230,7 +234,7 @@ schema_migrations
 4. 标记备份 `pending`。
 5. 返回可撤销批次和结果摘要。
 
-任何步骤失败都不得留下半批账单。撤销同样使用事务，只删除属于该批次且未被单独修改的条目；有修改时按 PRD 要求二次确认。
+任何步骤失败都不得留下半批账单。撤销同样使用事务，只删除属于该批次且未被单独修改的条目；有修改时按 PRD 要求二次确认。付款页识别使用独立 `createScreenTransaction`，以 `captureId` 作为账单主键，重复确认只返回已有账单。
 
 ### 5.5 统计
 
@@ -313,6 +317,22 @@ parsing -> saving -> success -> undo_window
 - `expo-sharing` 不提供可靠的发送完成或取消结果；`monthly_review_share_opened` 只表示系统面板成功打开。
 - `react-native-view-shot` 是原生依赖，新增或升级后必须生成新的 Android/iOS 构建，不能只依赖 OTA。
 - 详细契约见 [月度回顾与隐私分享卡](./33-monthly-review.md)。
+
+### 5.10 Android 付款页快捷记账
+
+付款页识别是 Android 11+ 的主动触发能力，不改变“语音优先、手动兜底”的产品主路径：
+
+1. `packages/screen-capture` 注册 Quick Settings Tile 和无障碍服务；用户在控制中心点击“声账记账”后才开始一次读取。
+2. 无障碍服务只在当前活动窗口仍属于 System UI 时收起控制中心，并在有限时间内等待微信 `com.tencent.mm`、支付宝 `com.eg.android.AlipayGphone` 成为活动窗口；超时只提示用户，不生成空草稿。
+3. 文本已包含可信实付金额时不截图；文本不足时才通过 AccessibilityService 截取一次画面，并调用 ML Kit 中文 OCR。
+4. 原生层只把 `captureId`、来源 App、页面文本、截图私有路径和时间写入 `noBackupFilesDir/screen-capture/capture.json`，最长保留 5 分钟。
+5. React Native 用 `packages/domain/src/screen-bill.ts` 结构化金额、时间、商户和置信度，再进入可编辑确认卡；用户确认后才写入 SQLite。
+6. 保存后同一确认卡提供 8 秒撤销；草稿、截图和 OCR 正文不进入账单、JSON 备份、CSV 或服务端。
+7. Expo Go 和 Web 返回 `supported=false`，只允许预览确认卡，不伪装原生读屏能力。
+
+`TransactionSource` 因此扩展为 `voice | manual | screen`。SQLite migration v3 重建 `transactions` 表并保留原数据、外键和索引；提交逻辑以 `captureId` 作为 `id` 保证同一草稿只入账一次。
+
+完整产品边界、权限说明和真机验收清单见 [付款页快捷记账规格](./35-payment-screen-capture.md)。
 
 ## 6. 服务端架构
 
@@ -470,6 +490,7 @@ voice_usage
 5. 备份按 `userId` 做服务端授权校验，不能仅凭对象 key 下载。
 6. 删除账号时先删除对象和数据库记录，再撤销令牌；MVP 可只提供本机数据删除，账号注销列入上线前必需项。
 7. 依赖安全扫描和密钥扫描进入 CI 的后续阶段。
+8. 付款页识别的原始截图只存在应用私有目录，最长 5 分钟；不写入相册、备份、CSV、日志或服务端。只读取用户主动触发时的微信/支付宝白名单窗口，不监听支付通知、不读取剪贴板。
 
 ## 8. 可观测性与运维
 
@@ -489,6 +510,7 @@ voice_usage
 - `packages/contracts`：Schema 正反例、未知字段和边界值。
 - `services/api`：Fastify `inject` 集成测试，覆盖语音、鉴权、备份和错误码。
 - `apps/mobile`：repository 测试使用临时 SQLite；关键组件使用 React Native Testing Library。
+- `packages/domain` 与 `apps/mobile`：付款页文本结构化、金额候选去噪、SQLite v3 迁移、`screen` 来源备份与 `captureId` 幂等写入。
 - 原型：`prototype/qa.mjs` 保持 19 个关键交互回归。
 - 端到端：Maestro 覆盖首次记账、手动记账、统计和异常态；微信与真实 ASR 使用测试环境 smoke test。
 
@@ -584,5 +606,6 @@ GitHub
 6. 移动端语音：录音状态机、上传、结果卡、修正和撤销。
 7. 免费首发后的账号与备份：内部身份、令牌、快照上传、恢复、冲突选择。
 8. 质量与发布：200 条评测集、Maestro、EAS 构建、隐私材料和商店审核。
+9. Android 付款页快捷记账：原生磁贴与无障碍模块、文本/OCR 解析、确认卡、SQLite v3、原生 APK 构建和 Android 11+ 真机验收。
 
 任何阶段都必须保持 `pnpm typecheck` 和 `pnpm test` 通过。

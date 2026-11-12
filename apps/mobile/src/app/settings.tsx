@@ -67,6 +67,17 @@ export default function SettingsScreen() {
           />
         </View>
 
+        <Text style={styles.sectionLabel}>效率</Text>
+        <View style={styles.group}>
+          <SettingRow
+            label="付款页快捷记账"
+            value="一键读取付款结果"
+            last
+            onPress={() => router.push('/screen-capture-settings')}
+          />
+        </View>
+        <Text style={styles.note}>Android 11+ 可开启控制中心磁贴；不需要输入金额也能完成记账。</Text>
+
         <Text style={styles.sectionLabel}>数据与账号</Text>
         <View style={styles.group}>
           <SettingRow

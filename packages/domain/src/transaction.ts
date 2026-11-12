@@ -1,5 +1,5 @@
 export type TransactionType = 'expense' | 'income';
-export type TransactionSource = 'voice' | 'manual';
+export type TransactionSource = 'voice' | 'manual' | 'screen';
 
 export interface Category {
   id: string;

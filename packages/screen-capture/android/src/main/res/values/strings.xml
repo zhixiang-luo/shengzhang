@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="screen_capture_tile_label">声账记账</string>
+  <string name="screen_capture_service_label">声账快捷记账</string>
+  <string name="screen_capture_accessibility_summary">仅在你点击声账磁贴时读取当前付款结果页</string>
+  <string name="screen_capture_accessibility_description">用于提取微信或支付宝付款成功页中的金额、时间和商户。不会后台持续读取，也不会保存截图到相册。</string>
+</resources>

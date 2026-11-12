@@ -80,6 +80,7 @@
 - 使用频率：App 启动次数 / App 活跃安装数；也可结合每日启动次数分析。
 - 语音使用率：发生 `voice_started` 的安装数 / App 活跃安装数。
 - 语音成功率：`voice_completed` / `voice_started`。
+- 缺金额批次：结构化成功即计入 `voice_completed`；补齐后写入才记 `voice_saved`；放弃补金额目前没有单独事件，二者之差只能近似未保存的批次。
 - 累计新增账单：所有 `voice_saved.entryCount` 加所有 `manual_transaction_created`。
 - 语音撤销：`voice_undone` 次数和撤销条数。
 - D1/D7 留存：用户首次活跃日之后第 1 天/第 7 天是否再次产生 `app_opened`。

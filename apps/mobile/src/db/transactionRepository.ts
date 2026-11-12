@@ -5,6 +5,14 @@ import type { ResolvedVoiceEntry } from '@shengzhang/domain';
 import { backupState, transactions, voiceBatches } from './schema';
 import type { AppDatabase } from './schema-types';
 import { findCategory } from './categoryRepository';
+import {
+  buildScreenTransactionRecord,
+  saveScreenTransaction,
+  type ScreenTransactionInput,
+  type ScreenTransactionPersistence,
+} from './screenTransaction';
+
+export type { ScreenTransactionInput } from './screenTransaction';
 
 export type TransactionRow = typeof transactions.$inferSelect;
 
@@ -69,6 +77,48 @@ export function createTransaction(db: AppDatabase, input: TransactionInput): str
   return id;
 }
 
+export function createScreenTransaction(db: AppDatabase, input: ScreenTransactionInput): string {
+  validateCategorySelection(db, {
+    type: input.type,
+    amountMinor: input.amountMinor,
+    categoryId: input.categoryId,
+    subcategoryId: input.subcategoryId,
+    occurredAt: input.occurredAt,
+    note: input.note,
+  });
+  const now = new Date().toISOString();
+  const record = buildScreenTransactionRecord(input, now);
+  let savedId = record.id;
+
+  db.transaction((tx) => {
+    savedId = saveScreenTransaction(
+      {
+        findById(id) {
+          return (
+            (tx
+              .select()
+              .from(transactions)
+              .where(eq(transactions.id, id))
+              .get() as ReturnType<ScreenTransactionPersistence['findById']>) ?? null
+          );
+        },
+        insert(values) {
+          tx.insert(transactions).values(values).run();
+        },
+        markBackupPending() {
+          tx.update(backupState)
+            .set({ status: 'pending' })
+            .where(eq(backupState.id, 1))
+            .run();
+        },
+      },
+      record,
+    );
+  });
+
+  return savedId;
+}
+
 export function updateTransaction(db: AppDatabase, id: string, input: TransactionInput) {
   if (!Number.isSafeInteger(input.amountMinor) || input.amountMinor <= 0) {
     throw new Error('金额必须大于 0');
@@ -125,7 +175,10 @@ export function createVoiceBatch(db: AppDatabase, input: VoiceBatchInput): strin
   if (input.entries.length === 0 || input.entries.length > 5) {
     throw new Error('一次语音需要生成 1–5 笔账单');
   }
-  input.entries.forEach((entry) =>
+  input.entries.forEach((entry) => {
+    if (!Number.isSafeInteger(entry.amountMinor) || entry.amountMinor <= 0) {
+      throw new Error('金额必须大于 0');
+    }
     validateCategorySelection(db, {
       type: entry.type,
       amountMinor: entry.amountMinor,
@@ -133,8 +186,8 @@ export function createVoiceBatch(db: AppDatabase, input: VoiceBatchInput): strin
       subcategoryId: entry.subcategoryId,
       occurredAt: entry.occurredAt,
       note: entry.note,
-    }),
-  );
+    });
+  });
 
   const now = new Date();
   const nowIso = now.toISOString();

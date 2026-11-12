@@ -159,7 +159,9 @@ function parseTransaction(value: unknown, index: number): PortableTransaction {
   const type = value.type;
   const source = value.source;
   if (type !== 'expense' && type !== 'income') throw new Error('账单类型不正确');
-  if (source !== 'voice' && source !== 'manual') throw new Error('账单来源不正确');
+  if (source !== 'voice' && source !== 'manual' && source !== 'screen') {
+    throw new Error('账单来源不正确');
+  }
   if (value.currency !== 'CNY') throw new Error('账单币种不正确');
   const voiceEntryIndex =
     value.voiceEntryIndex === null
@@ -354,7 +356,7 @@ export function buildTransactionsCsv(rows: ReadonlyArray<CsvTransactionRow>): st
       row.categoryName,
       row.subcategoryName ?? '',
       row.note,
-      row.source === 'voice' ? '语音' : '手动',
+      row.source === 'voice' ? '语音' : row.source === 'screen' ? '屏幕识别' : '手动',
     ]
       .map(escapeCsvCell)
       .join(',');

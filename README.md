@@ -7,7 +7,7 @@
   <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-292624?logo=expo&logoColor=white" />
   <img alt="React Native 0.88" src="https://img.shields.io/badge/React_Native-0.88-61DAFB?logo=react&logoColor=111111" />
   <img alt="TypeScript 6" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
-  <img alt="Tests 162" src="https://img.shields.io/badge/tests-162_passed-63795E" />
+  <img alt="Tests 251" src="https://img.shields.io/badge/tests-251_passed-63795E" />
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-E89A96" /></a>
 </p>
 
@@ -64,6 +64,7 @@
 | 语音流式录音与实时字幕 | ✅ 已接入真实火山 ASR |
 | 一句话多笔、自动分类与时间解析 | ✅ 已接入 DeepSeek 结构化 |
 | 语音结果自动入账、8 秒撤销 | ✅ 已完成 |
+| 语音缺金额逐笔补齐后整批入账 | 🚧 代码与自动化完成，待真机验收 |
 | 手动记账、金额计算键盘、备注 | ✅ 已完成 |
 | 两级自定义分类、拖拽排序、归档 | ✅ 已完成 |
 | 月度统计、分类下钻、每日明细 | ✅ 已完成 |
@@ -76,11 +77,12 @@
 | 本地 JSON 备份/恢复与 CSV 导出 | ✅ 已完成 |
 | 离线账单搜索与组合筛选 | ✅ 已完成 |
 | 确定性月度回顾与隐私分享卡 | ✅ 代码与双端导出完成，待真机验收 |
+| Android 11+ 付款页快捷记账 | 🚧 代码、SQLite v3 与 Android bundle 完成，待原生 APK 构建及真机验收 |
 | 30–50 条真人语音与双端真机矩阵 | 🚧 进行中 |
 | 隐私中心 | 🚧 进行中 |
 | 微信登录、云备份、会员与支付 | 🧭 外部依赖就绪后再启动 |
 
-项目当前处于 **M5/M6 内测、质量验证与本地增强能力收口阶段**。真实语音、数据安全、账单搜索和确定性月度回顾已经形成离线闭环；真人语音、双端真机矩阵与原生分享卡验收仍在推进，它还没有作为正式商业版本上架。
+项目当前处于 **M5/M6 内测、质量验证与 `0.3.0` 原生能力收口阶段**。真实语音、数据安全、账单搜索和确定性月度回顾已经形成离线闭环；付款页快捷记账的代码、SQLite migration v3 和 Android bundle 已完成，但还没有原生 APK 构建与 Android 真机验收。公开下载仍指向 `0.2.1`，它还没有作为正式商业版本上架。
 
 ## 技术亮点
 
@@ -88,12 +90,13 @@
 - **本地优先**：账单首先写入 SQLite，网络、登录和云备份不是记账前置条件。
 - **共享领域模型**：金额统一使用整数分，客户端、服务端和测试共用 Zod 契约与领域函数。
 - **流式语音链路**：手机 PCM → Fastify WebSocket → 火山双向流式 ASR → DeepSeek 结构化。
+- **付款页本地识别**：Android 磁贴按需触发，无障碍文本优先，文本不足时才端侧 OCR；不后台监听，不上传截图。
 - **持续更新**：兼容修复通过 EAS Update 自动 OTA；原生变化由服务端版本策略提示覆盖安装，必要时可阻断已停止支持的旧版。
 - **隐私边界明确**：录音仅用于本次识别，服务端不长期保存音频；语音模型不接收历史账单。
 - **隐私优先产品观测**：匿名统计激活、留存、功能渗透、语音时延与失败原因，不含金额、分类、备注、录音和转写正文。
 - **匿名反馈闭环**：站内反馈不要求登录，支持选填联系方式；正文进入私有收件箱，日报只统计数量和类型。
 - **确定性月度回顾**：所有回顾事实由本地账单聚合生成，不让模型编造金额、分类或趋势；分享卡默认隐藏具体账目。
-- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 162 项自动化测试。
+- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 251 项自动化测试。
 
 ### 架构概览
 
@@ -101,6 +104,7 @@
 flowchart LR
   A[Expo / React Native] -->|本地数据| B[(SQLite)]
   A -->|实时 PCM| C[Fastify 语音网关]
+  A -->|Android 主动触发| S[本地磁贴 / 无障碍 / OCR]
   C --> D[火山流式 ASR]
   C --> E[SiliconFlow 备用 ASR]
   C --> F[DeepSeek 结构化]
@@ -116,12 +120,12 @@ flowchart LR
 | --- | --- |
 | TypeScript 严格检查 | 通过 |
 | ESLint | 通过 |
-| 自动化测试 | 162 / 162 通过 |
-| Expo Doctor | 20 / 20 通过 |
+| 自动化测试 | 251 / 251 通过 |
+| Expo Doctor | 18 / 20；2 项在线检查受当前网络环境限制 |
 | 中文 TTS 语音评测 | 200 / 200 通过 |
 | 松手到结构化完成 | P50 1.68s / P95 2.20s |
-| Android EAS 内测构建 | 通过 |
-| iOS / Android Bundle 导出 | 通过 |
+| Android EAS 内测构建 | `0.2.1` 已通过；`0.3.0` 待原生构建 |
+| iOS / Android Bundle 导出 | `0.3.0` 通过 |
 
 200 条语音结果来自合成的中文 TTS 基线，不等同于真人噪声、口音和弱网环境。项目仍在补充真人语料与双端真机矩阵。
 
@@ -180,7 +184,8 @@ python3 -m http.server 4173
 ├── services/api/      语音、账号与备份网关
 ├── packages/
 │   ├── contracts/     Zod 接口契约与共享 DTO
-│   └── domain/        金额、分类、排序和统计纯函数
+│   ├── domain/        金额、分类、排序、统计与付款页文本纯函数
+│   └── screen-capture/ Android 磁贴、无障碍、短期草稿与端侧 OCR
 ├── docs/              产品、技术、隐私、评测与部署文档
 ├── design/            品牌资产、设计令牌与导出资源
 ├── prototype/         可点击交互原型与关键页面截图
@@ -198,6 +203,7 @@ python3 -m http.server 4173
 - [语音评测报告](docs/20-voice-eval-report.md)
 - [后期产品战略](docs/21-post-mvp-strategy.md)
 - [月度回顾与隐私分享卡](docs/33-monthly-review.md)
+- [Android 付款页快捷记账](docs/35-payment-screen-capture.md)
 - [生产基础设施与上线清单](docs/26-production-infrastructure.md)
 - [当前开发交接](docs/HANDOFF.md)
 
@@ -205,6 +211,7 @@ python3 -m http.server 4173
 
 ### 正在做
 
+- 构建 `0.3.0` Android 原生 APK，验收磁贴、无障碍权限、微信/支付宝文本与 OCR、SQLite v3 升级、同草稿幂等和保存撤销；
 - 扩充真人、口音、噪声和弱网语音测试；
 - 完成 iOS / Android 中低端真机矩阵；
 - 真机验收 JSON 导出、清空和恢复闭环；
@@ -213,6 +220,7 @@ python3 -m http.server 4173
 
 ### 后续
 
+- 完成 iOS 快捷指令 → App Intent 的付款页图片导入路线；
 - 云备份与手动恢复；
 - 隐私中心与可选分享控制；
 - 多平台发布和更完整的无障碍支持。
@@ -227,7 +235,7 @@ python3 -m http.server 4173
 
 ## 下载与发布
 
-最新 Android 内测版可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)，安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。官网不把版本号写进主文案，日常纯 JS 更新通过 EAS OTA 推送；只有原生依赖、权限、启动图或 runtime 变化时才要求重新下载安装包。`0.2.1` 已构建为新的原生安装包，包含全新的原生启动字标、连续入场体验和与 React 首帧一致的品牌开场。
+最新公开 Android 内测版仍为 `0.2.1`，可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)。安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。`0.3.0` 新增 AccessibilityService、TileService、ML Kit 与 `minSdkVersion=30`，不能通过 Expo Go 或同 runtime OTA 获得，必须完成新的原生构建和真机验收后再替换公开下载。
 
 GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。官网当前提供 `0.2.1 (18)`，GitHub Pre-release `v0.2.1-preview.1` 附带同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
 

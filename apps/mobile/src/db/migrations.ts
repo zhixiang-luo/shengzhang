@@ -1,7 +1,7 @@
 import { DEFAULT_CATEGORY_SEEDS } from '@shengzhang/domain';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 3;
 
 const INITIAL_SCHEMA = `
   CREATE TABLE IF NOT EXISTS categories (
@@ -117,6 +117,50 @@ async function updatePresetCategoryIcons(db: SQLiteDatabase) {
   });
 }
 
+const SCREEN_SOURCE_MIGRATION = `
+  BEGIN IMMEDIATE;
+  CREATE TABLE transactions_v3 (
+    id TEXT PRIMARY KEY NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('expense', 'income')),
+    amount_minor INTEGER NOT NULL CHECK(amount_minor > 0),
+    currency TEXT NOT NULL DEFAULT 'CNY',
+    category_id TEXT NOT NULL,
+    subcategory_id TEXT NULL,
+    occurred_at TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    source TEXT NOT NULL CHECK(source IN ('voice', 'manual', 'screen')),
+    voice_batch_id TEXT NULL,
+    voice_entry_index INTEGER NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT NULL,
+    FOREIGN KEY (category_id) REFERENCES categories(id),
+    FOREIGN KEY (subcategory_id) REFERENCES categories(id),
+    FOREIGN KEY (voice_batch_id) REFERENCES voice_batches(request_id)
+  );
+
+  INSERT INTO transactions_v3
+    (id, type, amount_minor, currency, category_id, subcategory_id, occurred_at, note,
+     source, voice_batch_id, voice_entry_index, created_at, updated_at, deleted_at)
+  SELECT
+    id, type, amount_minor, currency, category_id, subcategory_id, occurred_at, note,
+    source, voice_batch_id, voice_entry_index, created_at, updated_at, deleted_at
+  FROM transactions;
+
+  DROP TABLE transactions;
+  ALTER TABLE transactions_v3 RENAME TO transactions;
+
+  CREATE INDEX transactions_occurred_at_idx ON transactions(occurred_at);
+  CREATE INDEX transactions_type_occurred_at_idx ON transactions(type, occurred_at);
+  CREATE INDEX transactions_category_occurred_at_idx ON transactions(category_id, occurred_at);
+  CREATE INDEX transactions_voice_batch_idx ON transactions(voice_batch_id);
+  COMMIT;
+`;
+
+export async function migrateToVersion3(db: Pick<SQLiteDatabase, 'execAsync'>) {
+  await db.execAsync(SCREEN_SOURCE_MIGRATION);
+}
+
 export async function migrateDatabase(db: SQLiteDatabase) {
   await db.execAsync('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
   const row = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
@@ -138,5 +182,14 @@ export async function migrateDatabase(db: SQLiteDatabase) {
       new Date().toISOString(),
     );
     await db.execAsync('PRAGMA user_version = 2');
+  }
+
+  if (currentVersion < 3) {
+    await migrateToVersion3(db);
+    await db.runAsync(
+      'INSERT OR IGNORE INTO schema_migrations (version, applied_at) VALUES (3, ?)',
+      new Date().toISOString(),
+    );
+    await db.execAsync('PRAGMA user_version = 3');
   }
 }

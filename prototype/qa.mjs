@@ -83,7 +83,7 @@ await send("Emulation.setDeviceMetricsOverride", {
   mobile: true
 });
 await send("Page.navigate", {
-  url: "file:///Users/luozhixiang/Desktop/Codex/声账/prototype/index.html?scenario=home&capture=1"
+  url: "file:///Users/luozhixiang/Desktop/Codex/产品/声账/prototype/index.html?scenario=home&capture=1"
 });
 await wait(900);
 

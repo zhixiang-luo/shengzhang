@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomDock } from '../components/BottomDock';
 import { CategoryIcon } from '../components/CategoryIcon';
 import { Icon } from '../components/Icon';
+import { MissingAmountSheet } from '../components/MissingAmountSheet';
 import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
 import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useLedgerMonth } from '../features/ledger/useLedgerMonth';
@@ -334,6 +335,7 @@ export default function StatsScreen() {
         onManualFallback={openManualRecovery}
         onDismiss={voice.dismissOverlay}
       />
+      <MissingAmountSheet />
       <VoiceResultSheet onSaved={refresh} />
     </SafeAreaView>
   );

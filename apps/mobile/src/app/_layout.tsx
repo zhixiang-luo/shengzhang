@@ -63,6 +63,8 @@ export default function RootLayout() {
                     <Stack.Screen name="feedback" options={{ animation: 'slide_from_right' }} />
                     <Stack.Screen name="data-safety" options={{ animation: 'slide_from_right' }} />
                     <Stack.Screen name="categories" options={{ animation: 'slide_from_right' }} />
+                    <Stack.Screen name="screen-capture-settings" options={{ animation: 'slide_from_right' }} />
+                    <Stack.Screen name="screen-capture" options={{ animation: 'fade' }} />
                     <Stack.Screen
                       name="entry"
                       options={{ animation: 'slide_from_bottom', presentation: 'modal' }}

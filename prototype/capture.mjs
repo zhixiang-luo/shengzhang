@@ -41,8 +41,8 @@ async function evaluate(expression) {
 }
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const base = "file:///Users/luozhixiang/Desktop/Codex/声账/prototype/index.html";
-const outputDir = "/Users/luozhixiang/Desktop/Codex/声账/prototype/screenshots";
+const base = "file:///Users/luozhixiang/Desktop/Codex/产品/声账/prototype/index.html";
+const outputDir = "/Users/luozhixiang/Desktop/Codex/产品/声账/prototype/screenshots";
 const scenarios = [
   ["onboarding", ""],
   ["home", "?scenario=home&capture=1"],

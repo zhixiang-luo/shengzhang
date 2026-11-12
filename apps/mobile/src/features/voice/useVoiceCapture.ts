@@ -1,3 +1,4 @@
+import { completeVoiceDraft } from '@shengzhang/domain';
 import {
   getRecordingPermissionsAsync,
   requestRecordingPermissionsAsync,
@@ -19,7 +20,7 @@ import {
   resolveVoicePermissionAction,
   type VoicePermissionStatus,
 } from './permissionFlow';
-import { resolveVoiceEntries } from './voiceMapping';
+import { resolveVoiceDraftEntries } from './voiceMapping';
 import {
   resolveVoiceRecoveryAttempt,
   type VoiceRecoveryAttempt,
@@ -232,14 +233,28 @@ export function useVoiceCapture() {
       try {
         const categories = listCategories(db);
         const response = await parseVoiceTranscript(normalizedTranscript, categories);
-        const entries = resolveVoiceEntries(response, categories);
-        useVoiceResultStore.getState().setResult({
-          requestId: response.requestId,
-          transcript: response.transcript,
-          entries,
-        });
+        const draftEntries = resolveVoiceDraftEntries(response, categories);
+        const completed = completeVoiceDraft(draftEntries, {});
+        if (completed.ok) {
+          useVoiceResultStore.getState().setResult({
+            requestId: response.requestId,
+            transcript: response.transcript,
+            entries: completed.entries,
+          });
+        } else if (completed.reason === 'missing') {
+          // Never guess a missing amount and never drop the entries that were heard:
+          // hold the whole batch and let the user fill in the gap.
+          useVoiceResultStore.getState().setPending({
+            requestId: response.requestId,
+            transcript: response.transcript,
+            entries: draftEntries,
+          });
+        } else {
+          throw new Error('语音结果里的金额不正确，请改为手动记账');
+        }
+        // Structuring succeeded either way; whether the batch is later saved is `voice_saved`.
         trackAnalyticsEvent('voice_completed', {
-          entryCount: entries.length,
+          entryCount: draftEntries.length,
           durationMs: response.latencyMs,
         });
         closeSocket();
@@ -332,6 +347,8 @@ export function useVoiceCapture() {
   const startHold = useCallback(async () => {
     if (phaseRef.current === 'requesting' || phaseRef.current === 'recording') return;
     if (phaseRef.current === 'processing') return;
+    // A batch is waiting for its missing amount: finish or abandon it before recording again.
+    if (useVoiceResultStore.getState().pending) return;
     if (noticeTimerRef.current) clearTimeout(noticeTimerRef.current);
     releaseRef.current = null;
     finishingRef.current = false;

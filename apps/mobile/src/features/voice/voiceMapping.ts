@@ -1,16 +1,13 @@
 import type { VoiceParseResponse } from '@shengzhang/contracts';
-import type { ResolvedVoiceEntry } from '@shengzhang/domain';
+import type { ResolvedVoiceDraftEntry } from '@shengzhang/domain';
 
 import type { CategoryRow } from '../../db/categoryRepository';
 
-export function resolveVoiceEntries(
+export function resolveVoiceDraftEntries(
   response: VoiceParseResponse,
   categories: CategoryRow[],
-): ResolvedVoiceEntry[] {
-  return response.entries.map((entry, index) => {
-    if (!entry.amountMinor) {
-      throw new Error(`第 ${index + 1} 笔缺少金额，请改为手动记账`);
-    }
+): ResolvedVoiceDraftEntry[] {
+  return response.entries.map((entry) => {
     const type = entry.type ?? 'expense';
     const path = entry.categoryPath;
     const rootName = path?.[0] ?? '其他';
@@ -43,7 +40,8 @@ export function resolveVoiceEntries(
 
     return {
       type,
-      amountMinor: entry.amountMinor,
+      // A missing amount stays null: it is never guessed, the user fills it in.
+      amountMinor: entry.amountMinor && entry.amountMinor > 0 ? entry.amountMinor : null,
       categoryId: root.id,
       subcategoryId: child?.id ?? null,
       occurredAt: entry.occurredAt ?? new Date().toISOString(),

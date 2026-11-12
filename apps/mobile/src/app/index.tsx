@@ -20,6 +20,7 @@ import { FirstRunGuide } from '../components/FirstRunGuide';
 import { Icon } from '../components/Icon';
 import { UndoDeleteBanner } from '../components/UndoDeleteBanner';
 import { SwipeableDeleteRow } from '../components/SwipeableDeleteRow';
+import { MissingAmountSheet } from '../components/MissingAmountSheet';
 import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
 import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useDatabase } from '../db/DatabaseProvider';
@@ -283,6 +284,7 @@ export default function LedgerScreen() {
         onManualFallback={openManualRecovery}
         onDismiss={voice.dismissOverlay}
       />
+      <MissingAmountSheet />
       <VoiceResultSheet onSaved={refresh} />
       <FirstRunGuide
         onDismiss={markOnboardingSeen}
