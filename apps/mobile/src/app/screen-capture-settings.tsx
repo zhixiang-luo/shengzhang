@@ -177,7 +177,7 @@ export default function ScreenCaptureSettingsScreen() {
         <View style={styles.privacyCard}>
           <Text style={styles.privacyTitle}>隐私边界</Text>
           <Text style={styles.privacyText}>
-            只读取白名单里的微信和支付宝；不读取订单号、余额或银行卡信息；截图不存相册、不上传，最长保留 5 分钟后自动清理。
+            只在点击磁贴后临时读取当前微信或支付宝付款页的记账文字；订单号、余额等不会写入账单、备份或日志，截图不存相册、不上传，临时文字和截图最长保留 5 分钟后自动清理。
           </Text>
         </View>
       </ScrollView>

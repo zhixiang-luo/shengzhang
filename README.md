@@ -77,12 +77,12 @@
 | 本地 JSON 备份/恢复与 CSV 导出 | ✅ 已完成 |
 | 离线账单搜索与组合筛选 | ✅ 已完成 |
 | 确定性月度回顾与隐私分享卡 | ✅ 代码与双端导出完成，待真机验收 |
-| Android 11+ 付款页快捷记账 | 🚧 代码、SQLite v3 与 Android bundle 完成，待原生 APK 构建及真机验收 |
+| Android 11+ 付款页快捷记账 | 🟡 `0.3.0` 内测 APK 已构建，待 Android 真机验收 |
 | 30–50 条真人语音与双端真机矩阵 | 🚧 进行中 |
 | 隐私中心 | 🚧 进行中 |
 | 微信登录、云备份、会员与支付 | 🧭 外部依赖就绪后再启动 |
 
-项目当前处于 **M5/M6 内测、质量验证与 `0.3.0` 原生能力收口阶段**。真实语音、数据安全、账单搜索和确定性月度回顾已经形成离线闭环；付款页快捷记账的代码、SQLite migration v3 和 Android bundle 已完成，但还没有原生 APK 构建与 Android 真机验收。公开下载仍指向 `0.2.1`，它还没有作为正式商业版本上架。
+项目当前处于 **M5/M6 内测、质量验证与 `0.3.0` 原生能力收口阶段**。真实语音、数据安全、账单搜索和确定性月度回顾已经形成离线闭环；付款页快捷记账的代码、SQLite migration v3、Android 原生 APK 和基础包级校验已完成，但还没有 Android 真机验收。公开下载仍指向 `0.2.1`，它还没有作为正式商业版本上架。
 
 ## 技术亮点
 
@@ -124,8 +124,10 @@ flowchart LR
 | Expo Doctor | 18 / 20；2 项在线检查受当前网络环境限制 |
 | 中文 TTS 语音评测 | 200 / 200 通过 |
 | 松手到结构化完成 | P50 1.68s / P95 2.20s |
-| Android EAS 内测构建 | `0.2.1` 已通过；`0.3.0` 待原生构建 |
+| Android EAS 内测构建 | `0.3.0 (19)` 已通过；APK 基础包级校验通过 |
 | iOS / Android Bundle 导出 | `0.3.0` 通过 |
+
+`0.3.0` 内测 APK 由 EAS Build `231be593-8f86-498f-b950-dd3753bcdb60` 生成，源码提交 `45f7bfb44e18c7ce75781f78fdb21344e3490bc0`，大小 155,748,548 字节，SHA-256 为 `f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a`。包名、版本、`minSdkVersion=30`、签名 v2 和 Manifest 原生服务均已检查；ML Kit 中文 OCR 已进入安装包。真机上的磁贴、无障碍读屏、OCR、SQLite v2 → v3 升级、幂等和撤销仍未验收。
 
 200 条语音结果来自合成的中文 TTS 基线，不等同于真人噪声、口音和弱网环境。项目仍在补充真人语料与双端真机矩阵。
 
@@ -211,7 +213,7 @@ python3 -m http.server 4173
 
 ### 正在做
 
-- 构建 `0.3.0` Android 原生 APK，验收磁贴、无障碍权限、微信/支付宝文本与 OCR、SQLite v3 升级、同草稿幂等和保存撤销；
+- 在 Android 11+ 真机验收已构建的 `0.3.0` APK：磁贴、无障碍权限、微信/支付宝文本与 OCR、SQLite v3 升级、同草稿幂等和保存撤销；
 - 扩充真人、口音、噪声和弱网语音测试；
 - 完成 iOS / Android 中低端真机矩阵；
 - 真机验收 JSON 导出、清空和恢复闭环；
@@ -235,7 +237,7 @@ python3 -m http.server 4173
 
 ## 下载与发布
 
-最新公开 Android 内测版仍为 `0.2.1`，可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)。安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。`0.3.0` 新增 AccessibilityService、TileService、ML Kit 与 `minSdkVersion=30`，不能通过 Expo Go 或同 runtime OTA 获得，必须完成新的原生构建和真机验收后再替换公开下载。
+最新公开 Android 内测版仍为 `0.2.1`，可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)。安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。`0.3.0` 新增 AccessibilityService、TileService、ML Kit 与 `minSdkVersion=30`，已生成独立的内测 APK；Android 11+ 测试机可覆盖安装，现有本地账本应保留。它不能通过 Expo Go 或 `0.2.1` 的同 runtime OTA 获得，完成真机验收前不会替换公开稳定下载。
 
 GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。官网当前提供 `0.2.1 (18)`，GitHub Pre-release `v0.2.1-preview.1` 附带同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
 

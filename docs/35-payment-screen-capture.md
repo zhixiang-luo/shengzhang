@@ -2,7 +2,7 @@
 
 ## 1. 状态与结论
 
-- 状态：`0.3.0` Android 首版已实现，待原生 APK 真机验收
+- 状态：`0.3.0 (19)` Android 首版 APK 已构建并通过包级校验，待真机验收
 - 平台：Android 11（API 30）及以上
 - 触发方式：控制中心快捷设置磁贴“声账记账”
 - 主路径：用户主动点击磁贴后，读取当前微信/支付宝付款结果页，生成可编辑确认卡
@@ -169,12 +169,12 @@ CSV 的来源列显示“屏幕识别”。JSON 备份可往返 `screen` 来源�
 
 - 只读取白名单中的微信、支付宝；
 - 只在用户点击磁贴后读取；
-- 不读取订单号、余额、手机号、银行卡尾号等字段作为账单内容；
+- 点击后会将当前付款页的无障碍文字临时收集到应用私有草稿，用于提取金额、时间、商户；页面文字中可能包含订单号、余额、手机号或银行卡尾号，但解析器不会将这些字段写入账单、备份或日志；
 - 不把截图写入相册；
 - 不上传原始截图或 OCR 全文；
 - 不把金额、商户、OCR 正文写入日志；
 - 不后台持续监听，不监听支付通知，不读取剪贴板；
-- 草稿使用应用私有目录并最长保留 5 分钟；
+- 原始页面文字和截图使用应用私有目录，最长保留 5 分钟，并在读取、保存、取消、过期或下次启动时清理；
 - 用户确认前不落账；
 - 保存后立即清理草稿和截图，撤销只操作已写入账单。
 
@@ -219,7 +219,23 @@ pnpm --filter @shengzhang/mobile exec expo export --platform android
 git diff --check
 ```
 
-由于新增 AccessibilityService、TileService、ML Kit 和 Android `minSdkVersion=30`，必须重新执行 EAS Android 原生构建；不能通过 Expo Go 或同 runtime OTA 获得真实读屏能力。API 30 由 `expo-build-properties` 注入；可用 `expo config --type introspect` 检查 `gradleProperties` 中是否存在 `android.minSdkVersion=30`。
+由于新增 AccessibilityService、TileService、ML Kit 和 Android `minSdkVersion=30`，已重新执行 EAS Android 原生构建；不能通过 Expo Go 或 `0.2.1` 的同 runtime OTA 获得真实读屏能力。API 30 由 `expo-build-properties` 注入。
+
+### 12.1 Android `0.3.0` 内测构建
+
+| 项目 | 记录 |
+| --- | --- |
+| EAS Build | `231be593-8f86-498f-b950-dd3753bcdb60` |
+| Profile / Channel | `preview` / `preview` |
+| 源码提交 | `45f7bfb44e18c7ce75781f78fdb21344e3490bc0` |
+| App Version / Version Code | `0.3.0` / `19` |
+| Runtime Version | `0.3.0` |
+| SDK 范围 | `minSdkVersion=30`、`targetSdkVersion=36` |
+| APK 大小 | 155,748,548 字节（约 148.5 MiB） |
+| APK SHA-256 | `f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a` |
+| 本地路径 | `dist/releases/shengzhang-0.3.0-preview.apk`（Git 忽略） |
+
+包名、版本、ZIP 完整性、Signature v2、签名证书一致性、Manifest 服务声明和 DEX 原生类检查通过。APK 已声明 `SYSTEM_ALERT_WINDOW`，但本功能没有常驻悬浮窗，正式发布前需查来源并移除不必要权限。
 
 真机验收至少覆盖：
 

@@ -452,3 +452,23 @@ OTA 只负责后续兼容的 JS/TS 更新与在线更新清单。原生启动图
 - 为“昨天午饭 25”增加服务端日期锚定和移动端时间戳保留回归测试。
 
 同一版本发布前门禁为 typecheck、lint、API build、Android/iOS Expo export 和 `git diff --check` 全部通过；domain 34、mobile 68、API 60，共 162 项测试通过。Android/iOS 发布 Bundle 均已确认只包含正式 API 域名 `https://bigai.xin`。
+
+## 22. Android `0.3.0` 付款页快捷记账内测构建
+
+2026-11-12 完成 `0.3.0` Android 原生内测构建。本版新增 Quick Settings Tile、AccessibilityService、ML Kit 中文 OCR、SQLite migration v3 和新的 `minSdkVersion=30`，因此不能通过 Expo Go 或 `0.2.1` 的同 runtime OTA 获得，Android 11+ 测试机必须安装新的 APK。
+
+| 项目 | 记录 |
+| --- | --- |
+| EAS Build | `231be593-8f86-498f-b950-dd3753bcdb60` |
+| Profile / Channel | `preview` / `preview` |
+| 源码提交 | `45f7bfb44e18c7ce75781f78fdb21344e3490bc0` |
+| App Version / Version Code | `0.3.0` / `19` |
+| Runtime Version | `0.3.0` |
+| APK 大小 | 155,748,548 字节 |
+| APK SHA-256 | `f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a` |
+| 签名证书 SHA-256 | `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955` |
+| EAS Dashboard | `https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/231be593-8f86-498f-b950-dd3753bcdb60` |
+
+本地 APK 位于 `dist/releases/shengzhang-0.3.0-preview.apk`，不提交 Git。包名 `com.shengzhang.ledger`、版本 `0.3.0 (19)`、`minSdkVersion=30`、`targetSdkVersion=36`、ZIP 完整性、Signature v2 和签名证书连续性均检查通过。Manifest 已包含 `BillCaptureTileService`、`BillCaptureAccessibilityService` 和对应绑定权限，DEX 已确认包含自研屏幕采集模块与 ML Kit 中文 OCR 依赖。
+
+当前只完成构建与包级校验，尚未完成 Android 真机验收。官网、OSS/CDN、服务端更新策略和 GitHub Pre-release 仍以 `0.2.1` 为公开稳定版本。真机通过前不把该 APK 替换为公开下载，也不宣称付款页快捷记账已经发布。APK 声明了 `android.permission.SYSTEM_ALERT_WINDOW`，产品没有常驻悬浮窗，正式发布前需查来源并移除不必要权限。

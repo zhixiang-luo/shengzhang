@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾、M9 数据安全与 `0.3.0` 原生能力收口阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包仍是公开稳定版本，官网、OSS + CDN、服务端更新策略和 GitHub Pre-release 均未切换到 `0.3.0`。当前 `feature/screen-bill-capture` 分支已实现 Android 11+ 付款页快捷记账、SQLite migration v3 和语音缺金额逐笔补齐，类型检查、Lint、251 项测试与 Android/iOS bundle 导出通过；EAS 原生 APK、真机权限/读屏/OCR/幂等/撤销验收尚未完成。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付继续留在外部依赖 backlog。
+项目处于 **M5 质量验证、M8 月末回顾、M9 数据安全与 `0.3.0` 原生能力收口阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包仍是公开稳定版本，官网、OSS + CDN、服务端更新策略和 GitHub Pre-release 均未切换到 `0.3.0`。当前 `feature/screen-bill-capture` 分支已实现 Android 11+ 付款页快捷记账、SQLite migration v3 和语音缺金额逐笔补齐，类型检查、Lint、251 项测试与 Android/iOS bundle 导出通过；EAS 原生 APK 已构建并通过包级校验，真机权限/读屏/OCR/幂等/撤销验收尚未完成。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付继续留在外部依赖 backlog。
 
 ## 0.3.0 当前分支状态
 
@@ -12,8 +12,9 @@
 - 数据：`TransactionSource` 已扩展为 `voice | manual | screen`；SQLite v3 重建表并保留原数据、外键和索引；`captureId` 作为账单主键保证幂等；JSON 备份和 CSV 支持“屏幕识别”。
 - 语音修复：部分条目缺金额时只打开补齐面板，补齐后沿用同一 `requestId` 单事务入账；逗号小数、万、第三位小数和表达式不会被静默改写。
 - 自动化门禁：Node 22.19.0 下 typecheck、lint、251 项测试、Android/iOS Expo export 和 `git diff --check` 通过。
-- 未完成边界：当前机器缺少 Java/JDK 与 Android SDK，未生成 `0.3.0` APK；没有 Android 真机验收，也没有 iOS App Intent/快捷指令实现。
-- 发布边界：公开下载仍是 `0.2.1`；`0.3.0` 原生模块不能通过 Expo Go 或同 runtime OTA 获得，完成原生构建和真机验收前不得宣称可发布。
+- 原生构建：EAS Build `231be593-8f86-498f-b950-dd3753bcdb60` 已生成 `0.3.0 (19)` APK，源码提交 `45f7bfb44e18c7ce75781f78fdb21344e3490bc0`，大小 155,748,548 字节，SHA-256 `f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a`；包名、版本、`minSdkVersion=30`、Signature v2、Manifest 服务和 DEX 原生类均已检查。
+- 未完成边界：没有 Android 真机验收，也没有 iOS App Intent/快捷指令实现。
+- 发布边界：公开下载仍是 `0.2.1`；`0.3.0` 新增原生模块和 runtime，不能通过 Expo Go 或 `0.2.1` 的同 runtime OTA 获得。完成 Android 真机验收前不得替换官网稳定版或宣称可公开发布。
 
 ## 已完成
 
@@ -211,10 +212,12 @@
 - `0.3.0` 付款页快捷记账已落盘：新增本地 Expo Module `packages/screen-capture`、Android Quick Settings Tile、AccessibilityService、微信/支付宝白名单文本读取、Android 11+ 无障碍截图、ML Kit 中文 OCR、私有草稿 5 分钟 TTL、`shengzhang://screen-capture` 与设置 Deep Link。确认卡支持金额、收支、两级分类、时间和备注编辑，保存后同卡撤销；`/screen-capture?demo=1` 只预览不写账本。
 - SQLite v3 已实现：`transactions.source` CHECK 扩展为 `voice/manual/screen`，迁移在 `BEGIN IMMEDIATE` 中重建表并复制旧数据、外键与索引；屏幕账单以 `captureId` 为主键，重复提交返回已有 ID。JSON 备份和 CSV 已支持 `screen`。
 - `0.3.0` 当前全仓门禁通过：typecheck、lint、domain 101 + mobile 90 + API 60 = 251 项测试、Android Expo export（2178 modules，HBC 约 5.8 MB）、iOS Expo export（2182 modules，HBC 约 5.8 MB）和 `git diff --check`。Expo Doctor 为 18/20，两项失败是当前环境无法访问 `exp.host` / React Native Directory 的在线检查，不是已确认的代码故障。
+- `0.3.0` Android 内测 APK 已通过 EAS Build 完成：构建 ID `231be593-8f86-498f-b950-dd3753bcdb60`，profile/channel `preview / preview`，完成时间 2026-11-12 22:53（Asia/Shanghai）。EAS 日志确认自研 `shengzhang-screen-capture` Kotlin 模块编译、App Kotlin/Java、资源、Lint、R8、签名和 APK 打包成功。
+- APK 的 ZIP 完整性、包名 `com.shengzhang.ledger`、版本 `0.3.0 (19)`、`minSdkVersion=30`、`targetSdkVersion=36`、Android 应用名“声账”和 Signature v2 均通过；签名证书 SHA-256 为 `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955`，与此前版本相同，可覆盖安装并保留本地账本。Manifest 已确认包含 `BillCaptureTileService`、`BillCaptureAccessibilityService` 与相应权限，DEX 已确认包含两个原生服务和 ML Kit 中文 OCR 依赖。
+- APK 暂存于本地 `dist/releases/shengzhang-0.3.0-preview.apk`，该目录被 Git 忽略，不提交安装包。APK 声明了 `android.permission.SYSTEM_ALERT_WINDOW`，但产品未实现常驻悬浮窗；首版需在真机确认系统是否实际请求该权限，正式发布前继续查来源并移除不必要权限。
 
 ## 当前未实现
 
-- `0.3.0` 尚未执行 EAS Android 原生构建；当前机器没有 Java/JDK 和 Android SDK，不能本地编译 Kotlin/Gradle 或生成 APK。
 - 付款页快捷记账尚未做 Android 真机验收：无障碍开启、磁贴添加、微信/支付宝读屏、文本足够时不截图、OCR 兜底、小屏加键盘、同草稿重复保存、同卡撤销、草稿清理和 v3 升级都待验证。
 - iOS 付款页路线尚未实现；后续只能走用户主动运行快捷指令截图，再交给 App Intent/确认卡，不承诺 Android 式静默读屏。
 - 真人噪声/口音语料、iPhone/Android 中低端矩阵和 7 天封闭试用。
@@ -239,12 +242,11 @@
 
 ### 0.3.0 付款页快捷记账
 
-1. 在具备 Java/JDK、Android SDK 或 EAS 云端凭据的环境执行 preview Android 原生构建，生成 `0.3.0` APK。
-2. 在 Android 11+ 真机完成无障碍授权、控制中心磁贴添加、微信/支付宝付款成功页读取和目标窗口白名单验证。
-3. 分别验证“文本已有可信金额不截图”和“文本不足时 OCR 兜底”，记录识别字段、耗时、失败页面与手动补全体验。
-4. 验证金额、收支、一级/二级分类、时间、备注修改；同一草稿重复确认只入账一次；保存后 8 秒撤销；取消、保存、过期和下次启动后截图为空。
-5. 用包含旧版 `voice/manual` 数据的安装升级到 `0.3.0`，确认账本、分类、语音批次和软删除记录完整，CSV/JSON 往返包含“屏幕识别”。
-6. 完成以上门禁后再决定是否发布新的 preview 原生包；在此之前 README、官网和应用下载继续以 `0.2.1` 为公开稳定版本。
+1. 安装 `0.3.0 (19)` APK，确认覆盖安装后历史账本保留；在 Android 11+ 真机完成无障碍授权、控制中心磁贴添加、微信/支付宝付款成功页读取和目标窗口白名单验证。
+2. 分别验证“文本已有可信金额不截图”和“文本不足时 OCR 兜底”，记录识别字段、耗时、失败页面与手动补全体验。
+3. 验证金额、收支、一级/二级分类、时间、备注修改；同一草稿重复确认只入账一次；保存后 8 秒撤销；取消、保存、过期和下次启动后截图为空。
+4. 用包含旧版 `voice/manual` 数据的安装升级到 `0.3.0`，确认账本、分类、语音批次和软删除记录完整，CSV/JSON 往返包含“屏幕识别”。
+5. 检查设置页实际是否请求 `SYSTEM_ALERT_WINDOW`，确认来源后移除不需要的权限；完成以上门禁后再决定是否发布 preview OTA、GitHub Pre-release 或替换公开下载。
 
 1. 在 Android/iOS 真机验证 `0.1.7`：数据安全页布局、JSON/CSV 系统分享、文件选择与导入、覆盖确认、清空二次确认和“导出 → 清空 → 恢复”完整闭环。
 2. 在 Android/iOS 真机验证 `0.1.8`：日期选择 Sheet、日期单独清除、搜索与金额输入垂直居中、中文输入法、键盘避让、窄屏筛选面板、5000 笔账单搜索响应和结果进入编辑。
@@ -385,7 +387,9 @@ feedback fix preview OTA commit: 5130e2f62d9795a6d2bd845f914f2c652e0d8d0d
 0.3.0 ios export: passed (2182 modules, HBC about 5.8 MB)
 0.3.0 git diff --check: passed
 0.3.0 expo-doctor: 18/20, two network-dependent checks unavailable
-0.3.0 native apk: not built
+0.3.0 native apk: built, EAS 231be593-8f86-498f-b950-dd3753bcdb60
+0.3.0 native apk sha256: f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a
+0.3.0 native apk package checks: passed
 0.3.0 android device acceptance: not run
 boot policy typecheck: passed
 boot policy lint: passed
