@@ -42,29 +42,7 @@ class ScreenCaptureModule : Module() {
     }
 
     AsyncFunction("requestQuickSettingsTile").Coroutine {
-      val manager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        context.getSystemService(StatusBarManager::class.java)
-      } else {
-        null
-      }
-      if (manager == null) {
-        false
-      } else {
-        suspendCancellableCoroutine { continuation ->
-          manager.requestAddTileService(
-            ComponentName(context, BillCaptureTileService::class.java),
-            context.getString(R.string.screen_capture_tile_label),
-            Icon.createWithResource(context, R.drawable.ic_screen_capture_tile),
-            context.mainExecutor,
-            Consumer { result ->
-              val added =
-                result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED ||
-                  result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED
-              if (continuation.isActive) continuation.resume(added)
-            }
-          )
-        }
-      }
+      requestQuickSettingsTile()
     }
 
     AsyncFunction("getPendingCapture") {
@@ -98,6 +76,30 @@ class ScreenCaptureModule : Module() {
     ).orEmpty()
     return enabled.split(':').any { value ->
       ComponentName.unflattenFromString(value) == expected
+    }
+  }
+
+  private suspend fun requestQuickSettingsTile(): Boolean {
+    val manager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      context.getSystemService(StatusBarManager::class.java)
+    } else {
+      null
+    }
+    if (manager == null) return false
+
+    return suspendCancellableCoroutine { continuation ->
+      manager.requestAddTileService(
+        ComponentName(context, BillCaptureTileService::class.java),
+        context.getString(R.string.screen_capture_tile_label),
+        Icon.createWithResource(context, R.drawable.ic_screen_capture_tile),
+        context.mainExecutor,
+        Consumer { result ->
+          val added =
+            result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED ||
+              result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED
+          if (continuation.isActive) continuation.resume(added)
+        }
+      )
     }
   }
 }
