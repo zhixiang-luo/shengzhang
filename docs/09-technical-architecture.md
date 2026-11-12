@@ -330,6 +330,8 @@ parsing -> saving -> success -> undo_window
 6. 保存后同一确认卡提供 8 秒撤销；草稿、截图和 OCR 正文不进入账单、JSON 备份、CSV 或服务端。
 7. Expo Go 和 Web 返回 `supported=false`，只允许预览确认卡，不伪装原生读屏能力。
 
+Android 最低版本通过 `expo-build-properties` 的 `android.minSdkVersion=30` 注入 Gradle；不要直接写在 `expo.android` 下，Expo SDK 58 会把它视为无效 schema。原生模块使用 SDK 58 的 `appContext.applicationContext`，异步磁贴请求和 OCR 通过 Expo Modules 的协程 DSL 暴露给 React Native。
+
 `TransactionSource` 因此扩展为 `voice | manual | screen`。SQLite migration v3 重建 `transactions` 表并保留原数据、外键和索引；提交逻辑以 `captureId` 作为 `id` 保证同一草稿只入账一次。
 
 完整产品边界、权限说明和真机验收清单见 [付款页快捷记账规格](./35-payment-screen-capture.md)。

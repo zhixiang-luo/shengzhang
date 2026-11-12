@@ -25,7 +25,6 @@
     },
     "android": {
       "package": "com.shengzhang.ledger",
-      "minSdkVersion": 30,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "monochromeImage": "./assets/monochrome-icon.png",
@@ -58,7 +57,15 @@
       "expo-localization",
       "expo-asset",
       "./plugins/with-cleartext-api",
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 30
+          }
+        }
+      ]
     ],
     "extra": {
       "router": {

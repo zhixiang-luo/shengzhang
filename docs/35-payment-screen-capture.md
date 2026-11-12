@@ -219,7 +219,7 @@ pnpm --filter @shengzhang/mobile exec expo export --platform android
 git diff --check
 ```
 
-由于新增 AccessibilityService、TileService、ML Kit 和 Android `minSdkVersion=30`，必须重新执行 EAS Android 原生构建；不能通过 Expo Go 或同 runtime OTA 获得真实读屏能力。
+由于新增 AccessibilityService、TileService、ML Kit 和 Android `minSdkVersion=30`，必须重新执行 EAS Android 原生构建；不能通过 Expo Go 或同 runtime OTA 获得真实读屏能力。API 30 由 `expo-build-properties` 注入；可用 `expo config --type introspect` 检查 `gradleProperties` 中是否存在 `android.minSdkVersion=30`。
 
 真机验收至少覆盖：
 
