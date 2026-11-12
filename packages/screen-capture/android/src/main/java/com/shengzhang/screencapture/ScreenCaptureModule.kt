@@ -41,7 +41,7 @@ class ScreenCaptureModule : Module() {
       context.startActivity(intent)
     }
 
-    AsyncFunction("requestQuickSettingsTile").Coroutine {
+    AsyncFunction("requestQuickSettingsTile").Coroutine<Boolean> {
       requestQuickSettingsTile()
     }
 
