@@ -472,3 +472,19 @@ OTA 只负责后续兼容的 JS/TS 更新与在线更新清单。原生启动图
 本地 APK 位于 `dist/releases/shengzhang-0.3.0-preview.apk`，不提交 Git。包名 `com.shengzhang.ledger`、版本 `0.3.0 (19)`、`minSdkVersion=30`、`targetSdkVersion=36`、ZIP 完整性、Signature v2 和签名证书连续性均检查通过。Manifest 已包含 `BillCaptureTileService`、`BillCaptureAccessibilityService` 和对应绑定权限，DEX 已确认包含自研屏幕采集模块与 ML Kit 中文 OCR 依赖。
 
 当前只完成构建与包级校验，尚未完成 Android 真机验收。官网、OSS/CDN、服务端更新策略和 GitHub Pre-release 仍以 `0.2.1` 为公开稳定版本。真机通过前不把该 APK 替换为公开下载，也不宣称付款页快捷记账已经发布。APK 声明了 `android.permission.SYSTEM_ALERT_WINDOW`，产品没有常驻悬浮窗，正式发布前需查来源并移除不必要权限。
+
+### 22.1 Runtime `0.3.0` 隐私文案修正 OTA
+
+首版 APK 构建后发现付款页设置中的隐私文案过度承诺“完全不读取订单号和余额”。原生层会在点击磁贴后遍历目标付款页的无障碍节点并临时收集整页文字，因此页面文字中可能包含这些字段；解析器不会把它们写入账单、备份或日志，原始文字和截图最长保留 5 分钟。源码与 UI 文案已改为准确表述，并通过 preview OTA 只更新 Android JS，不需要重新下载 APK。
+
+| 项目 | 记录 |
+| --- | --- |
+| Channel / Environment | `preview` / `preview` |
+| Runtime Version | `0.3.0` |
+| Platform | Android |
+| Update Group | `7dbde641-2a72-4dc1-98f0-62cdfc12d3ed` |
+| Android Update | `01a1d044-bee2-7011-ab1f-34c71343e68a` |
+| 源码提交 | `cdffc69b1d02face73e89a3aeebd83f5ac09dc70` |
+| EAS Dashboard | `https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/updates/7dbde641-2a72-4dc1-98f0-62cdfc12d3ed` |
+
+安装 `0.3.0 (19)` APK 并联网启动后，现有 `expo-updates` 检查会下载并应用该 OTA。APK 内嵌版本仍保留构建时文案，离线首启在看到 OTA 前可能暂时显示旧文案；这不影响屏幕识别、确认和写入逻辑。该 OTA 不改变公开稳定下载，也不替代 Android 真机验收。

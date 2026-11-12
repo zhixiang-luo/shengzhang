@@ -127,7 +127,7 @@ flowchart LR
 | Android EAS 内测构建 | `0.3.0 (19)` 已通过；APK 基础包级校验通过 |
 | iOS / Android Bundle 导出 | `0.3.0` 通过 |
 
-`0.3.0` 内测 APK 由 EAS Build `231be593-8f86-498f-b950-dd3753bcdb60` 生成，源码提交 `45f7bfb44e18c7ce75781f78fdb21344e3490bc0`，大小 155,748,548 字节，SHA-256 为 `f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a`。包名、版本、`minSdkVersion=30`、签名 v2 和 Manifest 原生服务均已检查；ML Kit 中文 OCR 已进入安装包。真机上的磁贴、无障碍读屏、OCR、SQLite v2 → v3 升级、幂等和撤销仍未验收。
+`0.3.0` 内测 APK 由 EAS Build `231be593-8f86-498f-b950-dd3753bcdb60` 生成，源码提交 `45f7bfb44e18c7ce75781f78fdb21344e3490bc0`，大小 155,748,548 字节，SHA-256 为 `f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a`。包名、版本、`minSdkVersion=30`、签名 v2 和 Manifest 原生服务均已检查；ML Kit 中文 OCR 已进入安装包。构建后发布的隐私文案修正已通过 runtime `0.3.0` 的 preview OTA 更新组 `7dbde641-2a72-4dc1-98f0-62cdfc12d3ed` 分发。真机上的磁贴、无障碍读屏、OCR、SQLite v2 → v3 升级、幂等和撤销仍未验收。
 
 200 条语音结果来自合成的中文 TTS 基线，不等同于真人噪声、口音和弱网环境。项目仍在补充真人语料与双端真机矩阵。
 

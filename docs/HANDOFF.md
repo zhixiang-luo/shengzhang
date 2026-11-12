@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾、M9 数据安全与 `0.3.0` 原生能力收口阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包仍是公开稳定版本，官网、OSS + CDN、服务端更新策略和 GitHub Pre-release 均未切换到 `0.3.0`。当前 `feature/screen-bill-capture` 分支已实现 Android 11+ 付款页快捷记账、SQLite migration v3 和语音缺金额逐笔补齐，类型检查、Lint、251 项测试与 Android/iOS bundle 导出通过；EAS 原生 APK 已构建并通过包级校验，真机权限/读屏/OCR/幂等/撤销验收尚未完成。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付继续留在外部依赖 backlog。
+项目处于 **M5 质量验证、M8 月末回顾、M9 数据安全与 `0.3.0` 原生能力收口阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包仍是公开稳定版本，官网、OSS + CDN、服务端更新策略和 GitHub Pre-release 均未切换到 `0.3.0`。当前 `feature/screen-bill-capture` 分支已实现 Android 11+ 付款页快捷记账、SQLite migration v3 和语音缺金额逐笔补齐，类型检查、Lint、251 项测试与 Android/iOS bundle 导出通过；EAS 原生 APK 已构建并通过包级校验，隐私文案修正已发布 preview OTA，真机权限/读屏/OCR/幂等/撤销验收尚未完成。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付继续留在外部依赖 backlog。
 
 ## 0.3.0 当前分支状态
 
@@ -215,6 +215,7 @@
 - `0.3.0` Android 内测 APK 已通过 EAS Build 完成：构建 ID `231be593-8f86-498f-b950-dd3753bcdb60`，profile/channel `preview / preview`，完成时间 2026-11-12 22:53（Asia/Shanghai）。EAS 日志确认自研 `shengzhang-screen-capture` Kotlin 模块编译、App Kotlin/Java、资源、Lint、R8、签名和 APK 打包成功。
 - APK 的 ZIP 完整性、包名 `com.shengzhang.ledger`、版本 `0.3.0 (19)`、`minSdkVersion=30`、`targetSdkVersion=36`、Android 应用名“声账”和 Signature v2 均通过；签名证书 SHA-256 为 `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955`，与此前版本相同，可覆盖安装并保留本地账本。Manifest 已确认包含 `BillCaptureTileService`、`BillCaptureAccessibilityService` 与相应权限，DEX 已确认包含两个原生服务和 ML Kit 中文 OCR 依赖。
 - APK 暂存于本地 `dist/releases/shengzhang-0.3.0-preview.apk`，该目录被 Git 忽略，不提交安装包。APK 声明了 `android.permission.SYSTEM_ALERT_WINDOW`，但产品未实现常驻悬浮窗；首版需在真机确认系统是否实际请求该权限，正式发布前继续查来源并移除不必要权限。
+- 构建后修正了付款页设置的隐私文案，避免把整页无障碍文字存在订单号/余额的情况描述成“完全不读取这些字段”。Android preview OTA 已发布到 runtime `0.3.0`：Update Group `7dbde641-2a72-4dc1-98f0-62cdfc12d3ed`，Update `01a1d044-bee2-7011-ab1f-34c71343e68a`，源码提交 `cdffc69b1d02face73e89a3aeebd83f5ac09dc70`。联网启动的测试包会在现有更新检查流程中取得修正文案。
 
 ## 当前未实现
 
@@ -390,6 +391,9 @@ feedback fix preview OTA commit: 5130e2f62d9795a6d2bd845f914f2c652e0d8d0d
 0.3.0 native apk: built, EAS 231be593-8f86-498f-b950-dd3753bcdb60
 0.3.0 native apk sha256: f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a
 0.3.0 native apk package checks: passed
+0.3.0 preview OTA: 7dbde641-2a72-4dc1-98f0-62cdfc12d3ed, runtime 0.3.0, android
+0.3.0 preview OTA update: 01a1d044-bee2-7011-ab1f-34c71343e68a
+0.3.0 preview OTA commit: cdffc69b1d02face73e89a3aeebd83f5ac09dc70
 0.3.0 android device acceptance: not run
 boot policy typecheck: passed
 boot policy lint: passed
