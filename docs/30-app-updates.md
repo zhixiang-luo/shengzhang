@@ -629,6 +629,7 @@ APP_UPDATE_ANDROID_RELEASE_NOTES='["微信、支付宝付款详情页可用快�
 | 签名证书 SHA-256 | `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955` |
 | Embedded update | `77cf919e-d0cf-4e46-805b-378b0b5dc3e3` |
 | 正式下载 | `https://bigai.xin/shengzhang/downloads/shengzhang-0.3.3-preview.apk?download=latest&version=0.3.3` |
+| GitHub Release | `https://github.com/zhixiang-luo/shengzhang/releases/tag/v0.3.3` |
 
 服务端 `APP_UPDATE_ANDROID_LATEST_VERSION=0.3.3`，minimum 保持 `0.1.4`，`releaseNotes` 为 6 条，`requiresReinstall=true`。公网验收：
 
@@ -636,6 +637,8 @@ APP_UPDATE_ANDROID_RELEASE_NOTES='["微信、支付宝付款详情页可用快�
 - `0.3.3 → none`；
 - `0.1.3 → required`；
 - 所有返回的 `downloadUrl` 均指向上述正式直连地址。
+
+GitHub `v0.3.3` Release 已发布并标记为 Latest，不是 Pre-release，附件名为 `shengzhang-0.3.3.apk`。GitHub API 返回 `size=155851496`、`digest=sha256:4c84fd68003048b12c634a43f8b47eec13dc0087c76c4ab8db320657eb495c3b`，与本地正式包和官网直连包一致；Release 下载地址最终返回 `HTTP 200`、`content-length=155851496`。
 
 `SCREEN_VISION_DAILY_LIMIT=200` 与 `SCREEN_VISION_IP_MINUTE_LIMIT=60` 两行测试覆盖已从 `/opt/shengzhang/shared/.env` 删除，API 新进程环境已确认不再包含这两项，恢复默认 `20/天、10/分钟`。
 

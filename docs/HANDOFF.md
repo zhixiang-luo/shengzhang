@@ -1,6 +1,6 @@
 # 当前交接
 
-> 2026-11-14 晚。`main` 当前为 `f5ee0cd`，官网、更新策略和正式 APK 已切到 `0.3.3 (41)`；公网接口验证 `0.2.1 → optional`、`0.3.3 → none`、`0.1.3 → required`。旧 `0.2.1` 用户会看到覆盖安装弹窗，账本保留。CDN 仍是旧包，正式包暂走 `bigai.xin` 直连。
+> 2026-11-14 晚。`v0.3.3` 标签指向 `b9be727`，官网、更新策略、正式 APK 和 GitHub Release 均已切到 `0.3.3 (41)`；公网接口验证 `0.2.1 → optional`、`0.3.3 → none`、`0.1.3 → required`。旧 `0.2.1` 用户会看到覆盖安装弹窗，账本保留。GitHub Release 为 Latest/non-prerelease，附件 `shengzhang-0.3.3.apk` 与官网包 SHA-256 一致。CDN 仍是旧包，正式包暂走 `bigai.xin` 直连。
 
 ## 当前状态
 

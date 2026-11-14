@@ -258,7 +258,7 @@ python3 -m http.server 4173
 
 最新公开 Android 版为 `0.3.3 (41)`，可从[声账官网下载入口](https://bigai.xin/shengzhang/#download)获取。当前正式包大小 155,851,496 字节，SHA-256 为 `4c84fd68003048b12c634a43f8b47eec13dc0087c76c4ab8db320657eb495c3b`。由于本机与服务器均未配置 OSS 凭据，本轮正式下载改用 `https://bigai.xin/shengzhang/downloads/shengzhang-0.3.3-preview.apk` 直连；`download.bigai.xin` 仍保留 0.2.1 旧包，恢复凭据后再迁回 CDN。`0.3.3` 包含原生无障碍浮层、TileService、独立动作、同库写入与单图分享，`minSdkVersion=30`，必须新原生 APK/runtime；不申请 SYSTEM_ALERT_WINDOW。Android 11+ 可覆盖安装并保留本地账本。
 
-GitHub Releases 保留每个版本的 Tag 和更新说明作为可追溯记录。官网当前提供 `0.3.3 (41)`；GitHub Release 附带同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
+GitHub Releases 保留每个版本的 Tag 和更新说明作为可追溯记录。[GitHub `v0.3.3` Release](https://github.com/zhixiang-luo/shengzhang/releases/tag/v0.3.3) 已发布并标记为 Latest，附件 `shengzhang-0.3.3.apk` 与官网当前提供的 `0.3.3 (41)` 为同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
 
 当前尚未在 App Store 或国内 Android 应用商店正式上架。
 
