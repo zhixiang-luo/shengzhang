@@ -1,6 +1,6 @@
 # 当前交接
 
-> 2026-11-14 晚。`feature/screen-bill-capture` 已推送到 GitHub（`c1ef96f`），官网已部署并完成公网验收；公开稳定仍 0.2.1。0.3.3(37) 已在 Redmi K60 真机完成微信/支付宝快捷记账、语音接续、列表刷新和冷启动验证；无障碍被系统关闭时首页有低调恢复提示。剩余工作见 [44 号上线清单](./44-quick-accounting-device-verification.md)。
+> 2026-11-14 晚。`feature/screen-bill-capture` 已推送到 GitHub，`main` 已快进合并到 `0fb039f`，官网已部署并完成公网验收；公开稳定仍 0.2.1。0.3.3(37) 已在 Redmi K60 真机完成微信/支付宝快捷记账、语音接续、列表刷新和冷启动验证；无障碍被系统关闭时首页有低调恢复提示。剩余工作见 [44 号上线清单](./44-quick-accounting-device-verification.md)。
 
 ## 当前状态
 
