@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-11-13T10:10:09.024Z",
+  "sourceEvaluatedAt": "2026-11-13T09:15:13.009Z",
+  "model": "Qwen/Qwen3-VL-8B-Instruct",
+  "note": "Replayed generated fixtures only. No new model requests or real user screenshots; amount matches do not prove production accuracy. Some model timestamps fail evidence validation and remain unknown.",
+  "cases": [
+    {
+      "case": "alipay-signed",
+      "amountMatches": true,
+      "blocked": false,
+      "timeVerified": true
+    },
+    {
+      "case": "alipay-plain",
+      "amountMatches": true,
+      "blocked": false,
+      "timeVerified": false
+    },
+    {
+      "case": "alipay-unsigned",
+      "amountMatches": true,
+      "blocked": false,
+      "timeVerified": false
+    },
+    {
+      "case": "wechat-header",
+      "amountMatches": true,
+      "blocked": false,
+      "timeVerified": true
+    },
+    {
+      "case": "alipay-failed",
+      "amountMatches": true,
+      "blocked": true,
+      "timeVerified": false
+    },
+    {
+      "case": "wechat-missing",
+      "amountMatches": true,
+      "blocked": false,
+      "timeVerified": false
+    }
+  ]
+}

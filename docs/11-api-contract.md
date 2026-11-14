@@ -287,3 +287,43 @@ Bearer 鉴权，成功返回 `204`，不删除本地账本。
 3. 更新 API route 和客户端调用。
 4. 添加正向与失败测试。
 5. 更新 `docs/HANDOFF.md`。
+
+## 11. 截图视觉识别（0.3.3 默认快捷路线）
+
+`POST /v1/screen-bill/parse`。不依赖微信登录，以安装/IP/全局额度保护，默认不启用供应商。边界 schema 见 `packages/contracts/src/screen-bill.ts`，当前错误体为 `{error:{code,message}}`，使用 Fastify 请求 ID；不保证其他旧接口的额外 retryable 字段。
+
+请求必填：captureId（1–100 字符）、installationId（16–200 字符）、consent=true、带时区 capturedAt、有效 Intl timezone、最多 160 个启用分类 `{id,name,type}`、image `{mimeType,base64}`。MIME 只允许 JPEG/PNG；严格拒绝额外字段。body 上限 2,850,000 字节，解码后不超过 2,000,000 字节；图片头、尺寸不超过 4096×4096 且总像素不超过 600 万。安装 ID 只用于服务器哈希额度键，不转给视觉供应商。
+
+响应：
+
+```json
+{
+  "captureId": "synthetic-example",
+  "bill": {
+    "amountMinor": 2658,
+    "type": "expense",
+    "merchant": "示例餐厅",
+    "item": null,
+    "occurredAt": "2026-11-12T04:31:00.000Z",
+    "categoryId": "expense-food",
+    "amountEvidence": "实付 ￥26.58",
+    "blockingReason": null
+  },
+  "latencyMs": 3150
+}
+```
+
+amountMinor 为正整数分或 null（最大 99,999,999 分）；merchant/item 各最多 40 字；未识别字段保持 null。categoryId 只能来自请求中的同收支分类；页面没有可信交易时间则 occurredAt=null，由客户端固定回退采集时间。模型给出的单笔/成功/币种/金额及时间证据须再通过服务端校验。
+
+0.3.3 支持顶部无单位小数、负号支出/正号收入及分行货币符号；只核对模型已选择数字与所引原文，不再以旧 OCR 候选评分裁决。明确未完成状态、转账/退款及外币证据强阻断，不能被模型的 success/CNY 枚举覆盖。金额诊断通过请求头 `X-Screen-Bill-Diagnostics: 1` 协商：声明支持时 bill 可含可选 `amountIssue: "not_read" | "unverified" | null`；未声明或未知值时不返回该字段，以兼容 0.3.1/0.3.2 的 strict schema。新客户端兼容没有该字段的旧服务响应；它仅用于提示，不允许从被拒绝的证据恢复金额。
+
+| HTTP / 错误码 | 含义 |
+| --- | --- |
+| 400 SCREEN_BILL_INVALID | 请求/schema/授权标记错误 |
+| 400 SCREEN_IMAGE_INVALID | 图片头、大小或尺寸不合规 |
+| 429 SCREEN_VISION_LIMITED | 安装/IP/全局额度已满 |
+| 429 SCREEN_VISION_BUSY | 同时请求数达到 8 |
+| 503 SCREEN_VISION_DISABLED | 未配置或停用视觉供应商 |
+| 503 SCREEN_VISION_UNAVAILABLE | 供应商超时、异常或不合规输出 |
+
+默认每安装每日 20 次、IP 每分钟 10 次、全服务每日 500 次；当前单进程内存计数，重启会清零，扩容/推广前需持久化。服务端供应商超时 15 秒；RN 客户端 20 秒，原生连接 15 秒/读取 45 秒并有 60 秒总时限；断线取消上游请求，不自动循环重试。响应 `Cache-Control: no-store`，不记录图片/正文/模型响应。客户端请求前后检查本地授权，过期/关闭/新草稿/保存后丢弃旧响应。模型配置与供应商条款见 [19](./19-ai-providers.md)。

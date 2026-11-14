@@ -1,449 +1,70 @@
 # 当前交接
 
-> 每次阶段工作结束时覆盖本文件。临时聊天记录不能替代这里的事实。
+> 2026-11-14 晚。`feature/screen-bill-capture` 的代码、官网与文档已整理完毕，等待最终提交与推送；公开稳定仍 0.2.1。0.3.3(37) 已在 Redmi K60 真机完成微信/支付宝快捷记账、语音接续、列表刷新和冷启动验证；无障碍被系统关闭时首页有低调恢复提示。剩余工作见 [44 号上线清单](./44-quick-accounting-device-verification.md)。
 
 ## 当前状态
 
-项目处于 **M5 质量验证、M8 月末回顾、M9 数据安全与 `0.3.0` 原生能力收口阶段**。真实流式语音、200 条自动化评测、本地账本、JSON/CSV 数据安全闭环、离线账单搜索、确定性月度回顾和匿名站内反馈已可用；`0.2.1` Android 原生包仍是公开稳定版本，官网、OSS + CDN、服务端更新策略和 GitHub Pre-release 均未切换到 `0.3.0`。当前 `feature/screen-bill-capture` 分支已实现 Android 11+ 付款页快捷记账、SQLite migration v3 和语音缺金额逐笔补齐，类型检查、Lint、251 项测试与 Android/iOS bundle 导出通过；EAS 原生 APK 已构建并通过包级校验，隐私文案修正已发布 preview OTA，真机权限/读屏/OCR/幂等/撤销验收尚未完成。iOS 原生构建、启动动画真机验收、真人语料和双端真机矩阵仍待完成。微信登录、云备份和支付继续留在外部依赖 backlog。
+快捷记账主链路已闭环：微信付款详情页连续 3 次快捷键各生成一笔，随后语音 2 笔正常入账；首页 ¥8→¥61 自动刷新，搜索页 9 笔立即可见，冷启动仍为 ¥61，日志无 `Error code 10`。根因是 framework SQLite 与 expo-sqlite 共用 WAL，关闭短连接时触发 `SQLITE_IOERR`；现统一 rollback journal、串行化读取，并让关闭失败不覆盖已成功结果。详见 [44](./44-quick-accounting-device-verification.md)。
 
-## 0.3.0 当前分支状态
+设备当前安装 0.3.3(37)，无障碍服务已开启并连接。HyperOS 在强行停止或覆盖安装后会清掉无障碍开关；App 无法静默恢复，首页提示会引导用户重新开启，可忽略。从多任务划掉或系统回收不会清掉开关。
 
-- 本地实现：Quick Settings Tile、AccessibilityService、微信/支付宝白名单、文本优先识别、ML Kit 中文 OCR 兜底、私有短期草稿、可编辑确认卡、原地 8 秒撤销。
-- 数据：`TransactionSource` 已扩展为 `voice | manual | screen`；SQLite v3 重建表并保留原数据、外键和索引；`captureId` 作为账单主键保证幂等；JSON 备份和 CSV 支持“屏幕识别”。
-- 语音修复：部分条目缺金额时只打开补齐面板，补齐后沿用同一 `requestId` 单事务入账；逗号小数、万、第三位小数和表达式不会被静默改写。
-- 自动化门禁：Node 22.19.0 下 typecheck、lint、251 项测试、Android/iOS Expo export 和 `git diff --check` 通过。
-- 原生构建：EAS Build `231be593-8f86-498f-b950-dd3753bcdb60` 已生成 `0.3.0 (19)` APK，源码提交 `45f7bfb44e18c7ce75781f78fdb21344e3490bc0`，大小 155,748,548 字节，SHA-256 `f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a`；包名、版本、`minSdkVersion=30`、Signature v2、Manifest 服务和 DEX 原生类均已检查。
-- 未完成边界：没有 Android 真机验收，也没有 iOS App Intent/快捷指令实现。
-- 发布边界：公开下载仍是 `0.2.1`；`0.3.0` 新增原生模块和 runtime，不能通过 Expo Go 或 `0.2.1` 的同 runtime OTA 获得。完成 Android 真机验收前不得替换官网稳定版或宣称可公开发布。
+M5/M6 内测与 0.3.3 真机反馈修复。用户确认云端直识别、无障碍原页面浮层、一次“确定收好了”写现有本地账本；本轮按 0.3.2(23) 实际反馈修微信来源、金额校验、键盘、磁贴勾选并删除多余入口。语音、本地账本、统计、分类、备份导出、搜索、回顾及反馈延续既有行为。
 
-## 已完成
+当前事实入口：[35规格](./35-payment-screen-capture.md)、[39决策](./39-cloud-overlay-and-shortcuts.md)、[40平台调研](./40-shortcut-platform-support.md)、[42反馈记录](./42-quick-accounting-device-feedback.md)、[44真机闭环与上线清单](./44-quick-accounting-device-verification.md)。0.3.2 构建保留 [41](./41-cloud-overlay-validation.md)，0.3.1 保留 [38](./38-quick-accounting-validation.md)，发布历史见 [30](./30-app-updates.md)。
 
-- 产品与交互方案已确认，原型评审通过。
-- 底部“记账”已改成一步录音：按下直接开始，松手识别，不再出现“语音入账”二次入口。
-- 原型 19 项交互回归全部通过，12 个关键画面无横向溢出，运行时错误为 0。
-- 根目录 `AGENTS.md` 已建立，作为所有 AI 的统一规则入口。
-- 后期产品主纲已建立：`docs/21-post-mvp-strategy.md`，明确可信语音、月末回顾和数据安全三轴，以及 M7–M11 的阶段门禁。
-- 可信语音与月末回顾专项已建立：`docs/22-voice-trust-and-monthly-review.md`。
-- 会员与增长实验方案已建立：`docs/23-membership-and-growth.md`。
-- 成本与定价基线已建立：`docs/24-cost-model.md`。
-- 账号、会员与支付官方规则已核验：`docs/25-account-and-payment-feasibility.md`。
-- 生产基础设施与存储方案已建立：`docs/26-production-infrastructure.md`。
-- 已确认 Apple 个人开发者可以发布 App 和使用 Apple 内购；iOS 数字会员默认走 IAP。
-- 已确认会员权益与微信登录解耦；免费本地首发不依赖账号、微信登录、云备份或支付。
-- 微信支付 APP 支付官方当前材料列个体工商户/企业等主体；支付宝 APP 支付需要商家账号和经营资料。普通个人支付账号不能直接替代商户接入。
-- pnpm monorepo 已创建：`apps/mobile`、`services/api`、`packages/domain`、`packages/contracts`。
-- Expo 58、React Native 0.88、TypeScript 6、Expo Router、SQLite、Drizzle、Zustand 已接入。
-- Fastify API 骨架、`/health` 和 mock `/v1/voice/parse` 已建立。
-- 金额转换、核心领域类型和 Zod 接口契约已建立。
-- 完整文档体系已落盘：`AGENTS.md`、项目上下文、09–18 技术/流程/UI 文档、资产索引。
-- ESLint、TypeScript、Vitest、Expo Doctor、EAS 配置和 GitHub Actions 基础 CI 已接入。
-- Expo Doctor 20/20 通过；iOS JavaScript bundle 导出成功。
-- 全仓 TypeScript 检查和现有 Vitest 测试通过。
-- SQLite schema、首版迁移、内置分类种子和数据库 Provider 已实现。
-- 账本首页可读取真实本地账单，按日期分组并显示月度收支。
-- 手动新增、编辑和删除账单已接入本地数据库。
-- 基础月度统计已实现每日支出柱状图和一级分类占比。
-- 手动记账页支持新增一级/二级分类，并立即保存到 SQLite。
-- 手动记账金额区保持原版式，金额 `TextInput` 固定单行并关闭内部滚动；“0.00”改为独立垂直居中占位层，输入行高与字号一致，修复占位文字偏上和光标过长。
-- 手动记账新增自绘金额键盘，支持数字、小数点、`+ − × ÷` 和删除；金额表达式保存时按运算优先级精确换算为整数分。
-- 金额键盘默认收起，只有点击“花了多少/收到多少”标签或金额框时展开；点击页面其他位置或开始滚动时自动收起。
-- 备注输入获得焦点时隐藏金额键盘并自动滚动到系统输入法上方；备注改为单行“备注 / 选填”字段并修正光标垂直居中。
-- 账本与统计页统一使用淡入淡出，避免切换时出现空白页滑入。
-- 账本列表支持左滑删除，复用软删除和 8 秒撤销；横向手势需移动 24pt 才激活、52pt 才展开，并启用 iOS 方向锁定，避免纵向滚动误触删除。账单合并逻辑保持不变。
-- 语音转写完全没有日期或时刻时，服务端强制使用当前时间，避免模型自行编造收入时刻。
-- 移除账本右上角重复加号；空账本保留“加一笔”，非空账本通过语音面板右滑进入手动记账。
-- 语音面板支持左滑取消、右滑转手动记账；真实 ASR 已接通。
-- 手动记账的时间改为自绘月历 + 小时/分钟选择 Sheet，移除日期文本输入和格式解析。
-- 分类管理页可新增一级/二级分类、改名、隐藏和恢复；一级、二级分类均可长按整行主体约 400ms 后拖拽，单击仍执行展开或编辑，松手后事务化保存完整顺序，并为读屏保留上移/下移辅助操作。
-- 拖拽排序初版使用的 `react-native-draggable-flatlist@4.0.3` 在 React Native 0.88/Fabric 下会调用已移除的 `InteractionManager`，并触发旧式 `measureLayout` 错误，造成空白和长时间卡顿；已替换为 `react-native-reorderable-list@0.18.2`，分组内一级/二级分类拖拽均使用其嵌套列表实现。
-- 分类新增、编辑和记账页内“新建分类”Sheet 已统一键盘避让：Android 使用高度调整，输入聚焦后自动滚动到键盘上方，保存按钮不再被遮挡。
-- 所有底部 Sheet 改用独立的 `AnimatedSheetModal`：面板负责上下位移，蒙层独立淡入淡出，避免原生 `Modal` 的 slide 动画把黑色蒙层一起拖走；语音录制浮层改为整屏触摸拦截，弹层下方列表不会收到第二根手指的点击。
-- GitHub 门面已按独立开发者作品和开源项目两个目标重构：README 增加产品故事、目标用户、原型截图、当前能力、技术亮点、质量数据、架构图、路线图和 GitHub Releases 下载入口；新增 MIT License、贡献指南与安全策略。
-- 删除账单后提供 8 秒撤销，并恢复到本地 SQLite。
-- 统计增加较上月、日均、最高支出日、点击每日柱状图查看当天明细、一级分类下钻二级分类。
-- `expo-audio` 真机录音已接入，打开语音面板自动请求权限并开始录音。
-- 录音上传到 Fastify `/v1/voice/parse`，结果映射到本地分类后以单事务写入 SQLite；服务端支持 `mock/cloud` 两种供应商。
-- 语音多笔结果先进入单个确认卡，确认后写入并立即关闭；音频在请求结束后删除。
-- 服务端保留 SiliconFlow ASR + DeepSeek JSON 解析 HTTP 备用适配器，支持 `mock/cloud` 切换。
-- 本地 `.env` 配置入口、安装 ID 和每日语音额度已实现；火山流式 ASR、SiliconFlow 备用和 DeepSeek Key 均已验证。
-- DeepSeek Key 已通过真实请求验证，示例“午饭二十五，打车十八”能稳定返回两笔结构化账单。
-- 服务已切换到 SiliconFlow 国内站 `https://api.siliconflow.cn/v1`，国内站 Key 已验证通过。
-- SiliconFlow HTTP 备用模型为 Qwen3-ASR-1.7B（约 ¥0.79/小时）；同一 1 秒音频块实测约 0.24–0.28 秒。
-- 已实测免费的 XingChenASR-V3.2-Ultra：准确率与 Qwen3 相当，但 1.15 秒音频块延迟 0.72–8.85 秒波动过大，因此未切换默认模型。
-- 真实中文端到端已通过：测试音频“午饭二十五，打车十八”被转写为“午饭25、打车18”，解析为餐饮/午餐 25 元和交通/打车 18 元，两笔同时返回；整条 `/v1/voice/parse` 首测约 3.9 秒、热请求复测约 1.46 秒。
-- 供应商冷启动曾出现约 24 秒、热请求约 0.4–0.8 秒的波动；ASR 超时已提高到 30 秒，并将供应商超时映射为明确的 503 业务错误，避免直接暴露通用 500。
-- Expo Go 真机联调发现：React Native 0.88 不接受旧的 `{ uri, name, type }` FormData 文件写法；客户端已改用 `expo/fetch` + `expo-file-system` 的 `File` 上传。
-- 手机端旧版录音流程只更新计时，不会自动提交；现已改为检测一句话结束并自动提交，同时保留手动结束按钮。
-- SiliconFlow 国内站曾返回 `402 / account balance is insufficient`。控制台显示 SenseVoiceSmall 免费，但账户余额为 0 时仍无法调用；充值后真机请求已恢复成功。
-- 语音入口已按确认后的产品交互重做：按住中央按钮开始录音；火山 WebSocket 双向流式返回字幕；上滑 36pt 松手取消；向右滑进入手动记账；正常松手提交火山最终文字。
-- 实时链路为手机 PCM → `/v1/voice/stream` WebSocket → 火山 `wss://openspeech.bytedance.com/api/v3/sauc/bigmodel`，网关回传 `ready/partial/final/error`。
-- 松手后把浮层最后一版文字 POST 到 `/v1/voice/parse-transcript`，直接做 DeepSeek 结构化；实时文字为空则视为取消。
-- 完整语音结构化结果现在由 `VoiceResultSheet` 自动写入 SQLite，再展示“已记好”结果卡；8 秒内可按批次撤销，异常时提供重试。
-- 真机已验证按住手势、WAV 实时录制和连续 4 次字幕刷新；松手后完整链路返回成功。文字直连结构化接口的本机测试约 1.04 秒返回两笔账。
-- 上滑 36pt 进入取消态，向下回到 16pt 内恢复；右滑 48pt 进入手动记账态，浮层和按钮同步点亮。空实时文字直接关闭浮层，不再进入结构化。
-- 结果卡默认主路径不再要求“确认记账”：完整字段直接保存，结果卡提供“撤销”和“收好”；保存失败时账本不变并提供“重试”。
-- 结果卡合计统一使用 `summarizeAmounts`：纯支出时显示负合计，例如 26 元 + 174 元显示为 `合计 −¥200`，与逐笔金额符号一致。
-- 浮层光标在无实时文字时位于提示语开头；录音中麦克风图标持续呼吸，波形根据 PCM 音量实时跳动。
-- 火山真实 Key 已通过 WebSocket 验证：2.3 秒音频约 1 秒开始出现“午饭”，之后持续更新，最终返回“午饭25，打车18。”。
-- SiliconFlow HTTP 备用路径已验证；React Native 的 Blob 不支持从 ArrayBuffer 创建，因此备用上传使用临时 WAV 文件。
-- 滑动闪动的根因是父组件每次状态更新都会重建 PanResponder；现已把回调存入 ref，手势实例全程只创建一次，并采用 36pt 取消区/16pt 回退线、48pt 手动态/24pt 回退线。
-- 200 条中文 TTS 自动化评测已全部通过：金额、类型、分类、日期、多笔和缺金额指标均为 100%；首字 P50 1.28s，松手到结构化完成约 P50 1.68s、P95 2.20s。报告见 `docs/20-voice-eval-report.md`。
-- 成本看板脚本已建立：`pnpm --filter @shengzhang/api voice:cost`，产物为 `services/api/testdata/voice/cost-report.json`；当前只按 ASR 参考价计算情景，DeepSeek token、网关、存储、支付和客服尚未纳入。
-- React 19/Hook lint 门禁已修复：动画值改为稳定 state，PanResponder 保持单实例并移除非渲染期 ref 更新。
-- Expo SDK 58 的 5 个补丁依赖已对齐，Expo Doctor 20/20；iOS 和 Android 导出均通过。
-- 空语音与取消路径已修复：服务端把停止后的空音频收尾为正常空结果，客户端在没有转写文字时静默回到 idle，不再展示火山供应商报错。
-- 品牌资产已统一重绘：1024px 满版 App 图标、1024 × 341 透明启动字标、1024px Android 自适应前景与单色图标、2400px 横向品牌标志，以及 9 柱声波图形；App 内 `BrandMark` 使用同一套圆润线稿、眼部高光和声波语言。
-- Android `0.1.4` 修复首次麦克风授权流程：授权前不创建录音会话，首次授权成功后显示可关闭的“麦克风已经准备好”提示，避免系统弹窗打断按压后误报“录音过短”。
-- 新建手动账单现在默认展开自绘金额键盘，并在金额末尾显示短光标；编辑已有账单保持键盘收起。点击分类、时间、备注、空白或开始滚动会自动收起键盘。
-- 启动体验已改为“原生静态首帧 + React 连续展开”：`design/assets/splash-wordmark.svg` 导出透明横向“声账”字标和极小声波，不再出现粉色圆盘或小猪；React `BootScreen` 从同一字标出发，展开环境光晕、品牌主张和本地账本状态。新增资产测试防止启动图退回大面积圆形 Logo。
-- 启动字标的“声账”字形已从 `<text>` 转为 SVG 路径，消除 macOS 与 Ubuntu CI 的系统字体差异；资产测试现在能在缺少中文字体的 Linux Runner 上稳定验证暗色字标、透明底和非圆盘覆盖率。
-- 启动体验按进程生命周期分档：首次安装播放完整 2.72 秒入场；后续每次进程冷启动播放 1.2 秒快速入场；仅从后台恢复时不播放。React 首帧的声波尺寸与透明度对齐原生 Splash，避免原生层退出时跳变。
-- 本月支出卡片加入暖棕与腮红半透明圆形、细轮廓和呼吸层次；装饰层不接收点击，金额与收支信息保持最高视觉层级。
-- 分类图标升级为独立线性图标体系：内置二级分类不再继承一级图标，账本列表、统计、分类管理和手动记账选择器均读取 `categories.icon`。自定义分类创建和编辑可选择图标，未知值回退到 `other`。
-- SQLite schema 升至 v2，迁移只更新 `is_preset = 1` 的内置分类图标，保留用户自定义分类和历史账单数据。
-- 官网首版已落地到 `deploy/site/`：包含首屏语音入账动态演示、传统记账步骤对比、三张真实产品界面切换、能力卡片、隐私数据流、质量数据、独立开发者故事，以及 Android 内测和 GitHub Releases 双入口。
-- 官网使用无外部依赖的 `index.html`、`styles.css`、`app.js`，并纳入品牌 SVG、分享图和原型截图；支持滚动揭示、鼠标光晕、设备倾斜、声波和转写循环，并对 `prefers-reduced-motion` 做完整降级。
-- 官网已在 `1440×1000`、`768×1024`、`390×844` 和 `375×812` 四种视口完成布局验收；均无横向滚动，移动端导航、三个产品界面标签和方向键切换通过，页面自身无控制台错误。详细规格见 `docs/27-official-website.md`。
-- 官网已切换到正式域名 `https://bigai.xin/shengzhang/`；根路径跳转到该子目录，误拼 `/shengzheng/` 与 `www` 都 301 到规范地址。首页、样式、脚本、图片和 APK 下载均从公网验证。
-- Android 内测 APK 已上传到正式域名稳定路径 `/shengzhang/downloads/shengzhang-android-preview.apk`，访客不需要 Expo 或 GitHub 账户即可直接下载；当前为 `0.2.0 (17)`，大小 107,955,328 字节，SHA-256 为 `684e0cf5b56099332664f158aa6752bf766e15571224315855363e93be988321`。
-- App 已升级到 `0.1.3` 并接入 `expo-updates` + EAS Update：启动自动检查、回到前台限频检查、下载完成提示、立即重启和设置页手动检查均已实现；preview/production 使用独立 channel，runtimeVersion 跟随 appVersion。
-- 语音 API 已增加单安装、单 IP、全局分钟/日额度、WebSocket 并发和单次音频长度限制；Nginx 同时启用每 IP 请求与连接限制。面向千级注册用户，生产值已调整为 IP 每分钟 30、每日 600、全局每分钟 120、每日 5000；内部连续 31 次无效请求验证为前 30 次 `400`、第 31 次 `429`。
-- GitHub 仓库已设为 Public；已公开 MIT 源码、品牌边界、安全策略和 Android 内测 Releases。`v0.1.3-preview.1` Pre-release 已附带完整 APK 附件，官网与 Release 均可分发同一构建。
-- GitHub 已发布 `v0.1.4-preview.1` Pre-release 并附完整 APK，标题采用用户可读的更新说明，Tag 保留技术版本；官网主下载入口与链接已移除版本号，改为稳定的 `?download=latest`。
-- Android `0.1.4` 原生构建已完成：构建 ID `b623433e-835c-4e80-9c51-adcb74bb61a7`，版本 `0.1.4 (14)`，APK 109,914,393 字节，SHA-256 `6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b`；官网已原子替换并从公网验证。
-- 正式域名已启用 Let’s Encrypt HTTPS：证书 SAN 覆盖 `bigai.xin` 与 `www.bigai.xin`，有效期至 2027-01-26，自动续期 dry-run 通过；阿里云安全组和 Ubuntu UFW 均已放行 443/TCP。
-- 官网 footer 已展示 `京ICP备2026073107号` 并链接工信部备案系统，canonical 与 Open Graph 地址统一为 `https://bigai.xin/shengzhang/`。
-- preview 通道已发布 HTTPS 域名 OTA：Update Group `a2f27f47-d1fb-49ed-8529-cfd26ea0957c`，runtime `0.1.4`，Android/iOS bundle 均确认写入 `https://bigai.xin`。
-- GitHub 已启用 Private Vulnerability Reporting、依赖图、Dependabot alerts、恶意软件告警、安全更新、分组安全更新和 Secret Protection；`main` 分支已禁止强制推送与删除。
-- Vitest 已升级到 `4.1.12`，消除了 Tinypool 的两个 critical 漏洞；当前 71 项测试全部通过，其中移动端包含首次授权、金额键盘、启动分档、首启版本和分类图标回归测试 18 项。
-- 已接入隐私优先的第一方匿名统计：官网访问/下载、App 启动、语音开始/完成/保存/撤销/取消/失败、手动新增/编辑/删除、统计、分类和设置事件。事件只包含固定名称、平台、版本、条数、耗时和错误原因；金额、分类名、备注、转写和录音不上报。
-- 匿名安装 ID 在服务端使用私有 Salt 哈希后写入按日 JSONL；设置页提供“匿名使用统计”关闭开关，官网遵循 DNT/GPC。
-- 已增加 `pnpm --filter @shengzhang/api analytics:report` 报告脚本，可查看独立下载访客、活跃安装、启动频率、语音成功率、累计新增账单和每日趋势。
-- 已实现匿名站内“改进与反馈”：设置页入口、六类反馈、10–1000 字描述、选填联系方式和可关闭诊断信息；提交失败保留输入，重试复用同一幂等键。
-- `POST /v1/feedback` 使用严格 Zod 契约、16 KiB 请求上限、单 IP 每 10 分钟 5 条/每日 30 条和全局每日 500 条限制；重复 `clientFeedbackId` 即使跨日期重试也只保存一份。
-- 反馈私有收件箱位于 `/opt/shengzhang/shared/reports/.feedback`，按北京时间日期保存独立 JSON 文件，目录/文件权限分别为 `0700`/`0600`；安装 ID 只保存加盐 SHA-256，正文和联系方式不进入普通 API 日志或匿名统计。
-- 日报新增反馈总数与类型分布，只显示计数；服务器每日 00:35 自动清理超过 180 天的反馈目录。
-- 修复匿名反馈 OTA 的发布环境缺口：生产 Bundle 未注入 `EXPO_PUBLIC_API_BASE_URL` 时也默认 `https://bigai.xin`，Android/iOS HBC 中只保留正式域名，不再包含 loopback 或局域网地址。
-- 反馈详细描述改为更明确的“语音说‘昨天午饭 25’，但账单日期显示成了今天”，并补充“发生了什么、原本期望怎样”的填写提示；网络失败不再向用户展示底层 `Network request failed`。
-- 为“昨天午饭 25”补服务端相对日期和移动端时间戳保留回归测试；公网 API 返回日期为 `2026-11-06`，没有落在当天 `2026-11-07`。
-- 官网下载区与 GitHub `v0.2.1-preview.1` 发布说明已同步匿名反馈、相对日期修复和“已安装 0.2.1 无需重装 APK”的 OTA 指引。
-- 服务器已把新版日报入口安装到 `/opt/shengzhang/shared/reports/bin/daily-ops-report.sh`，可生成北京时间前一日的 `server + analytics + feedback` Markdown 简报，并写入 `/opt/shengzhang/shared/reports/`；cron 已切换到该入口。
-- Codex 心跳自动化 `声账每日运营简报` 已启用，每天北京时间 08:00 运行只读检查；异常时提示服务状态、磁盘/内存、错误日志和产品数据趋势。
-- 2026-11-05 已部署服务器端运维告警：`/opt/shengzhang/ops/ops-alert.sh` 每 5 分钟检查 API、Nginx、`/health`、磁盘、可用内存、系统负载、ECS 网络收发吞吐和最近 15 分钟 API error 日志；异常按 1 小时（紧急）或 6 小时（预警）冷却重发，恢复时发送恢复通知。当前 2 vCPU/约 1.7GB 内存的服务器把出网预警/紧急阈值暂设为 2.5/4.0 Mbps，触发后需要结合实际公网带宽和火山并发额度复核。
-- 新增 `.github/workflows/production-health.yml` 作为独立外部看门狗：随 `0.2.1` 发布提交进入默认分支后，GitHub 每 5 分钟访问公网 `/health`，在整台 ECS 或本机监控失联时创建运维 Issue 并发送邮件，恢复后关闭 Issue 并发送恢复邮件；邮件凭据复用 GitHub Actions Secrets。
-- 日报增加容量阈值：昨日活跃安装达到 100、300、500、1000 时分别提示里程碑、规划、预警和紧急；昨日语音开始达到 500、1500、2500 时分别提示观察、容量预警和紧急。服务器每天 00:50 生成日报，Codex 心跳每天 08:00 汇报。
-- 邮件告警脚本 `send-alert-email.py`、通知去重脚本 `ops-notify.sh` 和配置样例 `alerts.env.example` 已部署。本地可运行 `deploy/configure-email-alert.sh`，以隐藏输入方式把 SMTP App Password 写入服务器 `/opt/shengzhang/ops/alerts.env`（权限 0600），凭据不进入仓库或聊天。
-- 新增全局 Codex 技能 `email-alert`：QQ SMTP 授权码只存 macOS 钥匙串，其他项目可按需复用邮件告警，不把授权码写入项目文件或聊天；`configure-email-alert.sh` 完成本项目配置时也会同步保存该钥匙串条目。
-- 已制作 27 秒竖屏宣传片《一句话，长出三笔账》：围绕“按住说一句，松手自动入账”，用声波折成三笔真实账单，随后展示 8 秒整批撤销、本地优先与月度统计。当前旁白使用 Edge TTS `zh-CN-XiaoxiaoNeural`（晓晓普通话女声），原 Tingting 女声保留在 `assets/audio/vo-tingting/`。
-- 宣传片工程位于 `design/video/shengzhang-promo/`，包含分镜脚本、视觉规范、五段场景、中文旁白、原创配乐与可复现音频脚本；界面素材复用已评审原型截图。
-- 宣传片已通过 HyperFrames lint、runtime、motion 和逐帧布局检查；69 项文字对比度检查全部达到 WCAG AA，成片无黑帧或 1.2 秒以上静态段。
-- 竖版成片为 `design/exports/video/声账-宣传片-说一句就记好.mp4`，1080×1920、30fps、27 秒、810 帧，约 -16.0 LUFS / -4.7 dBTP，SHA-256 为 `998e5a5a12760841684740d1a4501aaa8e60ccbd722ecc5814a95ac986ad4e9d`。
-- 已用 `video-shotcraft` 镜头卡与 Remotion 制作 1920×1080 横屏宣传片《一句话，两笔账》，工程位于 `design/video/shengzhang-shotcraft/`；当前为 6 段晓晓普通话女声旁白、原创程序化配乐、转场拟音、镜头卡工作台和帧级分镜。旁白通过 `edge-tts` 生成，文案固定于 `scripts/voice_lines.json`，按画面窗口校准语速；Yunyang 男声和原 Tingting 女声保留用于回退对比。
-- shotcraft 主版为 `design/exports/video/声账-shotcraft-宣传片.mp4`，无 BGM 版为 `design/exports/video/声账-shotcraft-宣传片-无BGM.mp4`；两版均为 25.23 秒、757 帧、30fps、H.264 + AAC 48kHz stereo，且复用完全相同的视频流（MD5 `c6c2b9b05b4ac5e68d3543e5b96cb6bd`）。完整解码与无黑帧检查通过；带 BGM 版约 -16.0 LUFS / -1.8 dBTP，无 BGM 版约 -16.0 LUFS / -2.7 dBTP。主版 SHA-256 为 `5cd3f07f908b9e58537067e95accb03795c30fe60507236689d00e8f81c371ef`，无 BGM 版 SHA-256 为 `65b06e42606d9152cd214bfe7e63960730a81c1442352291e7fb9e6a3ed0a3ab`。
+## 本轮改动
 
-## 测试发布状态（2026-10-29）
+- 磁贴主动先收起控制中心；来源按 windowId/包名/revision 追踪，缺正文不跳过截图。SystemUI、IME、自身浮层短暂遮挡保留同 ID 映射；真正移除/换 App 清除。同包同窗口的新页面状态也取消旧卡，延迟检查绑定具体 task 和完整来源，旧检查不影响新任务。
+- API34+ 对已确认窗口截图，API30–33 使用显示截图；安全窗口不能绕过。固定阶段错误码帮助区分窗口、截图、网络、模型未读金额与核验失败，不记录图片/正文/金额/商户/库路径。
+- 编辑金额/内容等待 View attach、input focus 和 window focus 后自动请求原生键盘；退出编辑或关闭取消待执行请求。分类/日期直接选择，编辑页适配 IME 高度并把完成按钮置于滚动区外。默认主卡仍无滚动。
+- 删除边缘窗口及升级前 true 偏好，兼容 setter 恒 false；设置删除“添加快捷动作”按钮，仅保留无障碍/磁贴两步、云开关及简短厂商手势提示。
+- TileService 添加/移除/listening/click 与 API33 添加结果保存 true/false/unknown，取消添加不等于移除。设置在 AppState active、Android focus 及添加结束时刷新，只有明确 true 才打勾。
+- 云端金额不再运行旧 OCR 候选评分；保留无符号顶部小数、负号支出/正号收入及分行金额。明确状态标签只承认成功，失败/待付/退款/转账/外币证据不能被 success/CNY 枚举覆盖。金额未知仍 null，不恢复服务端拒绝证据。
+- 新可选 amountIssue 通过 X-Screen-Bill-Diagnostics:1 协商；默认旧 strict 响应不加字段，新 JS/native 仍能读旧响应。
+- 延续原页面 TYPE_ACCESSIBILITY_OVERLAY、同 SQLite v3 事务/幂等/backup pending、关闭取消与五分钟失效、手动编辑保护、一次保存后收起，无 SYSTEM_ALERT_WINDOW、无快捷撤销。语音撤销未改。
+- 本轮修复 `Error code 10`：账本统一 `journal_mode=DELETE`，原生不再请求 WAL；短连接读取串行化并设置 `busy_timeout=5000`、`query_only=ON`；关闭失败不覆盖已成功读取，IO 错误等待 150ms 重试一次。
+- 首页新增“快捷记账被系统关闭了 / 重新开启”提示，仅在曾开启、当前关闭且未忽略时出现；点击跳系统无障碍设置，返回自动消失，`×` 持久忽略，重新开启后再次关闭会重新提醒。
 
-- Expo/EAS 项目已关联为 `@xiaozhuluozhixiang/shengzhang`，项目 ID 为 `04dd154b-655a-4b0e-bd3f-f3fafd76ab3d`。
-- 首个 Android 内测 APK 已通过 EAS Build 完成：构建 ID `d0e1f1f3-41c6-4bf3-8c3b-7eb6fd4f1585`，profile `preview`，版本 `0.1.0 (1)`，构建耗时 21 分 12 秒。
-- APK 下载页：`https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/d0e1f1f3-41c6-4bf3-8c3b-7eb6fd4f1585`。
-- APK 文件大小 107,834,162 字节，SHA-256 为 `30f63e53349ff65fab6c2add525fd9fe991fc6e9d1efc624258ab37af83b4e36`；ZIP 完整性检查通过。
-- 分类拖拽、Sheet 动画、录音浮层触摸拦截和滚动删除阈值修复后的第二个 Android 内测 APK 已构建完成：构建 ID `7567289d-de66-4472-8df8-8d88c38243b7`，构建耗时 15 分 38 秒。
-- 第二个 APK 下载页：`https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/7567289d-de66-4472-8df8-8d88c38243b7`；文件大小 108,028,872 字节，SHA-256 为 `fbff3118433caf01565581de7bff3ce68dbb2e4f6f626db85fd42a7a89a68f98`。
-- Android `0.1.1` 匿名统计内测包已构建完成：EAS Build `f7643fc9-7eeb-48af-9272-15dc099b9809`，源码提交 `531c128`；文件大小 108,035,320 字节，SHA-256 为 `7d25239c7ed9429362b1cbbccc1df78a1d9063a366c7bfcf4c076f1a643b5d3a`。
-- Android `0.1.2` 完整统计内测包历史记录：EAS Build `cdddc769-589f-4143-a6dd-ae7f83a0b6e2`，源码提交 `0f331db`；文件大小 108,035,800 字节，SHA-256 为 `5f0cb8a736f0d3e36275fa7d6ab072b6db7fb378e10790f292fa49799f8eb0c6`，GitHub Pre-release 为 `v0.1.2-preview.1`。
-- Android `0.1.3` OTA 内测包已通过 EAS Build 完成：构建 ID `fb5ac32c-d8ca-40a3-bf98-5750b4aec28d`，源码提交 `65cfb1f`，profile/channel 为 `preview`，版本 `0.1.3 (13)`，runtime `0.1.3`，构建耗时约 23 分 5 秒；APK 文件大小 109,854,465 字节，SHA-256 为 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`，ZIP 完整性检查通过。
-- Android `0.1.4` 原生预览包已通过 EAS Build 完成：构建 ID `b623433e-835c-4e80-9c51-adcb74bb61a7`，源码提交 `a04bbb6`，profile/channel 为 `preview`，版本 `0.1.4 (14)`，runtime `0.1.4`，构建耗时约 18 分 11 秒；APK 文件大小 109,914,393 字节，SHA-256 为 `6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b`，ZIP 完整性检查通过。
-- 2026-10-22 21:10（Asia/Shanghai）官网 `/downloads/shengzhang-android-preview.apk` 已通过临时文件校验后原子替换为 `0.1.3`；首页版本参数、OTA 提示和下载按钮同步更新。服务器端文件大小 109,854,465 字节、SHA-256 `89db26c0d314dde5800368c947aa74d501bfa42d329de90f465f5377366dfecf`，旧 `0.1.2` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.2-preview.apk`。
-- 2026-10-23 10:36（Asia/Shanghai）官网已原子替换为 `0.1.4`，首页不再展示版本号，下载链接固定为 `?download=latest`；公网响应 `200` 且 `Content-Length` 为 109,914,393 字节。旧 `0.1.3` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.3-preview.apk`。
-- 两次 build 均使用同一 Android 签名证书，证书 MD5 为 `440A483CAFA42B8CE655EBC15DBAA2F2`；第二个 APK 的 ZIP 完整性和签名证书解析均通过。
-- `0.1.4` 安装包在构建时嵌入过临时 IP；当前 preview OTA 已把 API 切换到 `https://bigai.xin`。服务端继续保留 IP 的 `/v1/` 与 `/health`，用于兼容尚未接收 OTA 的旧安装。
-- Android `0.1.5` 原生候选包已通过 EAS Build 完成：构建 ID `250250ce-0722-40a7-af4e-d276ae4b61b9`，源码提交 `9c39483`，profile/channel 为 `preview`，版本 `0.1.5 (15)`，runtime `0.1.5`；APK 文件大小 109,937,553 字节，SHA-256 为 `0be61cd6aa907cac3ea563ae95dd860cfeefcbac0ce6dd88c543d178871f539b`，ZIP 完整性与嵌入版本配置检查均通过。
-- `0.1.5` 与 `0.1.6` 保留为历史候选；官网当前稳定 APK 为 `0.2.0`，GitHub 最新公开 Release 为 `v0.2.0-preview.1`。
-- runtime `0.2.0` 的 preview OTA 已发布：Update Group `da443e24-6536-41fa-8f6c-6027a5a8736d`，Android Update `01a1abef-539a-7a4a-a70b-7b95d851006f`，iOS Update `01a1abef-539a-71f1-b952-55e88b2bcd50`，源码提交 `12ea82c`，包含首次完整入场、后续进程冷启动快速入场、后台恢复不播放。低于 `0.1.3` 的旧 APK 不含 `expo-updates`，仍需覆盖安装一次。
-- 已实现并部署双轨更新策略：兼容 JS/TS 更新由 EAS 自动下载；服务端 `GET /v1/app/update-policy` 根据当前安装版本返回 `none / optional / required`，强制模式使用不可关闭门禁，推荐模式允许稍后处理。更新异常不再把底层异常原文直接展示给用户。公网已验证 `0.2.0 → none`、`0.1.6/0.1.4 → optional`、`0.1.3 → required`，API 发布目录为 `/opt/shengzhang/releases/20261105-1845`。
-- 启动动画写入“已看过”的时机已从动画开始改为完整播放结束后；如果首次启动中途退出，下一次不会误跳过动画。
-- 启动策略已从“只在首次安装播放”改为“首次完整、后续冷启动快速、后台恢复不播放”；移除了启动阶段每 50ms 更新一次计时的常驻状态，减少无意义重渲染。
-- 语音失败恢复已形成可操作闭环：识别或结构化失败后保留当前临时转写，错误面板不再自动消失；结构化失败可直接“重新整理”，恢复转录和失败文本可一键转手动记账并预填备注。
-- 语音结果卡已支持单笔修正：批量保存返回的交易 ID 与结果行一一对应，点击某一行会关闭整批结果卡并打开该笔真实账单编辑，避免修改后继续暴露整批撤销导致误删。
-- 首次使用说明已加入：空账本且当前引导版本未完成时展示“按住说话、松手入账、单笔可改”和手动记账入口；完成后按版本持久化。首次请求麦克风前先解释录音用途、处理方式和历史账单边界，再进入系统授权。
-- 新增单元测试覆盖语音恢复动作、转写手动预填、保存交易 ID 对齐、首次引导版本和麦克风解释决策。
-- `0.1.7` 已实现本地数据安全闭环：设置新增“数据安全”页，可导出完整版本化 JSON、导出 CSV、从 JSON 覆盖恢复、清空本机账本并恢复内置分类。
-- JSON 格式包含格式标识、schema 版本、导出时间、App 版本、分类/账单/语音批次计数、`fnv1a32` 校验和与完整可携带数据；恢复前验证分类层级、账单分类引用和语音批次引用。
-- JSON 恢复和清空均使用 SQLite exclusive transaction；真实 SQLite 自动化测试已验证写入失败后旧账本整体回滚。
-- CSV 使用 UTF-8 BOM、中文表头和 RFC 4180 转义，并中和 `=`, `+`, `-`, `@`, Tab、换行开头的公式注入；CSV 明确不作为恢复格式。
-- 设置页显示本机账单数、分类数和最近导出时间；当前无云备份时，数据安全页明确提示换机前先导出。
-- 新增数据安全匿名事件：打开、JSON 导出、CSV 导出、恢复和清空；事件不含账单数量、金额、分类、备注或文件内容。
-- `0.1.8` 已实现离线账单搜索：账本右上角提供 44×44 搜索入口，默认展示按时间倒序的最近账单。
-- 搜索支持备注/一级分类/二级分类关键词、支出/收入、两级分类、开始/结束日期、最低/最高金额，全部条件使用 AND 语义。
-- 金额筛选通过 `parseYuanToCents` 转为整数分；反向日期、非法日期、非法金额和反向金额范围均返回中文提示，条件错误时不展示误导性结果。
-- 搜索结果复用真实账单编辑页；归档分类仍能显示历史账单，搜索不依赖网络、账号、会员或云备份。
-- 新增 `ledger_search_opened` 与 `ledger_search_applied` 匿名事件，只记录筛选条件数量，不记录搜索词、金额、日期、分类名或结果内容。
-- `0.1.8` 自动化门禁通过：domain 28、mobile 49、API 38，共 115 项；Android/iOS Expo 导出均通过。
-- `0.2.0` 已实现确定性月度回顾：统计页空/非空月份均可进入 `/review?month=YYYY-MM`，回顾显示支出、收入、结余、分类、上月比较、日均、最高支出日、账单数和语音笔数。
-- 月度回顾聚合集中在 `packages/domain/src/monthly-review.ts`；当前月按已经过去的天数计算日均，历史月按完整自然月计算；空月份不生成虚构趋势或消费评价。
-- 分享卡先展示 App 内预览，再由用户主动生成 `1080×1350` PNG 并调起系统分享；默认不展示金额、备注、商户、分类名称或精确日期。
-- 分享摘要只使用分类占比区间、趋势方向、语音笔数和品牌 CTA；领域与移动端测试均验证敏感字段不会出现在默认摘要。
-- 新增 `react-native-view-shot@6.1.1` 原生依赖；旧安装包不能只通过 OTA 获得分享能力，发布 `0.2.0` 必须生成新的 Android/iOS 原生构建。
-- 新增 `monthly_review_opened`、`monthly_review_previewed`、`monthly_review_share_opened` 和 `monthly_review_share_failed` 匿名事件；`share_opened` 仅表示系统分享面板成功打开，不宣称发送完成或可靠识别取消。
-- 搜索页日期范围已从日期文本输入改为复用 `DateTimePickerSheet` 的日期模式：点击开始/结束字段打开现有月历，隐藏小时、分钟和“现在”，确认后保存 `YYYY-MM-DD`，取消不修改条件，已选日期可单独清除；手动记账继续使用日期与时间模式。
-- 搜索框、最低金额和最高金额输入统一为固定高度、零垂直内边距、固定行高和平台垂直居中；Android 关闭字体额外上下留白，占位词与用户输入使用同一基线。
-- `0.2.0` 自动化门禁通过：domain 34、mobile 58、API 38，共 130 项；typecheck、lint、`git diff --check`、Android/iOS Expo export 均通过。
-- `0.2.0` Android 原生构建已完成：EAS Build `986291b4-9975-40cd-ac7b-da1be3a94f49`，版本 `0.2.0 (17)`，APK 107,955,328 字节，SHA-256 `684e0cf5b56099332664f158aa6752bf766e15571224315855363e93be988321`。
-- APK ZIP 完整性、版本、包名与 DEX 原生模块检查通过；已确认包含 `ExpoDocumentPicker` 与 `RNViewShot`。
-- 官网稳定 APK 已先写入临时文件、核对大小与哈希后原子替换；旧 `0.1.6` 备份在 `/opt/shengzhang/releases/shengzhang-0.1.6-preview.apk`。
-- 服务端 `.env` 已切换 latest `0.2.0`、download URL version `0.2.0`，发布目录原子切换到 `/opt/shengzhang/releases/20261105-1845` 并成功重启。
-- GitHub Pre-release `v0.2.0-preview.1` 已创建并附带 APK。
-- 阿里云 ECS 运行 Ubuntu 24.04.5 LTS、Node.js 22、pnpm 11、Nginx 1.24 和 systemd；正式域名 HTTP 308 到 HTTPS，公网 `/health` 返回 200，WSS 语音握手通过。
-- APK 已上传到阿里云 OSS `shengzhang-releases`（华北2·北京），通过 `download.bigai.xin` CDN 分发；10 MB 分片实测由原服务器约 23.85 秒降至约 0.70 秒，分片 SHA-256 一致。CDN 已设置 100 GB/月流量、50 Mbps 带宽和每小时 100 万次 HTTPS 请求封顶，恢复策略为永不解封流量/带宽，避免异常刷量失控。
-- `download.bigai.xin` 的 DNS CNAME 已生效，CDN 已使用云盾证书 `cert-95qrl` 启用 HTTPS、HTTP/2、OCSP Stapling 和 HTTP → HTTPS 跳转。旧证书私钥曾被工具日志回显，未用于生产，后续应在用户确认后评估吊销。
-- 官网下载按钮、服务端 `.env` 和 `GET /v1/app/update-policy` 已切换到 `https://download.bigai.xin/releases/shengzhang-0.2.0-preview.apk?download=latest&version=0.2.0`；API 发布目录已原子切换到 `/opt/shengzhang/releases/20261105-2202` 并重启。
-- CDN HTTPS 公网验收通过：证书链与 SAN 正确，HTTP/2 返回 `200`，HTTP 自动 `301` 到 HTTPS，Range 下载正确，完整 APK SHA-256 与本地产物一致，重复请求为 CDN `HIT`。
-- 个人 ICP 备案已通过并展示备案号 `京ICP备2026073107号`；Android 包名为 `com.shengzhang.ledger`，备案订单号、实例 ID 和身份材料只保存在本地运维记录，不写入公开仓库。
-- Android `0.2.1` 原生包已完成：EAS Build `e0c11c47-ae73-46ae-88c8-474168672227`，源码提交 `e979a05`，版本 `0.2.1 (18)`，runtime `0.2.1`，大小 107,723,132 字节，SHA-256 `dbbf5f3f8657895ea2fa2ef9c686b959023a0a6bd56ed57056e17dac1b5fe084`。
-- `0.2.1` 原生启动图已替换为横向字标和声波，移除粉红圆盘与小猪；React 首帧从同一字标展开，并保留首次完整、进程冷启动快速、后台恢复不播放的三档策略。
-- `0.2.1` APK 的版本、包名、runtime、ZIP 完整性、Signature v2 与签名证书一致性均已检查；与 `0.2.0` 使用相同证书，可覆盖安装并保留本地账本。
-- 修复语音相对日期和宽泛时段被模型误判的问题：服务端现在根据客户端时区和解析时刻，确定性锚定“今天/今晚”“昨天/昨晚”“前天”的日期；无具体钟点时，“上午/中午/下午”分别使用 10:00/12:00/15:00 作为代表性落账时间，用户说出“四点半”等精确时刻时仍以具体时刻为准；一句话含多个不同日期时不会把其中一个日期错误套用到整批账单。
-- OSS/CDN 已切换到 `releases/shengzhang-0.2.1-preview.apk`；完整下载大小和 SHA-256 与本地构建逐字节一致。
-- 官网已切换到 `0.2.1` CDN 下载入口，页面主文案不突出版本号；API 已部署到 `/opt/shengzhang/releases/20261107-213930`，公网策略为 `0.2.1 → none`、`0.2.0/0.1.6/0.1.4 → optional`、`0.1.3 → required`，`/health` 正常。
-- 服务器 5 分钟巡检日志已增加 10 MiB 轮转与 5 份保留；GitHub 外部看门狗工作流升级到固定 Ubuntu 24.04 与 `actions/checkout@v7`，待提交到默认分支后生效。
-- GitHub Pre-release `v0.2.1-preview.1` 已发布并附带 APK；公开 API 返回资源状态 `uploaded`、大小 107,723,132 字节。
-- runtime `0.2.1` preview OTA 已发布到 Android/iOS：Update Group `5ee8d355-e8a9-465e-bd52-3e1b6d3c3edb`，Android `01a1ac78-a9ed-7882-b262-fc1b0995adfb`，iOS `01a1ac78-a9ed-7263-9dde-2a7c67132e87`，源码提交 `9bb75e9`。
-- 缺金额补齐面板（2026-11-11 初版，后续门禁结果已覆盖）：一句话里任何一笔没听到金额时，不再整批报错，而是弹出底部面板“还差一个金额”（缺多笔为“还差 N 个金额”）。面板按说话顺序列出整批，已有金额只读，只给缺金额的条目一个金额输入框；补齐后点“确认入账”，整批沿用同一 `requestId` 以单事务写入，并进入原有“已记好 N 笔”结果卡与 8 秒整批撤销；点“放弃”则整批不保存，转写不保留。金额输入由 `parseAmountInput` 严格解析为整数分，不做静默改写。一批只能决定一次，面板打开期间忽略新的录音。尚未进行真机验收。
-- `0.3.0` 付款页快捷记账已落盘：新增本地 Expo Module `packages/screen-capture`、Android Quick Settings Tile、AccessibilityService、微信/支付宝白名单文本读取、Android 11+ 无障碍截图、ML Kit 中文 OCR、私有草稿 5 分钟 TTL、`shengzhang://screen-capture` 与设置 Deep Link。确认卡支持金额、收支、两级分类、时间和备注编辑，保存后同卡撤销；`/screen-capture?demo=1` 只预览不写账本。
-- SQLite v3 已实现：`transactions.source` CHECK 扩展为 `voice/manual/screen`，迁移在 `BEGIN IMMEDIATE` 中重建表并复制旧数据、外键与索引；屏幕账单以 `captureId` 为主键，重复提交返回已有 ID。JSON 备份和 CSV 已支持 `screen`。
-- `0.3.0` 当前全仓门禁通过：typecheck、lint、domain 101 + mobile 90 + API 60 = 251 项测试、Android Expo export（2178 modules，HBC 约 5.8 MB）、iOS Expo export（2182 modules，HBC 约 5.8 MB）和 `git diff --check`。Expo Doctor 为 18/20，两项失败是当前环境无法访问 `exp.host` / React Native Directory 的在线检查，不是已确认的代码故障。
-- `0.3.0` Android 内测 APK 已通过 EAS Build 完成：构建 ID `231be593-8f86-498f-b950-dd3753bcdb60`，profile/channel `preview / preview`，完成时间 2026-11-12 22:53（Asia/Shanghai）。EAS 日志确认自研 `shengzhang-screen-capture` Kotlin 模块编译、App Kotlin/Java、资源、Lint、R8、签名和 APK 打包成功。
-- APK 的 ZIP 完整性、包名 `com.shengzhang.ledger`、版本 `0.3.0 (19)`、`minSdkVersion=30`、`targetSdkVersion=36`、Android 应用名“声账”和 Signature v2 均通过；签名证书 SHA-256 为 `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955`，与此前版本相同，可覆盖安装并保留本地账本。Manifest 已确认包含 `BillCaptureTileService`、`BillCaptureAccessibilityService` 与相应权限，DEX 已确认包含两个原生服务和 ML Kit 中文 OCR 依赖。
-- APK 暂存于本地 `dist/releases/shengzhang-0.3.0-preview.apk`，该目录被 Git 忽略，不提交安装包。APK 声明了 `android.permission.SYSTEM_ALERT_WINDOW`，但产品未实现常驻悬浮窗；首版需在真机确认系统是否实际请求该权限，正式发布前继续查来源并移除不必要权限。
-- 构建后修正了付款页设置的隐私文案，避免把整页无障碍文字存在订单号/余额的情况描述成“完全不读取这些字段”。Android preview OTA 已发布到 runtime `0.3.0`：Update Group `7dbde641-2a72-4dc1-98f0-62cdfc12d3ed`，Update `01a1d044-bee2-7011-ab1f-34c71343e68a`，源码提交 `cdffc69b1d02face73e89a3aeebd83f5ac09dc70`。联网启动的测试包会在现有更新检查流程中取得修正文案。
+## 验证与 APK
 
-## 当前未实现
+Node22.19.0：410 项全仓测试通过（domain137/mobile122/API151），lint/typecheck/API build、Android+iOS 单独 Expo export 通过；原生51JUnit和API35编译通过（排除Expo Module/MLKit两类）。独立审查无未解决P1/P2。实际设置组件在RNWeb390×844/320×568检查了添加打勾、模拟移除恢复、无横向溢出及入口删除；不是真机系统回调证据。六张程序生成虚构布局的模型原始JSON重放，金额/空值6/6符合，部分时间证据仍无法通过，标默认采集时间；不能当生产准确率。
 
-- 付款页快捷记账尚未做 Android 真机验收：无障碍开启、磁贴添加、微信/支付宝读屏、文本足够时不截图、OCR 兜底、小屏加键盘、同草稿重复保存、同卡撤销、草稿清理和 v3 升级都待验证。
-- iOS 付款页路线尚未实现；后续只能走用户主动运行快捷指令截图，再交给 App Intent/确认卡，不承诺 Android 式静默读屏。
-- 真人噪声/口音语料、iPhone/Android 中低端矩阵和 7 天封闭试用。
-- 宣传片仍使用原型截图，尚未替换为正式内测 APK 的真机录屏或设备截图。
-- 微信移动端登录：外部依赖 backlog，等 Apple/Android 发布路径和开放平台实际主体能力确认。
-- PostgreSQL、对象存储、云备份与恢复：不阻塞免费本地首发。
-- 高保真 UI 页面。
-- 完整成本看板：DeepSeek token、网关、存储、支付渠道、税费和客服账单尚未纳入。
-- 隐私中心与会员能力尚未实现；月度回顾和分享卡已实现代码，待原生构建与真机验收。
-- `0.1.7` 的 Android/iOS 系统分享、文件选择器以及“导出 → 清空 → 恢复”真机闭环尚未验收。
-- `0.2.0` Android 原生构建已完成，但 PNG 清晰度、系统分享、取消行为、临时文件清理和 `react-native-view-shot` 真机可用性尚未验收；iOS 原生构建尚未完成。
-- iOS 内购、会员 entitlement、恢复购买、微信/支付宝 APP 支付均未实现。
-- Android `0.2.1` 已替换官网稳定下载文件，GitHub Pre-release 和 runtime `0.2.1` preview OTA 均已发布；启动动画与 0.2.1 完整真机闭环仍待验收。
-- 服务器旧 `/downloads/` 路径仍返回旧安装包，仅用于短时兼容；官网与 App 更新接口不再把它作为稳定入口。待旧安装升级率足够高后再下线。
-- 语音失败恢复、单笔修正和首次引导已包含在 `0.2.0`，待 Android/iOS 真机回归。
-- 反馈首版不包含截图/文件附件、用户可见工单状态、站内回复和自动邮件通知；这些在主路径数据证明有需要后再做。
-- 缺金额补齐面板未经 Android/iOS 真机验证：键盘避让与小屏布局、自动聚焦、遮罩与返回键、iOS 小数键盘没有回车键时的收起方式、补金额 → 确认 → 结果卡 → 撤销的完整闭环；也未发布 OTA。`docs/08-acceptance-criteria.md` 的“缺金额时不落账，补齐后可保存”待真机验证后再勾选。
-- 真实语音模型对“几笔有金额、一笔没金额”的混合句是否会漏掉没金额的那一笔、或自行补金额，尚未验证：评测集 10 条缺金额样本都是单笔句子，服务端提示词未改。2026-11-11 一次真机实测返回了三笔且第 3 笔缺金额，只是单个样本。
-- 放弃补金额没有单独埋点：`voice_completed` 在结构化成功时记录，`voice_saved` 在写入时记录，两者之差只能近似未保存的批次；要区分需同时改客户端原因枚举、`services/api` 埋点白名单和 `docs/29`。待补金额的批次只在内存中，进程被系统回收会丢失，转写不保留。
+0.3.3(36)/(37) 均为 EAS preview 本地构建，使用线上发布证书，签名 SHA-256 `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955`。36 大小155,841,260字节，SHA256 `81dc40dde99b2b07d9967a7aef1ec82dee641e9bedaf4928f862b215347f83f1`，embedded update `d4474ed4-621e-482f-9de2-6761ca4436d0`；37 大小155,848,796字节，SHA256 `7b3045c101dd967c41d63e3f940a8e9e7318f34bd66b96a73ddb085e730cfb07`，embedded update `1a8c1619-d4b2-4d55-a1f7-f5e42130272b`。两包均通过完整 Gradle `assembleRelease`、`apksigner verify --print-certs`；真机日志确认 `NoUpdatesAvailable`，未被旧 preview OTA 覆盖。APK 不进入 Git，记录见 [44](./44-quick-accounting-device-verification.md)。
 
-## 下一步最小任务
+## 服务端与发布边界
 
-### 0.3.0 付款页快捷记账
+线上当前为 `/opt/shengzhang/releases/20261114-wechat-overflow-fix`，模型为 `deepseek-flash`，基址 `https://api.deepseek.com`；图片按既有供应商条款处理，不能宣传全链路零留存。前版 `/opt/shengzhang/releases/20261114-deepseek-flash` 和 `/opt/shengzhang/releases/20261113-quick-accounting-031-time` 保留用于回滚。
 
-1. 安装 `0.3.0 (19)` APK，确认覆盖安装后历史账本保留；在 Android 11+ 真机完成无障碍授权、控制中心磁贴添加、微信/支付宝付款成功页读取和目标窗口白名单验证。
-2. 分别验证“文本已有可信金额不截图”和“文本不足时 OCR 兜底”，记录识别字段、耗时、失败页面与手动补全体验。
-3. 验证金额、收支、一级/二级分类、时间、备注修改；同一草稿重复确认只入账一次；保存后 8 秒撤销；取消、保存、过期和下次启动后截图为空。
-4. 用包含旧版 `voice/manual` 数据的安装升级到 `0.3.0`，确认账本、分类、语音批次和软删除记录完整，CSV/JSON 往返包含“屏幕识别”。
-5. 检查设置页实际是否请求 `SYSTEM_ALERT_WINDOW`，确认来源后移除不需要的权限；完成以上门禁后再决定是否发布 preview OTA、GitHub Pre-release 或替换公开下载。
+2026-11-14 真实微信账单触发的 503 已修复：模型把超长商品说明写入 `item`，超过 40 字后被 Zod 拒绝，路由再统一映射为“云端识别暂不可用”。现在超长 `item` 安全置空、超长商户名截断到 40 字，金额证据、状态、币种、时间及未知字段仍严格校验；路由只记录脱敏后的 Zod 字段路径和稳定 provider 错误码。公网同一真实截图复测 HTTP 200、93.60 元、`item=null`、`amountIssue=null`、`no-store`，约 1.7 秒。证据见 [wechat-overflow-api-smoke.json](../design/exports/quick-accounting-033/wechat-overflow-api-smoke.json)。
 
-1. 在 Android/iOS 真机验证 `0.1.7`：数据安全页布局、JSON/CSV 系统分享、文件选择与导入、覆盖确认、清空二次确认和“导出 → 清空 → 恢复”完整闭环。
-2. 在 Android/iOS 真机验证 `0.1.8`：日期选择 Sheet、日期单独清除、搜索与金额输入垂直居中、中文输入法、键盘避让、窄屏筛选面板、5000 笔账单搜索响应和结果进入编辑。
-3. 在 Android/iOS 真机验证 `0.2.0`：空/非空月回顾、长文案、动态字体、PNG 清晰度、系统分享、取消分享和临时文件清理。
-4. 安装官网 `0.2.1 (18)` APK，完成数据安全、搜索、月度回顾和新增原生模块的真机回归。
-5. 在 Android/iOS 真机验证启动策略：首装完整入场、后续进程冷启动快速入场、后台恢复不播放入场，以及原生 Splash 到 React 首帧无跳变。
-6. 在 Android/iOS 真机验证 runtime `0.2.1` preview OTA 的自动检查、下载重启、快速入场、强制门禁和异常提示。
-7. 从正式官网、CDN 和 GitHub Release 分别下载 APK，核对同一哈希，并在 Android 真机验证覆盖安装后本地账本保留。
-8. 录制 30–50 条真人语音，覆盖口音、语速、噪声和吞字；完成 iOS 原生构建、双端真机矩阵与 12–15 人封闭试用。
-9. 公开语音服务前把内存额度迁移到 PostgreSQL，并准备域名、HTTPS/WSS、日志和成本告警。
-10. 用真实供应商账单补齐成本看板的 DeepSeek、网关和存储成本。
-11. 修复真人评测暴露的 P0/P1 问题，冻结内测候选版本。
-12. 微信登录、云备份和支付继续留在外部依赖 backlog；Apple 账号就绪后先评估 iOS 内购，不用等待微信。
-13. 在 Android/iOS 真机验证设置入口、反馈表单键盘避让、失败重试、成功编号和关闭诊断信息后的请求载荷。
-14. 在已安装 `0.2.1 (18)` 的 Android 真机接收 OTA `810cd59c`，分别提交一条“功能建议”和语音“昨天午饭 25”，确认反馈成功编号与账本“昨天”分组。
-15. 在 Android 真机验证缺金额补齐：说“早饭十二，打车三十，买书”，确认弹出面板且只需补“买书”一笔、确认后三笔一起入账、8 秒内撤销整批恢复；再验证放弃、点遮罩（键盘弹出时先收键盘）、返回键、小屏加键盘时的布局，以及输入 `12,5`、`1.2万` 时给出提示且“确认入账”保持禁用。
-16. 用同一句话在真机连说 10 次，记录每次是弹出面板、只记了两笔，还是第三笔被补了金额；出现漏记或猜金额就补充评测样本并调整服务端提示词。
-17. 以上通过后发布 preview OTA（本次只有 JS 改动，没有新增原生模块），并勾选 `docs/08-acceptance-criteria.md` 对应项。
+四文件窄补丁已在隔离 `/opt/shengzhang/releases/20261113-quick-accounting-033` 准备：screen-vision.js、screen-vision-amount.js、screen-bill route.js、contracts/src/screen-bill.ts。旧release通过硬链接复制后原子替换各文件，确认旧哈希未改变。localhost8791健康及两张虚构图真实模型smoke通过：无单位金额正确、失败交易强阻断、旧strict格式兼容；隔离进程已停止，结果见 design/exports/quick-accounting-033/api-stage-smoke.json。
 
-## 已知风险
+**线上切换已执行**：2026-11-14 已在预发布目录补齐 `packages/contracts/src/screen-bill.ts` 的 `amountIssue`，localhost 完整路由和公网 `https://bigai.xin/v1/screen-bill/parse` 均用合成图通过：HTTP 200、2658 分、页面时间正确、`amountIssue=null`、`Cache-Control: no-store`，约 1.0–1.2 秒。`shengzhang-api` 重启后 active，生产 current 已指向新 release；回滚只需把 current 切回前版并重启。证据见 [deepseek-flash-production-smoke.json](../design/exports/quick-accounting-033/deepseek-flash-production-smoke.json)。
 
-- 微信登录需要开放平台移动应用审核，不能只靠本地代码完成。
-- 200 条合成语音通过不等于真人、噪声和弱网通过；上线前仍需真人语料和双端矩阵。
-- 成本看板目前只有 ASR 情景，不能据此宣称已有完整单位经济模型。
-- 19.9 元终身无限 AI 会形成不可控长期成本；当前决策是限量创始支持包，不承诺无限 AI。
-- 微信开放平台公开审核规范包含个人主体和个人类目，但这不等于当前账号一定具备微信登录权限；以控制台和审核结果为准。
-- Apple 个人开发者的 App Store 卖家名称使用个人法定姓名，不能用别名或公司名替代。
-- 微信登录单靠 SDK 不能上线；还需要已审核应用、能力审核和上架状态，未上架认证应用默认限制 100 次登录/天。
-- 当前机器没有完整 Xcode、Android Studio 和 Java；短期使用 Expo Go/EAS，原生微信 SDK 联调前再补齐。
-- App 图标 PNG 已由品牌 SVG 生成，但 Android 自适应前景和启动页仍需高保真阶段复核。
-- GitHub 仓库和 Releases 已从匿名请求复验可访问；`v0.1.3-preview.1` 的 APK 附件 API 状态为 `uploaded`，公开下载响应大小为 109,854,465 字节。
-- GitHub 网页端上传大于 100 MiB 的 Release 附件可能在 policy/finalization 阶段失败；本项目已改用已认证的 GitHub CLI/API 上传。`v0.1.4-preview.1` 的 APK 附件已通过公开 API 和下载响应复验。
-- 临时 IP 入口仅为旧安装兼容而保留；新版本只使用 HTTPS 正式域名。待确认用户都已收到 OTA 后，再评估关闭 IP 的网页跳转或 API 兼容。
-- 当前单安装/IP/全局限流计数保存在 API 进程内存中，重启会清零；扩容或公开推广前应迁移到 PostgreSQL 或 Redis。
-- 紧急邮件通道尚未启用：服务器没有预装邮件代理，且 `/opt/shengzhang/ops/alerts.env` 尚未填入真实 SMTP App Password。在配置完成前，定时任务会记录告警状态，但无法真正投递邮件。
-- `0.2.0` 分享卡依赖新增原生模块，必须重新构建和覆盖安装；旧 APK 即使收到同 runtime OTA 也不能安全获得该能力。
-- `expo-sharing` 无法可靠判断用户是否最终发送或取消系统分享，因此运营报告只能把“打开分享面板”当作传播意向，不能当作完成分享。
-- `0.2.1` 修改了原生启动图，旧安装无法通过同 runtime OTA 获得；用户必须覆盖安装新的 APK，本地 SQLite 账本不受影响。
-- 反馈收件箱当前是单机私有 JSON 存储，适合内测和早期访问量；扩容到多 API 实例前需要迁移到数据库或对象存储。
-- `pnpm audit --prod` 仍报告 Expo CLI 传递依赖中的 `node-forge` 与 `braces` 两项高危告警；当前上游没有可用补丁，它们位于本地/EAS 构建工具链，不进入语音 API 请求路径或运行时移动包，由 Dependabot 持续跟踪。宣传片工程自身 `npm audit` 为 0。
+代码、官网和文档已整理，等待最终提交与推送。官网/CDN/稳定更新策略仍为 0.2.1，无 OTA 或新公开 APK；完成 [44 号上线清单](./44-quick-accounting-device-verification.md) 后再切换公开发布。
 
-## 最近验证
+## 下一步
 
-```text
-prototype qa: 19/19 passed, 0 runtime errors
-expo-doctor: 20/20 passed
-pnpm typecheck: passed
-pnpm lint: passed
-pnpm test: passed
-expo export --platform ios: passed
-expo export --platform android: passed
-expo-updates config: passed
-expo-doctor: 20/20 passed
-domain tests: 28 passed
-api tests: 38 passed
-mobile tests: 43 passed (boot, onboarding, permissions, voice recovery, data safety, SQLite rollback)
-typecheck: passed
-lint: passed
-android export: passed
-ios export: passed
-0.1.7 android export: passed
-0.1.7 ios export: passed
-0.1.8 typecheck: passed
-0.1.8 lint: passed
-0.1.8 tests: domain 28 + mobile 49 + api 38 = 115 passed
-0.1.8 git diff --check: passed
-0.1.8 android export: passed
-0.1.8 ios export: passed
-0.2.0 typecheck: passed
-0.2.0 lint: passed
-0.2.0 tests: domain 34 + mobile 58 + api 38 = 130 passed
-0.2.0 search date picker model: passed
-0.2.0 search date writeback: passed
-0.2.0 git diff --check: passed
-0.2.0 android export: passed
-0.2.0 ios export: passed
-0.2.0 expo-doctor: 20/20 passed
-0.2.0 expo config: version/runtime policy confirmed at 0.2.0
-0.2.1 typecheck: passed
-0.2.1 lint: passed
-0.2.1 tests: domain 34 + mobile 58 + api 38 = 130 passed
-0.2.1 git diff --check: passed
-0.2.1 apk zip/config/signature: passed
-0.2.1 apk sha256: dbbf5f3f8657895ea2fa2ef9c686b959023a0a6bd56ed57056e17dac1b5fe084
-0.2.1 cdn download: HTTP 200, size and SHA-256 matched
-0.2.1 official site: switched to CDN object
-0.2.1 api update policy: 0.2.1 -> none, 0.2.0 -> optional, 0.1.3 -> required
-0.2.1 health: HTTP 200, status=ok
-0.2.1 github release: v0.2.1-preview.1 prerelease, APK uploaded
-0.2.1 github release asset: 107723132 bytes
-0.2.1 preview OTA: 5ee8d355-e8a9-465e-bd52-3e1b6d3c3edb, runtime 0.2.1, android + ios
-0.2.1 preview OTA commit: 9bb75e98ab449fdfcef1dbf3158955247fd77916
-relative date fix targeted test: passed
-relative date fix typecheck: passed
-relative date fix lint: passed
-relative date fix tests: domain 34 + mobile 58 + api 50 = 142 passed
-relative date fix git diff --check: passed
-relative date fix api build: passed
-relative date fix release deployment: /opt/shengzhang/releases/20261107-213930
-relative date fix health: HTTP 200, status=ok
-relative date fix public batch: 昨天 10:00 + 前天 15:00 matched
-relative date fix public exact clock: 昨天下午四点半 -> 昨天 16:30 matched
-feedback typecheck: passed
-feedback lint: passed
-feedback tests: domain 34 + mobile 61 + api 59 = 154 passed
-feedback api build: passed
-feedback android export: passed
-feedback ios export: passed
-feedback git diff --check: passed
-feedback public submit: HTTP 202
-feedback public duplicate: same reference, one stored record
-feedback public invalid: HTTP 400
-feedback public oversize: HTTP 413
-feedback privacy: hashed install id only, file 0600 / dir 0700, body absent from API logs
-feedback daily summary: counts/type distribution only
-feedback release deployment: /opt/shengzhang/releases/20261107-215526
-feedback release health: HTTP 200, status=ok
-feedback retention cron: daily 00:35 Asia/Shanghai, 180-day cutoff
-feedback preview OTA: 64610999-a11e-4684-8147-3d62561286d7, runtime 0.2.1, android + ios (superseded)
-feedback official site copy: deployed and verified
-feedback github release notes: updated, APK unchanged
-feedback regression typecheck: passed
-feedback regression lint: passed
-feedback regression tests: domain 34 + mobile 68 + api 60 = 162 passed
-feedback regression api build: passed
-feedback regression android export: passed, only https://bigai.xin in HBC
-feedback regression ios export: passed, only https://bigai.xin in HBC
-feedback regression git diff --check: passed
-feedback regression public date: 昨天午饭 25 -> 2026-11-06, yesterday matched
-feedback regression public submit: HTTP 202 with valid UUID
-feedback regression health: HTTP 200, status=ok
-feedback fix preview OTA: 810cd59c-0666-4c9e-b4e7-c5d4402b230a, runtime 0.2.1, android + ios
-feedback fix preview OTA commit: 5130e2f62d9795a6d2bd845f914f2c652e0d8d0d
-0.3.0 typecheck: passed
-0.3.0 lint: passed
-0.3.0 tests: domain 101 + mobile 90 + api 60 = 251 passed
-0.3.0 android export: passed (2178 modules, HBC about 5.8 MB)
-0.3.0 ios export: passed (2182 modules, HBC about 5.8 MB)
-0.3.0 git diff --check: passed
-0.3.0 expo-doctor: 18/20, two network-dependent checks unavailable
-0.3.0 native apk: built, EAS 231be593-8f86-498f-b950-dd3753bcdb60
-0.3.0 native apk sha256: f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a
-0.3.0 native apk package checks: passed
-0.3.0 preview OTA: 7dbde641-2a72-4dc1-98f0-62cdfc12d3ed, runtime 0.3.0, android
-0.3.0 preview OTA update: 01a1d044-bee2-7011-ab1f-34c71343e68a
-0.3.0 preview OTA commit: cdffc69b1d02face73e89a3aeebd83f5ac09dc70
-0.3.0 android device acceptance: not run
-boot policy typecheck: passed
-boot policy lint: passed
-boot policy tests: domain 34 + mobile 56 + api 38 = 128 passed
-boot policy build: passed
-boot policy git diff --check: passed
-boot policy android export: passed
-boot policy ios export: passed
-runtime 0.2.0 preview OTA: da443e24-6536-41fa-8f6c-6027a5a8736d
-runtime 0.2.0 preview OTA platforms: android, ios
-runtime 0.2.0 preview OTA commit: 12ea82c2c88ac808510e117e3a79c84c04e7d50a
-cdn http download: HTTP 200, Content-Type application/vnd.android.package-archive
-cdn range benchmark: 0.70s vs origin 23.85s, SHA-256 matched
-cdn https: HTTP/2 200, valid DigiCert chain, SAN download.bigai.xin
-cdn redirect: http -> https 301
-cdn full apk sha256: 684e0cf5b56099332664f158aa6752bf766e15571224315855363e93be988321
-cdn cache after full download: HIT TCP_MEM_HIT
-official download link: switched to download.bigai.xin
-api update policy: deployed from /opt/shengzhang/releases/20261105-2202
-voice eval: 200/200 exact, amount/type/category/date 100%
-cost dashboard: ASR scenario generated
-account/payment feasibility: official Apple/WeChat/Alipay pages reviewed on 2026-10-20
-SQLite schema: sqlite3 语法与 foreign_key_check 通过
-official website: desktop/tablet/mobile viewport checks passed, 0 local console errors
-analytics ingestion: public POST 202, hashed install id, report aggregation passed
-analytics test data: cleared after verification
-android bundle export: passed for 0.1.5 candidate
-android preview build: b623433e-835c-4e80-9c51-adcb74bb61a7 finished
-android preview site: 0.1.6 APK atomically deployed, Content-Length 107798948
-android preview sha256: 7289f328eff65b20235328c7b9c69d7016defe6c02096a35bfecb6a4b29c9a93
-android 0.1.5 candidate build: 250250ce-0722-40a7-af4e-d276ae4b61b9 finished
-android 0.1.5 candidate size: 109937553
-android 0.1.5 candidate sha256: 0be61cd6aa907cac3ea563ae95dd860cfeefcbac0ce6dd88c543d178871f539b
-android 0.1.5 candidate zip/config: passed
-github release asset: shengzhang-0.1.4-preview.apk uploaded, size 109914393
-github release digest: sha256:6f5cd3c9d873b0e70e33070f8b1a9433ed87c5111866e14698a32519be52002b
-github release public download: HTTP 200, Content-Length 109914393
-official domain: https://bigai.xin/shengzhang/ HTTP 200
-official domain redirects: / -> /shengzhang/, /shengzheng/ -> /shengzhang/, www -> apex
-official domain assets/downloads: image/css/js/apk reachable
-official domain tls: bigai.xin + www.bigai.xin, expires 2027-01-26
-official domain renew dry-run: passed
-official domain api: /health HTTP 200
-official domain websocket: wss_open
-preview OTA domain: a2f27f47-d1fb-49ed-8529-cfd26ea0957c, runtime 0.1.4
-promo video lint: 0 errors / 0 warnings
-promo video runtime: 0 errors
-promo video contrast: 69/69 passed WCAG AA
-promo video encode: 1080x1920, 30fps, 27.0s, H.264 + AAC
-promo video integrity: full decode passed, no black frames, no freeze >= 1.2s
-promo dependency audit: 0 vulnerabilities
-promo still render: 1920x1080 passed after dependency update
-```
+1. 删除服务器 `/opt/shengzhang/shared/.env` 中 `TEST ONLY` 的额度覆盖，恢复 `20/天、10/分钟`，重启 `shengzhang-api` 并确认进程环境。
+2. 部署包含“可直接填写金额和分类后保存”的友好 429 文案，跑 API 测试与公网 smoke。
+3. 用本轮代码生成 production 渠道安装包，核对 versionCode、证书连续性、Manifest、Bundle 和 embedded update。
+4. 确认 runtime `0.3.3` 的 preview/production OTA 不会用旧 JS 覆盖新包；如发布 OTA，先验证内嵌包与 OTA 组优先级。
+5. 覆盖安装 production 包，再回归微信/支付宝、磁贴/系统动作、连续多笔、语音接续、刷新、冷启动和无障碍关闭提示。
+6. 切换官网下载、CDN、服务端更新策略和 GitHub Release；公开文案不展示内部 versionCode、测试额度、内网 IP 或构建路径。
+
+真机失败时记录型号、系统/微信/支付宝版本、页面类型和固定阶段错误码；不要把单次失败扩展成所有详情页均不可用。iOS App Intent、银行安全页和其他视觉模型实测仍待单独推进。
+4. 手机通过后才决定公开发布；此前官网、CDN、稳定更新策略和公开 APK 仍保持 0.2.1。
+
+候选包记录与下载链接见 [30 号发布记录](./30-app-updates.md) 的 `25.1`；机器校验见 `design/exports/quick-accounting-033/eas-build-release-25.json`。
+
+## 2026-11-14 快捷记账“点收好不入账 / 列表不刷新”修复
+
+- 现场实测 0.3.3(33)：点“确定收好了”后卡片关闭，但既没有 `save` 原生日志，数据库也没有新行，冷启动仍是旧条数。最符合现有代码的路径是窗口变化检测（含浮层自身、SystemUI、IME 的空包名 `TYPE_WINDOWS_CHANGED`）在保存前静默 `cancelCurrent()`；该路径不弹 toast，所以用户只看到卡片消失。
+- 原生加固：用户点“确定收好了”即视为确认，保存不再依赖后续窗口状态；`saving` 期间窗口事件不得取消任务；display fallback 分支忽略自身包、SystemUI、IME 与空包名的窗口变化。新增仅含结构信息的常驻日志 `ShengzhangCapture: save requested / save result=ok|error / cancelled reason=...`，不含金额、商户、正文或截图。
+- 刷新加固：原生写入走 Android framework SQLite，`SQLiteProvider` 的长连接会持续返回旧快照（同进程、同文件，冷启动后才更新）。`PRAGMA wal_checkpoint` 与空写事务都不能可靠解除，现改为每次刷新用 `openDatabaseAsync('shengzhang.db', { useNewConnection: true })` 新建短连接读取后关闭；首页、搜索、月回顾统一走该路径。
+- 2026-11-14 18:30 现场回归发现 `Error code 10: disk I/O error`：日志为 expo-sqlite 在关闭短连接/终结语句时触发 `SQLITE_IOERR`；现场还出现热刷新停留在旧列表、刚保存的快捷记账未出现在首页。当前判断根因是 framework SQLite 与 expo-sqlite 两套实现对同一账本使用 WAL，cross-build checkpoint 不稳定；这是高度可疑根因，需新包真机闭环确认。修复为账本统一使用 rollback journal（`journal_mode=DELETE`，原生不再请求 `ENABLE_WRITE_AHEAD_LOGGING`），新连接读取串行化、设置 `busy_timeout=5000`、失败重试一次，且关闭失败不能覆盖已成功读取的结果。该修复需要新的原生包，不能只靠 OTA。
+- 2026-11-14 18:55–18:57 真机闭环（0.3.3(36)，EAS preview 本地包 `apps/mobile/build-1794653390614.apk`，embedded update `d4474ed4-621e-482f-9de2-6761ca4436d0`，签名 SHA-256 与 35 一致）：同一微信付款详情页连续 3 次快捷键各生成 1 笔（`save result=ok` ×3，generation 2/5/8），随后语音记 2 笔（打车 ¥18、午饭 ¥25）也同时入账；首页 ¥8→¥61 自动刷新，搜索页 9 笔立即可见，全程无需重启；日志无 `expo-sqlite` 警告、无 `Error code 10`。冷启动后仍为 ¥61，`onBackgroundUpdateFinished: No update available`，确认运行内嵌新 bundle 而非旧 preview OTA。
+- 覆盖安装后 HyperOS 会关闭无障碍服务，本次已用 ADB 重新开启 `com.shengzhang.ledger/com.shengzhang.screencapture.BillCaptureAccessibilityService`；正式升级流程需保留“升级后检查并引导重新开启”的提示，否则用户会误判为快捷键失效。
+- 2026-11-14 19:25 真机闭环 0.3.3(37)（`apps/mobile/build-1794655330782.apk`，embedded update `1a8c1619-d4b2-4d55-a1f7-f5e42130272b`）：首页在摘要卡片下方增加低调提示“快捷记账被系统关闭了 / 重新开启”，仅在安装曾观察到无障碍已开启、之后被系统关闭且用户未忽略时出现；点击跳转系统无障碍设置，返回后自动消失；右侧 `×` 会持久忽略，重新开启过服务后再次关闭会重新提醒。首次开启、被强制停止后提示、点击跳转、返回自动隐藏、忽略后不再出现均已实测。状态存放在 `app_settings` 的 `quick_capture_ever_enabled` / `quick_capture_reminder_dismissed`，新用户不会看到与自己无关的提示。
+- 真机闭环（Redmi K60 / HyperOS）：17:49 保存 ¥2 后冷启动 12→13 笔；17:53 保存 ¥3 首页 ¥24→¥29；17:58 同一会话再保存 ¥1 首页 ¥30→¥31，均无需重启。原生日志与 JS 刷新均命中。
+- 已知边界：服务端有识别额度（`SCREEN_VISION_DAILY_LIMIT` 默认 20 次/安装/天，`SCREEN_VISION_GLOBAL_DAILY_LIMIT` 默认 500 次/天）。2026-11-14 现场测试期间在 `/opt/shengzhang/shared/.env` 临时覆盖为 200 次/天、60 次/分钟，并在文件内标注 TEST ONLY；上线前必须删除这两行覆盖值并重启 `shengzhang-api`，release 自带配置会恢复为 20/10。额度用尽时提示“云端识别暂时受限，可直接填写金额和分类后保存，稍后再试”，仍可手动保存。

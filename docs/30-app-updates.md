@@ -488,3 +488,78 @@ OTA 只负责后续兼容的 JS/TS 更新与在线更新清单。原生启动图
 | EAS Dashboard | `https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/updates/7dbde641-2a72-4dc1-98f0-62cdfc12d3ed` |
 
 安装 `0.3.0 (19)` APK 并联网启动后，现有 `expo-updates` 检查会下载并应用该 OTA。APK 内嵌版本仍保留构建时文案，离线首启在看到 OTA 前可能暂时显示旧文案；这不影响屏幕识别、确认和写入逻辑。该 OTA 不改变公开稳定下载，也不替代 Android 真机验收。
+
+## 23. Android 0.3.1 快捷记账重做内测
+
+0.3.1 包含单张截图分享 Activity、图片导出、采集生命周期和权限变更，runtime 为 0.3.1，必须安装新 APK；没有发布旧 runtime OTA。EAS `dc219c41-7eb5-4359-83f3-b80b492c7d3d` 已成功构建 0.3.1(22)，profile/channel=preview；基线 HEAD 219ae1d，加本轮未提交实现快照。完整验证、下载、签名与哈希统一见 [38 号记录](./38-quick-accounting-validation.md)。
+
+最终 APK 已完整下载并通过 ZIP、Manifest、DEX 和 Signature v2 校验，155,764,580 字节；证书与 0.2.1/0.3.0 一致，支持覆盖安装。Manifest 不含悬浮窗权限，分享 Activity 接收单张 image/*；这些是包级证据，实际安装与账本完整性仍由设备验收确认。用户已明确先在自己的手机测试，通过后再上线。
+
+0.3.1(20) 首次因 Kotlin Coroutine 泛型声明失败；修正后启动的 (21) 因随后独立审查修复而取消；仅 (22) 为最终候选。未将失败/取消包交付，也不把JS导出当原生构建。
+
+服务端已先隔离验证，再切换到 `/opt/shengzhang/releases/20261113-quick-accounting-031-time`，前版 `20261113-quick-accounting-031`、原版 `20261107-215526` 保留。新目录 .env 仅包含视觉开关、模型和额度；共享服务端密钥未改。健康200，公网合成图金额2658分与页面时间通过，响应no-store；最初一次时间安全降级仍保留在评测记录。手机端默认关闭，用户单独授权后才发送当前图。
+
+回滚 API 可把 current 原子切回前版并让 systemd 重启；只需停用视觉时修改当前发布目录 SCREEN_VISION_ENABLED=false 再重启，语音/本地账本继续可用。计数为单进程内存，重启清零；推广前需预算告警与持久化额度。
+
+公开稳定下载、CDN、GitHub Pre-release 和 Android 更新策略继续为0.2.1，未切换。新内测包需 Android 11+ 设备验收后再决定发布。
+
+
+## 24. Android 0.3.2 云端原页面浮层内测
+
+用户批准TYPE_ACCESSIBILITY_OVERLAY原页面卡、云端直接截图识别和一次确认入账；移除快捷记账保存后八秒撤销/二次“收好”，语音不改。新增原生网络/同库写入及系统动作，runtime=0.3.2，不能旧包OTA获得。EAS preview 0.3.2(23)已FINISHED：54e6df65-1b99-4b3d-be1e-1f8348c3ba7c；155,821,768字节，ZIP/Manifest/DEX/v2签名及与0.2.1/0.3.0/0.3.1证书连续性通过。最终包级结果见 [41](./41-cloud-overlay-validation.md)。
+
+官网/CDN/稳定策略仍0.2.1，未发OTA或公开发布。官方千问适配与专用Key隔离完成，但尚无官方凭证；线上视觉 API 后续于 2026-11-14 切到 DeepSeek Flash，见第 25 节。先用户安装测试，真机通过后再上线。
+
+
+## 0.3.3 真机反馈修复测试包（2026-11-13）
+
+0.3.3(24) 为独立测试 APK/runtime，修正窗口来源、原生编辑键盘焦点、磁贴状态及设置入口；需要覆盖安装，不发旧runtime OTA。EAS完整构建与APK版本、权限、签名连续性均通过，证据及下载见 [42号记录](./42-quick-accounting-device-feedback.md)。官网/CDN/稳定更新策略仍0.2.1，没有Git commit/push。
+
+金额证据校验和 DeepSeek Flash 已随 `20261114-deepseek-flash` 发布到生产；合成图在预发布和公网均通过。手机调试包不需要重新安装即可调用新模型，但微信/支付宝真实付款页验收仍需用户执行。窗口/键盘/磁贴/设置修正可先测，用户手机通过后再决定稳定 APK/OTA/官网发布。
+
+## 25. 视觉 API 切换 DeepSeek Flash（2026-11-14）
+
+生产视觉识别已从硅基 `Qwen/Qwen3-VL-8B-Instruct` 切到 `deepseek-flash`，基址 `https://api.deepseek.com`，当前发布目录 `/opt/shengzhang/releases/20261114-deepseek-flash`。这是服务端配置与适配器变更，不涉及 APK/runtime，不需要 OTA。
+
+同日后续 `current` 已切到 `/opt/shengzhang/releases/20261114-wechat-overflow-fix`，修复超长商品说明导致的 503；模型仍为 `deepseek-flash`。当前线上目录以 [HANDOFF](./HANDOFF.md) 为准。
+
+- 12 张合成账单金额/拒识：DeepSeek Flash 12/12，平均约 1.06 秒；千问 3.8 27B 12/12，平均约 2.81 秒。只覆盖金额和拒识，不代表真实页面全字段准确率。
+- 预发布 localhost 完整路由：HTTP 200、2658 分、页面时间正确、`no-store`，1191ms。
+- 公网生产完整路由：HTTP 200、2658 分、页面时间正确、`no-store`，1030ms。
+- 预发布首次失败已修复：旧 contracts 缺少 `amountIssue`，同步 `packages/contracts/src/screen-bill.ts` 后 Zod 校验通过。
+- 回滚：将 `/opt/shengzhang/current` 切回 `/opt/shengzhang/releases/20261113-quick-accounting-031-time`，重启 `shengzhang-api` 即可。
+
+验收证据见 [deepseek-flash-production-smoke.json](../design/exports/quick-accounting-033/deepseek-flash-production-smoke.json)。
+
+### 25.1 正式渠道候选包 0.3.3 (25)（未发布）
+
+2026-11-14 已生成可直接安装的正式渠道候选 APK，尚未替换官网、CDN、OTA 或公开更新策略。
+
+- EAS Build：`9af3b571-661f-412b-a0b5-7b49b1fc3927`；包 `com.shengzhang.ledger`，版本 `0.3.3`，versionCode `25`，runtime `0.3.3`。
+- 下载地址：`https://expo.dev/artifacts/eas/VXOEDhqRnXTXFIrI4v3COTpYFFJfBeG3ZnISJqi0j3M.apk`；本机副本 `dist/releases/shengzhang-0.3.3-25-release.apk`。
+- 大小 155,835,824 字节；SHA-256 `b9b7e71ffd208e08b6c65fa8bb8d571aaa50a148ca7f95bb44be0700a59ed29d`。
+- APK ZIP 完整性、包名、版本、Bundle 内 `https://bigai.xin`、v2 签名、证书连续性均通过；签名证书 SHA-256 为 `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955`，可覆盖旧正式包。
+- Manifest 无 `SYSTEM_ALERT_WINDOW`，未标记 debuggable；仍保留 Expo 继承的 Android 12 及以下旧外部存储权限声明，截图分享流程不请求相册权限。
+- 生成该包前已将本机 `apps/mobile/android` 调试工程移出构建输入；否则 EAS 会误用 `com.shengzhang.ledger.debug` 和 debug versionCode。`.easignore` 已加入 `apps/mobile/android/`、`apps/mobile/ios/`。
+- 手机侧调试包已卸载，开发者选项/USB 调试已关闭；候选包等待用户下载安装和微信/支付宝真机验收。未通过前不上线。
+
+## 26. 0.3.3(36)/(37) 真机闭环内测构建（2026-11-14）
+
+这两个包用于修复真机反馈的 `Error code 10: disk I/O error`、保存后列表不刷新和无障碍被系统关闭后的恢复提示，均为 **preview 本地构建**，没有替换 production 渠道、官网下载或公开更新策略。
+
+| 项目 | 0.3.3 (36) | 0.3.3 (37) |
+| --- | --- | --- |
+| 构建时间 | 2026-11-14 18:49 CST | 2026-11-14 19:25 CST |
+| 本机文件 | `apps/mobile/build-1794653390614.apk` | `apps/mobile/build-1794655330782.apk` |
+| 大小 | 155,841,260 B | 155,848,796 B |
+| SHA-256 | `81dc40dde99b2b07d9967a7aef1ec82dee641e9bedaf4928f862b215347f83f1` | `7b3045c101dd967c41d63e3f940a8e9e7318f34bd66b96a73ddb085e730cfb07` |
+| Embedded update | `d4474ed4-621e-482f-9de2-6761ca4436d0` | `1a8c1619-d4b2-4d55-a1f7-f5e42130272b` |
+| 签名证书 SHA-256 | `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955` | 同左 |
+
+36 修复：账本统一 rollback journal（`journal_mode=DELETE`），原生不再请求 `ENABLE_WRITE_AHEAD_LOGGING`；短连接读取串行化、设置 `busy_timeout=5000` 与 `query_only=ON`；关闭连接失败不覆盖已成功读取，`Error code 10` 等待 150ms 重试一次；原生保存事件与 AppState/focus 共同触发列表刷新，下拉刷新显示刷新态。
+
+37 增加：首页低调提示“快捷记账被系统关闭了 / 重新开启”，仅在安装曾开启过、当前被系统关闭且用户未忽略时出现；点击跳转系统无障碍设置，返回后自动消失；`×` 持久忽略，重新开启后再次关闭会重新提醒。
+
+真机（Redmi K60 / HyperOS）：同一微信付款详情页连续 3 次快捷键均 `save result=ok` 并生成 3 笔；随后语音 2 笔正常入账；首页 ¥8→¥61 自动刷新，搜索页 9 笔立即可见；冷启动仍为 ¥61，无 `expo-sqlite` 警告或 `Error code 10`；`NoUpdatesAvailable` 确认运行内嵌新 bundle。完整证据和上线清单见 [44号记录](./44-quick-accounting-device-verification.md)。
+
+仍待办：删除服务器测试额度覆盖（200/天、60/分钟）、部署友好 429 文案、生成 production 包、确认 runtime 0.3.3 OTA 优先级、切换官网与 GitHub Release。两个 APK 已加入 `.gitignore`，不进入 Git 仓库。

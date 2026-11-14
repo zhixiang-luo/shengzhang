@@ -1,0 +1,74 @@
+{
+  "date": "2026-11-13T01:48:15.725Z",
+  "environment": "Actual React Native screen and hook rendered through react-native-web; only native, storage, routing and network boundaries replaced by synthetic fixtures. Not an Android device test.",
+  "checks": [
+    {
+      "name": "ready-390",
+      "result": {
+        "width": 390,
+        "height": 844,
+        "pageHeight": 844,
+        "saveBottom": 552.5,
+        "saveTop": 504.5,
+        "disabled": null
+      }
+    },
+    {
+      "name": "ready-360",
+      "result": {
+        "width": 360,
+        "height": 640,
+        "pageHeight": 640,
+        "saveBottom": 450.5,
+        "saveTop": 402.5,
+        "disabled": null
+      }
+    },
+    {
+      "name": "ready-320",
+      "result": {
+        "width": 320,
+        "height": 568,
+        "pageHeight": 568,
+        "saveBottom": 414.5,
+        "saveTop": 366.5,
+        "disabled": null
+      }
+    },
+    {
+      "name": "unknown-no-upload",
+      "result": {
+        "width": 320,
+        "height": 568,
+        "pageHeight": 568,
+        "saveBottom": 415.5,
+        "saveTop": 367.5,
+        "disabled": "true"
+      }
+    },
+    {
+      "name": "edit-save-undo",
+      "result": {
+        "captureId": "qa-first",
+        "type": "expense",
+        "amountMinor": 2600,
+        "categoryId": "expense-shopping",
+        "subcategoryId": null,
+        "occurredAt": "2026-11-13T01:48:08.671Z",
+        "note": "用户修改的内容"
+      }
+    },
+    {
+      "name": "cloud-preserves-user-edit",
+      "result": true
+    },
+    {
+      "name": "stale-ocr-discarded",
+      "result": true
+    },
+    {
+      "name": "expired-capture-cleared",
+      "result": true
+    }
+  ]
+}

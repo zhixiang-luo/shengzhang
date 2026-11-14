@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-11-14T01:45:00+08:00",
+  "release": "/opt/shengzhang/releases/20261114-deepseek-flash",
+  "model": "deepseek-flash",
+  "endpoint": "https://bigai.xin/v1/screen-bill/parse",
+  "image": "services/api/testdata/screen-bill/decimal.png (synthetic)",
+  "staging": {
+    "statusCode": 200,
+    "amountMinor": 2658,
+    "merchant": "示例餐厅",
+    "occurredAt": "2026-11-12T04:31:00.000Z",
+    "categoryId": "food",
+    "amountIssue": null,
+    "blockingReason": null,
+    "latencyMs": 1191
+  },
+  "production": {
+    "statusCode": 200,
+    "cacheControl": "no-store",
+    "amountMinor": 2658,
+    "merchant": "示例餐厅",
+    "occurredAt": "2026-11-12T04:31:00.000Z",
+    "categoryId": "food",
+    "amountIssue": null,
+    "blockingReason": null,
+    "latencyMs": 1030
+  },
+  "realDevice": {
+    "status": "pending",
+    "note": "ADB 已识别手机，但当前不在微信/支付宝付款详情页；未上传真实账单截图。"
+  },
+  "rollbackRelease": "/opt/shengzhang/releases/20261113-quick-accounting-031-time"
+}

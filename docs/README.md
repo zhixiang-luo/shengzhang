@@ -38,6 +38,7 @@
 - [开发环境](./13-development-environment.md)
 - [实施路线](./14-implementation-roadmap.md)
 - [测试与发布](./15-testing-and-release.md)
+- [Android 原生模块实现说明](../packages/screen-capture/README.md)
 - [UI 交接](./18-ui-handoff.md)
 - [AI 供应商配置与 ASR 调研](./19-ai-providers.md)
 - [语音评测报告](./20-voice-eval-report.md)
@@ -46,6 +47,15 @@
 - [账单搜索](./32-ledger-search.md)
 - [月度回顾与隐私分享卡](./33-monthly-review.md)
 - [Android 付款页快捷记账](./35-payment-screen-capture.md)
+- [快捷记账首轮审计与重做决策](./36-quick-accounting-redesign.md)
+- [快捷记账实施计划](./37-quick-accounting-implementation.md)
+- [0.3.1 快捷记账验证与交付记录](./38-quick-accounting-validation.md)
+- [云端原页面浮层与快捷入口决策](./39-cloud-overlay-and-shortcuts.md)
+- [快捷入口与系统手势支持](./40-shortcut-platform-support.md)
+- [0.3.2 原页面浮层验证与交付记录](./41-cloud-overlay-validation.md)
+- [0.3.3 真机反馈修复与验证](./42-quick-accounting-device-feedback.md)
+- [Android 快捷记账现场调试](./43-android-device-debugging.md)
+- [0.3.3 快捷记账真机闭环与发布前检查](./44-quick-accounting-device-verification.md)
 
 ## 决策与交接
 
@@ -67,7 +77,9 @@
 | 账单搜索规则与边界 | `docs/32-ledger-search.md` |
 | 月度回顾和分享卡隐私边界 | `docs/33-monthly-review.md` |
 | 改进与反馈、存储和运营边界 | `docs/34-feedback-and-support.md` |
-| 付款页快捷记账、OCR 和屏幕数据边界 | `docs/35-payment-screen-capture.md` |
+| 付款页快捷记账、云端浮层和屏幕数据边界 | `docs/35-payment-screen-capture.md` |
+| 快捷记账历史缺陷与决策 | `docs/36-quick-accounting-redesign.md` |
+| 快捷记账当前实现/评测/原生构建与真机验收 | `docs/35-payment-screen-capture.md`、`docs/39-cloud-overlay-and-shortcuts.md`、`docs/44-quick-accounting-device-verification.md` |
 | 技术与目录 | `docs/09`–`docs/12` |
 | 工程与发布流程 | `docs/13`–`docs/15` |
 | 视觉令牌 | `design/tokens/design-tokens.json` |

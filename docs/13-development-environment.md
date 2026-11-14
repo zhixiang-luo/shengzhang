@@ -2,30 +2,32 @@
 
 ## 1. 当前机器状态
 
-检查时间：2026-10-19。
+检查时间：2026-11-14。
 
 | 项目 | 当前状态 | 结论 |
 | --- | --- | --- |
-| macOS | 14.5，Apple Silicon | 可开发，但需确认与最新 Xcode 的兼容性 |
-| 磁盘可用空间 | 约 56 GB | 可安装 Xcode 和 Android Studio，但空间偏紧 |
-| Node.js | 22.19.0 | 满足仓库 `>=22` 要求 |
-| pnpm | 11.25.0 可用 | 可继续使用 |
+| macOS | 14.5，Apple Silicon | 可开发；Android 构建已在本机完成 |
+| 磁盘可用空间 | 约 61 GB | 可继续构建；安装完整 Xcode 仍偏紧 |
+| Node.js | nvm 22.19.0；默认 shell 的 `node` 可能是 20.x | 项目要求 `>=22`，命令前先 `nvm use 22` |
+| pnpm | 11.25.0 | 满足要求 |
 | Homebrew | 已安装 | 可用于安装后续工具 |
-| Xcode | 只有 Command Line Tools | 不能运行 iOS 模拟器或构建 |
-| Java/JDK | 未安装 | Android 构建缺失 |
-| Android Studio | 未安装 | 不能运行 Android 模拟器 |
-| CocoaPods | 未安装 | 使用 Expo 时可暂不单独安装 |
-| GitHub CLI | 未安装 | 可选，用于创建远程仓库和 PR |
+| Xcode | 只有 Command Line Tools | 不能本地构建或运行 iOS 模拟器 |
+| Java/JDK | Homebrew OpenJDK 17/27 已安装，默认 PATH 未指向 | 需要显式设置 `JAVA_HOME` |
+| Android SDK | `$(brew --prefix)/share/android-commandlinetools`，含 platform 35/36/37、build-tools 与 platform-tools | 可执行 `adb` 和完整 Gradle 构建 |
+| Android Studio | 未安装 | 不影响 EAS 本地构建；需要模拟器时再装 |
+| CocoaPods | 未安装 | iOS 原生构建前需要安装 |
+| GitHub CLI | 已安装 | 可用于 PR、Issue 和 Release 操作 |
 
-当前已验证 `pnpm typecheck`、`pnpm test`、Expo Doctor 20/20 和 iOS JavaScript bundle 导出。完整原生编译、模拟器和微信 SDK 联调仍需后续安装 Xcode/Android Studio。
+当前已验证 `pnpm typecheck`、`pnpm test`、Expo Doctor、iOS/Android JavaScript bundle 导出、Android 完整 Gradle 构建、APK 签名校验和 ADB 真机安装。iOS 原生编译、模拟器和微信 SDK 联调仍需安装完整 Xcode；Android 模拟器需要 Android Studio 或独立 emulator 镜像。
 
 ## 2. 推荐安装顺序
 
 ### 2.1 Node.js 22 LTS
 
-当前已安装 Node 22.19.0，无需重复安装。验证：
+当前已通过 nvm 安装 Node 22.19.0，无需重复安装。默认 shell 可能仍指向 20.x，先切换再验证：
 
 ```bash
+nvm use 22
 node --version
 pnpm --version
 pnpm install
@@ -51,12 +53,27 @@ xcodebuild -version
 注意：
 
 - macOS 14.5 可能无法安装最新版 Xcode。先在 App Store 查看兼容性；若不兼容，需要先升级 macOS。
-- 完整 Xcode 通常占用 20–40 GB，当前 54 GB 可用空间安装后可能不足；建议至少保留 15 GB 余量。
+- 完整 Xcode 通常占用 20–40 GB，当前约 61 GB 可用空间安装后可能偏紧；建议至少保留 15 GB 余量。
 - 仅做 Expo Go 界面预览时可以先不安装 Xcode；真机测试、微信 SDK 和商店构建必须安装。
 
 ### 2.3 Android Studio、JDK 与模拟器
 
-推荐安装 Android Studio，并使用其自带 JDK：
+只做 EAS 本地构建、ADB 真机安装和日志调试时，可以不安装 Android Studio。Homebrew 方案：
+
+```bash
+brew install --cask android-commandlinetools
+brew install openjdk@17
+
+export ANDROID_HOME="$(brew --prefix)/share/android-commandlinetools"
+export JAVA_HOME="$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home"
+export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+
+adb version
+java -version
+sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+```
+
+需要 Android 模拟器或图形化 SDK 管理时，再安装 Android Studio，并使用其自带 JDK：
 
 ```bash
 brew install --cask android-studio
@@ -80,7 +97,7 @@ java -version
 如果 `adb` 不在 PATH，将以下目录加入 shell 配置：
 
 ```bash
-export ANDROID_HOME="$HOME/Library/Android/sdk"
+export ANDROID_HOME="$(brew --prefix)/share/android-commandlinetools"
 export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
 ```
 
@@ -176,8 +193,34 @@ cp .env.example .env
 | `FEEDBACK_HASH_SALT` | 反馈安装 ID 哈希盐 | 生产必须配置且只放服务端 |
 | `EXPO_PUBLIC_API_BASE_URL` | 移动端 API 地址 | 真机测试 |
 | `EXPO_PUBLIC_ANALYTICS_ENABLED` | 构建时统计总开关 | 默认开启 |
+| `SCREEN_VISION_ENABLED` | 服务端截图视觉总开关 | 本地默认 `false`；生产由服务端配置 |
+| `SCREEN_VISION_BASE_URL` | 视觉模型 OpenAI 兼容地址 | 当前生产为 `https://api.deepseek.com` |
+| `SCREEN_VISION_MODEL` | 视觉模型名 | 当前生产为 `deepseek-flash` |
+| `SCREEN_VISION_API_KEY` | 视觉专用 Key | 可选；未配置时按地址复用 `DEEPSEEK_API_KEY` |
+| `SCREEN_VISION_DAILY_LIMIT` | 单安装每日额度 | 生产默认 20 |
+| `SCREEN_VISION_GLOBAL_DAILY_LIMIT` | 全局限额 | 生产默认 500 |
+| `SCREEN_VISION_IP_MINUTE_LIMIT` | 单 IP 每分钟额度 | 生产默认 10 |
+| `SHENGZHANG_LOCAL_ANDROID_PACKAGE` | 本地构建包名覆盖 | 可选，用于与正式包并存调试 |
 
 `EXPO_PUBLIC_*` 会进入客户端包，禁止放入任何密钥。
+
+首次运行先 `nvm use 22`，再执行 `pnpm install`、`pnpm typecheck`、`pnpm lint`、`pnpm test`。默认 shell 的 `node` 可能仍是 20.x，版本不符时 pnpm 会直接报错。
+
+## 5.1 Android 真机与快捷记账调试
+
+1. 手机开启开发者选项和 USB 调试，连接后在手机上接受这台电脑的授权。
+2. 确认设备：`adb devices -l`。
+3. 安装本轮 APK：`adb install -r apps/mobile/build-<timestamp>.apk`；覆盖安装会保留本地账本，仍建议先导出 JSON 备份。
+4. 只看快捷记账结构日志：`adb logcat -s ShengzhangCapture ReactNativeJS`。日志不应出现金额、商户、正文、截图或数据库路径。
+5. 需要窗口/无障碍现场证据时，运行只读诊断：
+
+```bash
+python3 packages/screen-capture/scripts/device_diagnostics.py --seconds 30
+```
+
+JS 页面和提示可以通过 Metro/Fast Refresh 迭代；Kotlin 窗口识别、截图、磁贴和原生浮层必须重新编译安装。完整方法、脚本边界和本轮真机结果见 [43](./43-android-device-debugging.md)、[44](./44-quick-accounting-device-verification.md)。
+
+EAS preview 本地构建使用 `apps/mobile/eas.json` 的 `preview` profile，产物为 `apps/mobile/build-<timestamp>.apk`。`production` profile 尚未用于公开发布；在正式切换前不要把它与 preview 包混用。
 
 生产部署、对象存储和客服/支付资源的详细取舍见 [生产基础设施与上线清单](./26-production-infrastructure.md)。
 
@@ -290,4 +333,4 @@ pnpm typecheck
 pnpm test
 ```
 
-当前下一项环境任务是升级 Node.js 22，并在不安装 Xcode/Android Studio 的前提下继续完成本地账本、API mock 和 CI 验证。
+Android 已完成本地 Gradle 构建、APK 签名和 ADB 真机调试；当前下一项环境任务是在需要 iOS 原生构建或模拟器时安装完整 Xcode。

@@ -2,9 +2,9 @@
 
 ## 1. 文档信息
 
-- 状态：MVP 技术基线（含 0.3.0 付款页快捷记账）
+- 状态：MVP 技术基线（含 0.3.3 云端原页面浮层反馈修复，发布状态见 HANDOFF）
 - 适用版本：0.3.x
-- 最后确认：2026-11-12
+- 最后确认：2026-11-14
 - 上游事实来源：`01-prd.md`、`03-user-flows.md`、`05-voice-accounting.md`、`06-account-and-backup.md`
 - 实现入口：`apps/mobile`、`services/api`、`packages/contracts`、`packages/domain`、`packages/screen-capture`
 
@@ -23,7 +23,7 @@
 │      ├── feature services ──> domain rules                       │
 │      ├── SQLite repository ──> 本地账本（主数据源）                │
 │      ├── expo-audio ──> 录音 ──> 语音网关                         │
-│      ├── 本地 Expo Module ──> Android 磁贴 / 无障碍 / 端侧 OCR      │
+│      ├── 本地 Expo Module ──> Android 磁贴 / 无障碍浮层 / 同库写入      │
 │      ├── SecureStore ──> 登录令牌                                  │
 │      └── 文件导出 / 恢复                                           │
 └───────────────┬───────────────────────────────┬──────────────────┘
@@ -49,7 +49,7 @@
 5. 微信登录只用于建立云备份归属；MVP 的云端是快照备份，不是实时同步。
 6. 服务端使用 Fastify、PostgreSQL 和私有对象存储，按账号隔离数据。
 7. 服务端和客户端共用 `packages/contracts` 的边界 schema，避免接口字段漂移。
-8. Android 付款页快捷记账采用用户主动触发的本地原生模块；文本优先、OCR 兜底，不常驻监听屏幕，也不把截图或 OCR 正文交给服务端。
+8. Android 快捷记账主动触发磁贴/系统动作或分享单图，首次同意后直接云端视觉。原页面无障碍浮层一次确认写同库，不后台采集、不上传历史账单。
 
 ## 3. 技术栈
 
@@ -70,7 +70,7 @@
 | 分类排序 | react-native-reorderable-list | 兼容 Fabric、Gesture Handler 与 Reanimated，支持分组内拖拽；辅助功能保留上移/下移语义 |
 | 导出与导入 | expo-file-system + expo-sharing + expo-document-picker | JSON 备份、CSV 导出、系统文件选择和分享 |
 | 触觉 | expo-haptics | 录音开始、成功和错误反馈 |
-| Android 付款页识别 | 本地 Expo Module + Kotlin + ML Kit | Quick Settings Tile、AccessibilityService、端侧中文 OCR；最低 API 30 |
+| Android 付款页识别 | 本地 Expo Module + Kotlin + ML Kit | 磁贴/动作、无障碍原页面浮层、云端直识别、同库写入；最低 API 30 |
 
 Expo Go 可用于早期界面开发；微信 SDK、正式签名和商店构建必须使用 development build 或 EAS Build。
 
@@ -113,7 +113,7 @@ apps/mobile/
 
 packages/contracts/        Zod DTO、接口响应、备份格式
 packages/domain/           金额、账单、分类、语音批次等纯规则
-packages/screen-capture/  Android 磁贴、无障碍读取、短期草稿和端侧 OCR
+packages/screen-capture/  Android 快捷入口、无障碍浮层、同库写入和单图分享
 
 services/api/
   src/routes/              HTTP 路由
@@ -320,21 +320,17 @@ parsing -> saving -> success -> undo_window
 
 ### 5.10 Android 付款页快捷记账
 
-付款页识别是 Android 11+ 的主动触发能力，不改变“语音优先、手动兜底”的产品主路径：
+1. 本地 Expo Module 提供磁贴、系统无障碍按钮及独立动作；0.3.3删除边缘窗口及旧开关，设置只引导两步开通与机型手势说明；共享无障碍服务只观察窗口来源，主动触发后隐藏自身窗口、校验微信/支付宝来源并截图。不遍历正文，不先 OCR。
+2. 服务拥有 TYPE_ACCESSIBILITY_OVERLAY 和原生网络/SQLite 任务，不依赖 RN Activity。独立 CaptureShortcutActivity 仅立即结束的轻入口，不承载确认 UI；不申请 SYSTEM_ALERT_WINDOW。
+3. DB 完成常规迁移后 RN 传实际 db.$client.databasePath、HTTPS API、安装标识与当前云授权；私有配置同值不打断任务，云开关串行同步防旧 true 覆盖关闭。JS 关闭即拦截/取消上传，并校验授权 revision，off→on 不复活旧图。
+4. 原生只打开既有 filesDir/SQLite/shengzhang.db，校验 schema 3、外键、rollback journal 与 busy timeout；同一事务写 source=screen 和 backup_state=pending。金额整数分、有效根/子分类、UTC ISO，captureId 幂等且 deleted id 不复活。
+5. 原生截图在内存压为最长边1600/JPEG/2MB；直接调用既有 /v1/screen-bill/parse。服务端验证图头/尺寸/额度/并发，独立视觉 provider 校验单笔成功、人民币、金额/时间证据与有效分类，不依赖本地解析猜测。
+6. 五分钟/generation 保护任务，切换 App、锁屏、取消、云关闭、新任务或销毁均取消 HTTP/丢弃旧回调；截图前后同包、同windowId、同revision复核；同App同窗口的新状态也取消旧任务。SystemUI/输入法/自身浮层短暂遮挡不丢原ID映射，延迟检查绑定task+完整来源，旧检查不取消新任务。缺少无障碍正文仍可确认窗口并截图；API34+按已确认窗口截图，不能绕过安全窗口。
+7. 原生和应用内分享卡均按字段编辑，金额未知不显示零，blockingReason 强阻断，晚到结果保护人工编辑和分类对应类型。一次“确定收好了”成功即关闭，无快捷记账撤销；语音路径不变。
+8. ACTION_SEND image/* 单图分享保留，cacheDir 生成后由 PendingCaptureStore 同锁发布、AtomicFile metadata；五分钟有效、保存/取消/活跃到期或下次访问清理。RN 分享确认 Hook 直接云端、不跑OCR；App 回前台刷新账本/统计、搜索与月回顾。
+9. 默认官方千问非思考 JSON Object 配置，专用Key、服务端Zod及证据校验；当前线上已切到 DeepSeek Flash，官方千问适配保留为备选。Expo Go/Web 不提供真实采集，iOS App Intent未实现。
 
-1. `packages/screen-capture` 注册 Quick Settings Tile 和无障碍服务；用户在控制中心点击“声账记账”后才开始一次读取。
-2. 无障碍服务只在当前活动窗口仍属于 System UI 时收起控制中心，并在有限时间内等待微信 `com.tencent.mm`、支付宝 `com.eg.android.AlipayGphone` 成为活动窗口；超时只提示用户，不生成空草稿。
-3. 文本已包含可信实付金额时不截图；文本不足时才通过 AccessibilityService 截取一次画面，并调用 ML Kit 中文 OCR。
-4. 原生层只把 `captureId`、来源 App、页面文本、截图私有路径和时间写入 `noBackupFilesDir/screen-capture/capture.json`，最长保留 5 分钟。
-5. React Native 用 `packages/domain/src/screen-bill.ts` 结构化金额、时间、商户和置信度，再进入可编辑确认卡；用户确认后才写入 SQLite。
-6. 保存后同一确认卡提供 8 秒撤销；草稿、截图和 OCR 正文不进入账单、JSON 备份、CSV 或服务端。
-7. Expo Go 和 Web 返回 `supported=false`，只允许预览确认卡，不伪装原生读屏能力。
-
-Android 最低版本通过 `expo-build-properties` 的 `android.minSdkVersion=30` 注入 Gradle；不要直接写在 `expo.android` 下，Expo SDK 58 会把它视为无效 schema。原生模块使用 SDK 58 的 `appContext.applicationContext`，异步磁贴请求和 OCR 通过 Expo Modules 的协程 DSL 暴露给 React Native。
-
-`TransactionSource` 因此扩展为 `voice | manual | screen`。SQLite migration v3 重建 `transactions` 表并保留原数据、外键和索引；提交逻辑以 `captureId` 作为 `id` 保证同一草稿只入账一次。
-
-完整产品边界、权限说明和真机验收清单见 [付款页快捷记账规格](./35-payment-screen-capture.md)。
+最低 API 30 由 expo-build-properties 注入；服务/Activity 来自本地 Expo Module，遵循 CNG。历史文本/ML Kit兼容代码仍保留，但新快捷链路不调用。0.3.3原生变更必须新APK/runtime。磁贴状态用生命周期及系统添加结果保存true/false/unknown，RN在AppState active及Android focus刷新。编辑键盘等attach、view focus和window focus就绪再请求，关闭取消待执行请求。服务端按模型金额与原文确定性核验，不再运行旧OCR候选打分；金额诊断仅向声明X-Screen-Bill-Diagnostics:1的新客户端返回，旧strict响应不增加字段。接口见 [11](./11-api-contract.md)，数据边界见 [07](./07-data-privacy.md)，供应商见 [19](./19-ai-providers.md)，当前验证见 [42](./42-quick-accounting-device-feedback.md)，0.3.2历史见 [41](./41-cloud-overlay-validation.md)。
 
 ## 6. 服务端架构
 
@@ -492,7 +488,7 @@ voice_usage
 5. 备份按 `userId` 做服务端授权校验，不能仅凭对象 key 下载。
 6. 删除账号时先删除对象和数据库记录，再撤销令牌；MVP 可只提供本机数据删除，账号注销列入上线前必需项。
 7. 依赖安全扫描和密钥扫描进入 CI 的后续阶段。
-8. 付款页识别的原始截图只存在应用私有目录，最长 5 分钟；不写入相册、备份、CSV、日志或服务端。只读取用户主动触发时的微信/支付宝白名单窗口，不监听支付通知、不读取剪贴板。
+8. 快捷记账原始截图在私有目录短期保留，不写相册/账本/备份/CSV/日志；用户单独授权后才将当前压缩图发送服务端及视觉供应商。关闭时无截图外发，服务端仅请求内处理。磁贴只读取微信/支付宝，用户分享不受磁贴白名单限制；不监听支付通知或剪贴板。
 
 ## 8. 可观测性与运维
 

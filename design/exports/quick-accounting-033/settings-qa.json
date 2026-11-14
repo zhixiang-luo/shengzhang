@@ -1,0 +1,25 @@
+{
+  "scope": "Actual screen-capture-settings React component in RNWeb harness; native/DB/router boundaries use synthetic states. Does not verify Android tile lifecycle or native overlay/IME on a device.",
+  "viewports": [
+    {
+      "width": 390,
+      "height": 844,
+      "scenario": "tile added",
+      "screenshot": "settings-added-390.png"
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "scenario": "unknown or removed tile",
+      "screenshot": "settings-incomplete-320.png"
+    }
+  ],
+  "observed": {
+    "addedTileHasCheckmark": true,
+    "addActionThenCheckmark": true,
+    "removedTileAndAndroidFocusRestoresStep": true,
+    "horizontalOverflow": false,
+    "edgeButtonPresent": false,
+    "pinShortcutActionPresent": false
+  }
+}

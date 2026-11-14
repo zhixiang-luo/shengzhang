@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-11-14T02:45:00+08:00",
+  "status": "candidate-not-published",
+  "easBuildId": "9af3b571-661f-412b-a0b5-7b49b1fc3927",
+  "easBuildUrl": "https://expo.dev/accounts/xiaozhuluozhixiang/projects/shengzhang/builds/9af3b571-661f-412b-a0b5-7b49b1fc3927",
+  "artifactUrl": "https://expo.dev/artifacts/eas/VXOEDhqRnXTXFIrI4v3COTpYFFJfBeG3ZnISJqi0j3M.apk",
+  "localFile": "dist/releases/shengzhang-0.3.3-25-release.apk",
+  "profile": "preview",
+  "distribution": "internal",
+  "channel": "preview",
+  "package": "com.shengzhang.ledger",
+  "versionName": "0.3.3",
+  "versionCode": 25,
+  "runtimeVersion": "0.3.3",
+  "apiBaseUrlInBundle": "https://bigai.xin",
+  "sizeBytes": 155835824,
+  "sha256": "b9b7e71ffd208e08b6c65fa8bb8d571aaa50a148ca7f95bb44be0700a59ed29d",
+  "signature": {
+    "scheme": "v2",
+    "sha256": "d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955",
+    "matchesExistingRelease": true
+  },
+  "permissionsChecked": {
+    "systemAlertWindow": false,
+    "debuggable": false
+  },
+  "published": false,
+  "realDeviceTest": "pending-user-download"
+}

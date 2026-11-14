@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-14",
+  "scope": "server-side hotfix; no APK rebuild or OTA",
+  "cause": {
+    "stage": "vision result validation",
+    "symptom": "HTTP 503 SCREEN_VISION_UNAVAILABLE",
+    "modelOutput": "verified amount with an overlong item description",
+    "validationIssue": {
+      "code": "too_big",
+      "path": ["item"],
+      "maximumCharacters": 40
+    }
+  },
+  "fix": [
+    "set overlong item to null",
+    "truncate overlong merchant to 40 characters",
+    "log only redacted Zod issue codes, known field paths and stable provider error codes",
+    "keep amount evidence, payment status, currency, time and unknown-field validation strict"
+  ],
+  "tests": {
+    "workspaceTestsPassed": 400,
+    "apiTestsPassed": 151,
+    "apiTypecheck": "passed",
+    "apiBuild": "passed",
+    "lint": "passed"
+  },
+  "isolatedSmoke": {
+    "endpoint": "http://127.0.0.1:8791/v1/screen-bill/parse",
+    "httpStatus": 200,
+    "amountMinor": 9360,
+    "item": null,
+    "amountIssue": null,
+    "blockingReason": null,
+    "cacheControl": "no-store",
+    "latencyMs": 1519
+  },
+  "productionSmoke": {
+    "endpoint": "https://bigai.xin/v1/screen-bill/parse",
+    "httpStatus": 200,
+    "amountMinor": 9360,
+    "item": null,
+    "amountIssue": null,
+    "blockingReason": null,
+    "cacheControl": "no-store",
+    "latencyMs": 1568
+  },
+  "release": {
+    "current": "/opt/shengzhang/releases/20261114-wechat-overflow-fix",
+    "rollback": "/opt/shengzhang/releases/20261114-deepseek-flash",
+    "service": "shengzhang-api",
+    "serviceState": "active"
+  },
+  "privacy": "No image, extracted amount, merchant, order number or raw model text was written to the diagnostic log evidence."
+}

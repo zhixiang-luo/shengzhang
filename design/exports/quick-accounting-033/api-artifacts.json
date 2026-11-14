@@ -1,0 +1,6 @@
+{
+  "services/api/dist/providers/screen-vision.js": "7f8c79bd9501bb238fa3b51ee1ab40a8fed61e6c601bd1e9b8312fafbb550df5",
+  "services/api/dist/providers/screen-vision-amount.js": "0182d2dcbd083aa9c51924cce475781c59fac99f66899a41adb6925766941647",
+  "services/api/dist/routes/screen-bill.js": "c0850c4bff4783831d07462e0b56810cc3aa1637c75afe980a31a2b5764ec046",
+  "packages/contracts/src/screen-bill.ts": "976da51ed436488e59bb05df8b7588e44c1c058d8746aeb651967fb30fc1e962"
+}

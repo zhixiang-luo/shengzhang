@@ -1,0 +1,39 @@
+{
+  "checkedAt": "2026-11-13T02:41:29.532994+00:00",
+  "note": "APK package/signature validation only; not an Android installation or device test. Legacy external-storage declarations inherited from Expo modules are not requested by the screenshot share flow.",
+  "version": "0.3.1",
+  "versionCode": 22,
+  "package": "com.shengzhang.ledger",
+  "minSdk": 30,
+  "targetSdk": 36,
+  "size": 155764580,
+  "sha256": "7530e902402623ab8b952b5f0f58d5a24285c802d54155bc1b045601dd134ae8",
+  "zipValid": true,
+  "signatureSchemeV2Verified": true,
+  "certificateSha256": "d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955",
+  "certificateMatches021And030": true,
+  "systemAlertWindow": false,
+  "permissions": [
+    "android.permission.FOREGROUND_SERVICE",
+    "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+    "android.permission.INTERNET",
+    "android.permission.MODIFY_AUDIO_SETTINGS",
+    "android.permission.READ_EXTERNAL_STORAGE",
+    "android.permission.RECORD_AUDIO",
+    "android.permission.VIBRATE",
+    "android.permission.WRITE_EXTERNAL_STORAGE",
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.WAKE_LOCK",
+    "android.permission.USE_BIOMETRIC",
+    "android.permission.USE_FINGERPRINT",
+    "com.shengzhang.ledger.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "shareExported": true,
+  "shareImageIntent": true,
+  "nativeCapabilities": {
+    "ShareBillActivity": true,
+    "BillCaptureAccessibilityService": true,
+    "BillCaptureTileService": true,
+    "prepareCaptureImage": true
+  }
+}

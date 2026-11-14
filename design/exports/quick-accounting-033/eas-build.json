@@ -1,0 +1,10 @@
+{
+  "id": "84a7566b-b38f-463f-a473-debfc776386c",
+  "status": "FINISHED",
+  "appVersion": "0.3.3",
+  "appBuildVersion": "24",
+  "createdAt": "2026-11-13T10:23:06.548Z",
+  "completedAt": "2026-11-13T10:41:46.691Z",
+  "artifactUrl": "https://expo.dev/artifacts/eas/2EAlVQ2hsuIF_D0upXIIYr-f8goRxd6-AiKUgsgQ7U8.apk",
+  "scope": "EAS full Android release build only; no device installation test or OTA publication."
+}

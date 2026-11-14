@@ -1,0 +1,2 @@
+{"connection": "device", "androidApi": "35", "app": {"name": "0.3.3", "code": 24}, "accessibilitySettingEnabled": true, "note": "Setting enabled does not prove the service is connected. OS windows do not prove what the app received."}
+{"elapsedSeconds": 0.3, "systemFocusSource": null, "serviceMentionedInSystemDump": true, "accessibilityWindows": []}

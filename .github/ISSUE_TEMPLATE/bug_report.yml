@@ -1,0 +1,77 @@
+name: 问题反馈
+description: 报告可复现的崩溃、识别错误或交互问题
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请勿上传真实账单、录音、密钥、手机号、微信身份或包含金额/商户的原始截图。需要说明界面时，请使用合成数据或先遮盖敏感信息。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么
+      description: 写清实际结果和原本期望的结果。
+      placeholder: 例如：在微信付款详情页连续第二次触发快捷键后，没有生成新记录。
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开微信单笔付款详情页
+        2. 点击控制中心磁贴
+        3. 点“确定收好了”
+        4. ……
+    validations:
+      required: true
+  - type: dropdown
+    id: entry
+    attributes:
+      label: 触发入口
+      options:
+        - 语音记账
+        - 手动记账
+        - 微信付款页 · 控制中心磁贴
+        - 微信付款页 · 系统快捷动作
+        - 支付宝付款页 · 控制中心磁贴
+        - 支付宝付款页 · 系统快捷动作
+        - 单张截图分享
+        - 其他
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: App 版本
+      description: 设置页可查看，例如 0.3.3 (37)。
+      placeholder: 0.3.3 (37)
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: 设备与系统
+      placeholder: Redmi K60 / HyperOS / Android 15
+    validations:
+      required: true
+  - type: input
+    id: error-code
+    attributes:
+      label: 错误码（可选）
+      description: 只填固定错误码或请求 ID，不要填金额、商户或页面正文。
+      placeholder: ERROR_WINDOW_UNCONFIRMED / Error code 10
+  - type: textarea
+    id: logs
+    attributes:
+      label: 脱敏日志（可选）
+      description: 只粘贴固定阶段、错误码、窗口结构或异常堆栈；不要包含金额、商户、正文、截图或数据库路径。
+      render: text
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: 隐私确认
+      options:
+        - label: 我已确认内容不含真实账单、录音、密钥、设备序列号或其他敏感信息。
+          required: true

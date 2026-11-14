@@ -1,0 +1,76 @@
+{
+  "date": "2026-11-13T05:20:23.048Z",
+  "version": "0.3.2",
+  "environment": "Actual React Native share confirmation screen and hook rendered through react-native-web; native, storage, routing and network boundaries use synthetic fixtures. Not the Android native overlay or a device test.",
+  "checks": [
+    {
+      "name": "ready-390",
+      "result": {
+        "width": 390,
+        "height": 844,
+        "pageHeight": 844,
+        "saveBottom": 552.5,
+        "saveTop": 504.5,
+        "disabled": null
+      }
+    },
+    {
+      "name": "ready-360",
+      "result": {
+        "width": 360,
+        "height": 640,
+        "pageHeight": 640,
+        "saveBottom": 450.5,
+        "saveTop": 402.5,
+        "disabled": null
+      }
+    },
+    {
+      "name": "ready-320",
+      "result": {
+        "width": 320,
+        "height": 568,
+        "pageHeight": 568,
+        "saveBottom": 414.5,
+        "saveTop": 366.5,
+        "disabled": null
+      }
+    },
+    {
+      "name": "edit-save-once-exit",
+      "result": {
+        "captureId": "qa-first",
+        "type": "expense",
+        "amountMinor": 2600,
+        "categoryId": "expense-shopping",
+        "subcategoryId": null,
+        "occurredAt": "2026-11-13T04:31:00.000Z",
+        "note": "用户修改的内容"
+      }
+    },
+    {
+      "name": "save-error-preserves-edit",
+      "result": true
+    },
+    {
+      "name": "cloud-preserves-user-edit",
+      "result": true
+    },
+    {
+      "name": "stale-cloud-discarded",
+      "result": true
+    },
+    {
+      "name": "first-consent-before-upload",
+      "result": true
+    },
+    {
+      "name": "blocked-cannot-bypass-with-edit",
+      "result": true
+    },
+    {
+      "name": "expired-capture-cleared",
+      "result": true
+    }
+  ]
+}

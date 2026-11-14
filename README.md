@@ -7,7 +7,7 @@
   <img alt="Expo 58" src="https://img.shields.io/badge/Expo-58-292624?logo=expo&logoColor=white" />
   <img alt="React Native 0.88" src="https://img.shields.io/badge/React_Native-0.88-61DAFB?logo=react&logoColor=111111" />
   <img alt="TypeScript 6" src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" />
-  <img alt="Tests 251" src="https://img.shields.io/badge/tests-251_passed-63795E" />
+  <img alt="Tests 410" src="https://img.shields.io/badge/tests-410_passed-63795E" />
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-E89A96" /></a>
 </p>
 
@@ -30,11 +30,19 @@
 
 ## 产品截图
 
-以下截图来自已评审的交互原型，正式 App 截图会随内测版本持续更新。
+以下前三张截图来自已评审的交互原型；付款页快捷卡由当前 RNWeb 组件以合成数据渲染，不是原生浮层真机截图。正式 App 截图会随内测版本持续更新。
 
 | 一句话多笔记账 | 月度统计 | 手动记账兜底 |
 | :---: | :---: | :---: |
 | <img src="prototype/screenshots/voice-result.png" alt="语音记账结果" width="250" /> | <img src="prototype/screenshots/stats.png" alt="月度统计" width="250" /> | <img src="prototype/screenshots/manual-entry.png" alt="手动记账" width="250" /> |
+
+### 付款页快捷记账
+
+Android 11+ 在微信、支付宝单笔付款详情页，通过控制中心磁贴或系统快捷动作触发。金额、商户、时间和分类生成一张可编辑卡，点一次“确定收好了”写入本地账本，不跳转主页面。
+
+<p align="center">
+  <img src="deploy/site/assets/screens/quick-capture.png" alt="声账付款页快捷记账确认卡" width="300" />
+</p>
 
 ## 为谁而做
 
@@ -77,12 +85,14 @@
 | 本地 JSON 备份/恢复与 CSV 导出 | ✅ 已完成 |
 | 离线账单搜索与组合筛选 | ✅ 已完成 |
 | 确定性月度回顾与隐私分享卡 | ✅ 代码与双端导出完成，待真机验收 |
-| Android 11+ 付款页快捷记账 | 🟡 `0.3.0` 内测 APK 已构建，待 Android 真机验收 |
+| Android 11+ 付款页快捷记账 | ✅ `0.3.3 (37)` 微信、支付宝真机通过；连续多笔、语音接续、列表自动刷新与冷启动已验证 |
 | 30–50 条真人语音与双端真机矩阵 | 🚧 进行中 |
 | 隐私中心 | 🚧 进行中 |
 | 微信登录、云备份、会员与支付 | 🧭 外部依赖就绪后再启动 |
 
-项目当前处于 **M5/M6 内测、质量验证与 `0.3.0` 原生能力收口阶段**。真实语音、数据安全、账单搜索和确定性月度回顾已经形成离线闭环；付款页快捷记账的代码、SQLite migration v3、Android 原生 APK 和基础包级校验已完成，但还没有 Android 真机验收。公开下载仍指向 `0.2.1`，它还没有作为正式商业版本上架。
+项目当前处于 **M5/M6 内测与正式发布准备阶段**。快捷记账由主动截图直接走云端，在当前微信/支付宝页面显示可编辑卡，点一次“确定收好了”写现有本地账本并收起。保留单图分享；不先 OCR，不把未知金额伪装 0 元，不增加快捷记账二次确认或撤销页。410 项测试、类型检查、Lint、API build 及双端 bundle 通过；原生规则 51 项通过，0.3.3(37) 完整 Gradle 构建通过。公开稳定仍为 0.2.1，详见 [真机闭环记录](docs/44-quick-accounting-device-verification.md)。
+
+线上视觉模型已切到 DeepSeek Flash。0.3.3(36) 真机完成同一微信详情页连续 3 次快捷键、随后 2 笔语音、首页/搜索自动刷新和冷启动验证；0.3.3(37) 增加“快捷记账被系统关闭”的低调恢复提示。HyperOS 在强行停止或覆盖安装后会关闭无障碍，App 只能引导用户重新开启，不能静默恢复。当前剩余工作是撤掉服务器测试额度、部署友好 429 文案、生成 production 包并切换官网下载。
 
 ## 技术亮点
 
@@ -90,13 +100,14 @@
 - **本地优先**：账单首先写入 SQLite，网络、登录和云备份不是记账前置条件。
 - **共享领域模型**：金额统一使用整数分，客户端、服务端和测试共用 Zod 契约与领域函数。
 - **流式语音链路**：手机 PCM → Fastify WebSocket → 火山双向流式 ASR → DeepSeek 结构化。
-- **付款页本地识别**：Android 磁贴按需触发，无障碍文本优先，文本不足时才端侧 OCR；不后台监听，不上传截图。
+- **主动截图快捷记账**：Android 磁贴/兼容系统动作 → 内存截图直接云端 → 原页面无障碍简卡 → 一次确认写同库。首次同意后直接识别，可关闭；金额未知不伪装，晚到结果不覆盖编辑。分享单图也可用，供应商处理见隐私设计。
+- **原生写入与 JS 读取隔离**：账本统一使用 rollback journal，短连接读取串行化；关闭连接失败不覆盖已成功结果，避免跨 SQLite 实现的 WAL checkpoint 把“保存成功”变成“账本读取失败”。
 - **持续更新**：兼容修复通过 EAS Update 自动 OTA；原生变化由服务端版本策略提示覆盖安装，必要时可阻断已停止支持的旧版。
 - **隐私边界明确**：录音仅用于本次识别，服务端不长期保存音频；语音模型不接收历史账单。
 - **隐私优先产品观测**：匿名统计激活、留存、功能渗透、语音时延与失败原因，不含金额、分类、备注、录音和转写正文。
 - **匿名反馈闭环**：站内反馈不要求登录，支持选填联系方式；正文进入私有收件箱，日报只统计数量和类型。
 - **确定性月度回顾**：所有回顾事实由本地账单聚合生成，不让模型编造金额、分类或趋势；分享卡默认隐藏具体账目。
-- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 251 项自动化测试。
+- **可验证质量**：200 条中文 TTS 语音基线全部通过，当前仓库包含 410 项自动化测试。
 
 ### 架构概览
 
@@ -104,7 +115,12 @@
 flowchart LR
   A[Expo / React Native] -->|本地数据| B[(SQLite)]
   A -->|实时 PCM| C[Fastify 语音网关]
-  A -->|Android 主动触发| S[本地磁贴 / 无障碍 / OCR]
+  A -->|Android 主动触发| S[磁贴 / 兼容系统动作]
+  S -->|首次同意后当前图| V[截图视觉网关]
+  V --> O[原页面确认卡]
+  O --> B
+  A -->|主动分享单图| V
+  V --> Q[可替换视觉模型]
   C --> D[火山流式 ASR]
   C --> E[SiliconFlow 备用 ASR]
   C --> F[DeepSeek 结构化]
@@ -120,14 +136,14 @@ flowchart LR
 | --- | --- |
 | TypeScript 严格检查 | 通过 |
 | ESLint | 通过 |
-| 自动化测试 | 251 / 251 通过 |
+| 自动化测试 | 410 / 410 通过（domain 137 / mobile 122 / API 151） |
 | Expo Doctor | 18 / 20；2 项在线检查受当前网络环境限制 |
 | 中文 TTS 语音评测 | 200 / 200 通过 |
 | 松手到结构化完成 | P50 1.68s / P95 2.20s |
-| Android EAS 内测构建 | `0.3.0 (19)` 已通过；APK 基础包级校验通过 |
-| iOS / Android Bundle 导出 | `0.3.0` 通过 |
+| Android EAS 内测构建 | `0.3.3 (37)` 完整 Gradle 构建、v2 签名及旧证书连续性通过 |
+| iOS / Android Bundle 导出 | `0.3.3` 通过 |
 
-`0.3.0` 内测 APK 由 EAS Build `231be593-8f86-498f-b950-dd3753bcdb60` 生成，源码提交 `45f7bfb44e18c7ce75781f78fdb21344e3490bc0`，大小 155,748,548 字节，SHA-256 为 `f08d85b016aae9397de44ccea9a64dbe6ee970de8ac40c216b1fbb273134967a`。包名、版本、`minSdkVersion=30`、签名 v2 和 Manifest 原生服务均已检查；ML Kit 中文 OCR 已进入安装包。构建后发布的隐私文案修正已通过 runtime `0.3.0` 的 preview OTA 更新组 `7dbde641-2a72-4dc1-98f0-62cdfc12d3ed` 分发。真机上的磁贴、无障碍读屏、OCR、SQLite v2 → v3 升级、幂等和撤销仍未验收。
+`0.3.3 (37)` 为 preview 本地构建，`versionCode=37`，签名 SHA-256 `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955`，与 0.2.1–0.3.3(35) 连续；本机文件不进入 Git，构建记录、真机证据和上线清单见 [44号记录](docs/44-quick-accounting-device-verification.md)。上一版0.3.2(23)保留在 [41号记录](docs/41-cloud-overlay-validation.md)，0.3.1(22)及合成模型评测保留在 [38号记录](docs/38-quick-accounting-validation.md)。
 
 200 条语音结果来自合成的中文 TTS 基线，不等同于真人噪声、口音和弱网环境。项目仍在补充真人语料与双端真机矩阵。
 
@@ -187,7 +203,7 @@ python3 -m http.server 4173
 ├── packages/
 │   ├── contracts/     Zod 接口契约与共享 DTO
 │   ├── domain/        金额、分类、排序、统计与付款页文本纯函数
-│   └── screen-capture/ Android 磁贴、无障碍、短期草稿与端侧 OCR
+│   └── screen-capture/ Android 无障碍浮层、快捷入口、同库写入与单张分享
 ├── docs/              产品、技术、隐私、评测与部署文档
 ├── design/            品牌资产、设计令牌与导出资源
 ├── prototype/         可点击交互原型与关键页面截图
@@ -205,7 +221,9 @@ python3 -m http.server 4173
 - [语音评测报告](docs/20-voice-eval-report.md)
 - [后期产品战略](docs/21-post-mvp-strategy.md)
 - [月度回顾与隐私分享卡](docs/33-monthly-review.md)
-- [Android 付款页快捷记账](docs/35-payment-screen-capture.md)
+- [Android 付款页快捷记账规格](docs/35-payment-screen-capture.md)
+- [Android 快捷记账现场调试](docs/43-android-device-debugging.md)
+- [0.3.3 真机闭环与上线清单](docs/44-quick-accounting-device-verification.md)
 - [生产基础设施与上线清单](docs/26-production-infrastructure.md)
 - [当前开发交接](docs/HANDOFF.md)
 
@@ -213,7 +231,8 @@ python3 -m http.server 4173
 
 ### 正在做
 
-- 在 Android 11+ 真机验收已构建的 `0.3.0` APK：磁贴、无障碍权限、微信/支付宝文本与 OCR、SQLite v3 升级、同草稿幂等和保存撤销；
+- 准备 `0.3.3` 正式发布：撤掉服务器测试额度、部署友好 429 文案、生成 production 渠道安装包并确认 OTA 优先级；
+- 用真实微信/支付宝页面继续抽测 DeepSeek Flash 的金额、商户、时间、分类和拒识边界，官方千问保留为备选；
 - 扩充真人、口音、噪声和弱网语音测试；
 - 完成 iOS / Android 中低端真机矩阵；
 - 真机验收 JSON 导出、清空和恢复闭环；
@@ -237,7 +256,7 @@ python3 -m http.server 4173
 
 ## 下载与发布
 
-最新公开 Android 内测版仍为 `0.2.1`，可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)。安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。`0.3.0` 新增 AccessibilityService、TileService、ML Kit 与 `minSdkVersion=30`，已生成独立的内测 APK；Android 11+ 测试机可覆盖安装，现有本地账本应保留。它不能通过 Expo Go 或 `0.2.1` 的同 runtime OTA 获得，完成真机验收前不会替换公开稳定下载。
+最新公开 Android 内测版仍为 `0.2.1`，可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)。安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。`0.3.3` 内测线包含原生无障碍浮层、TileService、独立动作、同库写入与单图分享，`minSdkVersion=30`，必须新原生 APK/runtime；不申请 SYSTEM_ALERT_WINDOW。Android 11+ 可做覆盖安装测试，先导出 JSON 备份便于核对升级前后账本。不能通过 Expo Go 或 `0.2.1/0.3.0/0.3.1` 的同 runtime OTA 获得新原生能力；`0.3.3(37)` 已完成真机回归，待完成 production 构建与[上线清单](docs/44-quick-accounting-device-verification.md)后切换稳定下载。
 
 GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。官网当前提供 `0.2.1 (18)`，GitHub Pre-release `v0.2.1-preview.1` 附带同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
 

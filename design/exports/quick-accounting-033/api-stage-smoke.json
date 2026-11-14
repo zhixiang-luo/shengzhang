@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-11-13T10:21:58.110Z",
+  "scope": "localhost isolated release; two synthetic images only",
+  "results": [
+    {
+      "sample": "alipay-unsigned",
+      "status": 200,
+      "amountMatches": true,
+      "blocked": false,
+      "diagnosticNegotiated": true,
+      "oldStrictCompatible": true,
+      "latencyMs": 3714
+    },
+    {
+      "sample": "alipay-failed",
+      "status": 200,
+      "amountMatches": true,
+      "blocked": true,
+      "diagnosticNegotiated": true,
+      "oldStrictCompatible": null,
+      "latencyMs": 6538
+    }
+  ],
+  "runningReleaseUnchanged": true,
+  "isolatedProcessStopped": true,
+  "activation": "not performed; production cutover awaits explicit authorization"
+}
