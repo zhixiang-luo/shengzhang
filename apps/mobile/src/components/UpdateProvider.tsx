@@ -8,11 +8,21 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { AppState, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  AppState,
+  BackHandler,
+  Linking,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { AppUpdatePolicyResponse } from '@shengzhang/contracts';
 
+import { NativeUpdateDialog } from './NativeUpdateDialog';
 import { toUpdateFailureMessage } from '../features/updates/updateMessages';
 import {
   applyAppUpdate,
@@ -37,7 +47,8 @@ type UpdateContextValue = {
   nativeChecking: boolean;
   nativeError: string | null;
   dismissNativeUpdate: () => void;
-  openNativeUpdate: () => Promise<void>;
+  showNativeUpdate: () => void;
+  openNativeUpdate: (options?: { exitAfterOpen?: boolean }) => Promise<void>;
 };
 
 const UpdateContext = createContext<UpdateContextValue | null>(null);
@@ -52,7 +63,9 @@ export function UpdateProvider({ children }: { children: ReactNode }) {
   const [nativeUpdate, setNativeUpdate] = useState<AppUpdatePolicyResponse | null>(null);
   const [nativeChecking, setNativeChecking] = useState(false);
   const [nativeError, setNativeError] = useState<string | null>(null);
-  const [nativeDismissed, setNativeDismissed] = useState(false);
+  const [dismissedNativeVersion, setDismissedNativeVersion] = useState<string | null>(
+    null,
+  );
   const checkingRef = useRef(false);
   const lastCheckRef = useRef(0);
 
@@ -109,15 +122,22 @@ export function UpdateProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const openNativeUpdate = useCallback(async () => {
-    const url = nativeUpdate?.downloadUrl;
-    if (!url) return;
-    try {
-      await Linking.openURL(url);
-    } catch (caught) {
-      setNativeError(toUpdateFailureMessage(caught));
-    }
-  }, [nativeUpdate?.downloadUrl]);
+  const openNativeUpdate = useCallback(
+    async (options?: { exitAfterOpen?: boolean }) => {
+      const url = nativeUpdate?.downloadUrl;
+      if (!url) return;
+      try {
+        await Linking.openURL(url);
+        if (options?.exitAfterOpen && Platform.OS === 'android') {
+          setTimeout(() => BackHandler.exitApp(), 600);
+        }
+      } catch (caught) {
+        setNativeError(toUpdateFailureMessage(caught));
+      }
+    },
+    [nativeUpdate?.downloadUrl],
+  );
+  const showNativeUpdate = useCallback(() => setDismissedNativeVersion(null), []);
 
   useEffect(() => {
     if (!info.enabled) return;
@@ -146,7 +166,9 @@ export function UpdateProvider({ children }: { children: ReactNode }) {
       nativeUpdate,
       nativeChecking,
       nativeError,
-      dismissNativeUpdate: () => setNativeDismissed(true),
+      dismissNativeUpdate: () =>
+        setDismissedNativeVersion(nativeUpdate?.latestVersion ?? null),
+      showNativeUpdate,
       openNativeUpdate,
     }),
     [
@@ -158,40 +180,67 @@ export function UpdateProvider({ children }: { children: ReactNode }) {
       nativeError,
       nativeUpdate,
       openNativeUpdate,
+      showNativeUpdate,
       showBanner,
       status,
     ],
   );
 
   const forceNativeUpdate = nativeUpdate?.updateType === 'required';
+  const optionalNativeUpdate = nativeUpdate?.updateType === 'optional';
+  const dismissedNativeCurrentVersion =
+    nativeUpdate?.latestVersion === dismissedNativeVersion;
+  const showNativeDialog =
+    optionalNativeUpdate &&
+    Boolean(nativeUpdate?.downloadUrl) &&
+    nativeUpdate?.requiresReinstall === true &&
+    !dismissedNativeCurrentVersion;
   const showNativeBanner =
-    nativeUpdate?.updateType === 'optional' &&
-    Boolean(nativeUpdate.downloadUrl) &&
-    !nativeDismissed &&
-    !showBanner;
+    optionalNativeUpdate &&
+    Boolean(nativeUpdate?.downloadUrl) &&
+    nativeUpdate?.requiresReinstall === false &&
+    !dismissedNativeCurrentVersion &&
+    !showBanner &&
+    !forceNativeUpdate;
+  const showOtaBanner =
+    showBanner && !showNativeDialog && !showNativeBanner && !forceNativeUpdate;
 
   return (
     <UpdateContext.Provider value={value}>
       {children}
-      {showBanner ? (
+      {showOtaBanner ? (
         <UpdateBanner
           onApply={() => void apply()}
           onDismiss={() => setBannerVisible(false)}
         />
       ) : showNativeBanner && nativeUpdate ? (
         <UpdateBanner
-          title="有新的安装包"
-          body="覆盖安装即可使用新功能，本地账本会保留。"
-          primaryLabel="下载"
+          title={`声账 ${nativeUpdate.latestVersion} 已发布`}
+          body={nativeUpdate.message}
+          primaryLabel="前往下载"
           onApply={() => void openNativeUpdate()}
-          onDismiss={() => setNativeDismissed(true)}
+          onDismiss={() =>
+            setDismissedNativeVersion(nativeUpdate.latestVersion)
+          }
+        />
+      ) : null}
+      {showNativeDialog && nativeUpdate ? (
+        <NativeUpdateDialog
+          update={nativeUpdate}
+          required={false}
+          error={nativeError}
+          onDownload={() => void openNativeUpdate({ exitAfterOpen: true })}
+          onDismiss={() => setDismissedNativeVersion(nativeUpdate.latestVersion)}
+          onRetry={() => undefined}
         />
       ) : null}
       {forceNativeUpdate && nativeUpdate ? (
-        <ForceUpdateGate
+        <NativeUpdateDialog
           update={nativeUpdate}
+          required
           error={nativeError}
-          onOpen={() => void openNativeUpdate()}
+          onDownload={() => void openNativeUpdate({ exitAfterOpen: true })}
+          onDismiss={() => undefined}
           onRetry={() => void check(true)}
         />
       ) : null}
@@ -225,42 +274,6 @@ function UpdateBanner({
         </Pressable>
         <Pressable onPress={onApply} style={styles.applyButton}>
           <Text style={styles.applyText}>{primaryLabel}</Text>
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
-function ForceUpdateGate({
-  update,
-  error,
-  onOpen,
-  onRetry,
-}: {
-  update: AppUpdatePolicyResponse;
-  error: string | null;
-  onOpen: () => void;
-  onRetry: () => void;
-}) {
-  const insets = useSafeAreaInsets();
-  return (
-    <View
-      accessibilityViewIsModal
-      style={[styles.forceGate, { paddingTop: insets.top + spacing.huge }]}
-    >
-      <View style={styles.forceCard}>
-        <Text style={styles.forceEyebrow}>安装包更新</Text>
-        <Text style={styles.forceTitle}>{update.title}</Text>
-        <Text style={styles.forceBody}>{update.message}</Text>
-        <Text style={styles.forceVersion}>
-          当前 {update.currentVersion} · 最新 {update.latestVersion}
-        </Text>
-        {error ? <Text style={styles.forceError}>{error}</Text> : null}
-        <Pressable accessibilityRole="button" onPress={onOpen} style={styles.forcePrimary}>
-          <Text style={styles.forcePrimaryText}>前往官网下载</Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" onPress={onRetry} style={styles.forceSecondary}>
-          <Text style={styles.forceSecondaryText}>重新检查</Text>
         </Pressable>
       </View>
     </View>
@@ -325,75 +338,5 @@ const styles = StyleSheet.create({
     color: colors.ink,
     fontSize: 11,
     fontWeight: '700',
-  },
-  forceGate: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    zIndex: 2000,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.huge,
-    backgroundColor: colors.canvas,
-  },
-  forceCard: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radii.lg,
-    padding: spacing.xl,
-    backgroundColor: colors.surface,
-  },
-  forceEyebrow: {
-    color: colors.inkTertiary,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-  },
-  forceTitle: {
-    marginTop: spacing.sm,
-    color: colors.ink,
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  forceBody: {
-    marginTop: spacing.md,
-    color: colors.inkSecondary,
-    fontSize: 14,
-    lineHeight: 22,
-  },
-  forceVersion: {
-    marginTop: spacing.md,
-    color: colors.inkTertiary,
-    fontSize: 11,
-  },
-  forceError: {
-    marginTop: spacing.md,
-    color: colors.danger,
-    fontSize: 11,
-    lineHeight: 17,
-  },
-  forcePrimary: {
-    minHeight: 48,
-    marginTop: spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radii.pill,
-    backgroundColor: colors.ink,
-  },
-  forcePrimaryText: {
-    color: colors.surface,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  forceSecondary: {
-    minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  forceSecondaryText: {
-    color: colors.inkSecondary,
-    fontSize: 12,
   },
 });

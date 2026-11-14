@@ -81,17 +81,22 @@ export const backupMetadataSchema = z.object({
 
 export const appUpdatePlatformSchema = z.enum(['android', 'ios']);
 export const appUpdateTypeSchema = z.enum(['none', 'optional', 'required']);
+export const appUpdateReleaseNoteSchema = z.string().trim().min(1).max(120);
 
 export const appUpdatePolicyConfigSchema = z.object({
   android: z.object({
     latestVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
     minimumSupportedVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
     downloadUrl: z.url().nullable(),
+    releaseNotes: z.array(appUpdateReleaseNoteSchema).max(6).optional(),
+    requiresReinstall: z.boolean().optional(),
   }),
   ios: z.object({
     latestVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
     minimumSupportedVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
     downloadUrl: z.url().nullable(),
+    releaseNotes: z.array(appUpdateReleaseNoteSchema).max(6).optional(),
+    requiresReinstall: z.boolean().optional(),
   }),
 });
 
@@ -102,6 +107,8 @@ export const appUpdatePolicyResponseSchema = z.object({
   minimumSupportedVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
   updateType: appUpdateTypeSchema,
   downloadUrl: z.url().nullable(),
+  releaseNotes: z.array(appUpdateReleaseNoteSchema).max(6).default([]),
+  requiresReinstall: z.boolean().default(true),
   title: z.string().min(1).max(80),
   message: z.string().min(1).max(240),
 });

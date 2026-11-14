@@ -150,9 +150,15 @@ export default function SettingsScreen() {
               value={
                 updates.nativeUpdate.updateType === 'required'
                   ? '必须更新'
-                  : '可更新'
+                  : updates.nativeUpdate.requiresReinstall
+                    ? '需要重新下载'
+                    : '可更新'
               }
-              onPress={() => void updates.openNativeUpdate()}
+              onPress={
+                updates.nativeUpdate.requiresReinstall
+                  ? updates.showNativeUpdate
+                  : () => void updates.openNativeUpdate()
+              }
               last
             />
           ) : null}

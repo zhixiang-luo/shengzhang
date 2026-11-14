@@ -38,8 +38,8 @@ Expo Go 会直接加载 Metro，不支持应用内更新；设置页会显示“
 
 1. App 启动后并行检查 EAS channel 与服务端安装包策略。
 2. 有兼容的 JS/TS 更新时后台自动下载；下载完成后提示立即重启或稍后生效。
-3. 当前安装包低于最低支持版本时，显示不可关闭的原生更新门禁，并提供官网 APK 或商店入口。
-4. 当前安装包仍受支持、但低于最新稳定版时，显示可稍后处理的安装包更新提示。
+3. 当前安装包低于最低支持版本时，显示不可关闭的版本更新弹窗，并列出服务端下发的更新要点。
+4. 当前安装包仍受支持、但低于最新稳定版时，显示可稍后处理的版本更新弹窗；点“下载并退出”会打开官网安装包，并在 Android 上关闭应用。
 5. Android 不允许普通 App 静默安装 APK，因此原生更新仍需要用户下载并确认覆盖安装；本地 SQLite 账本会保留。
 6. 检查、下载或策略接口失败时继续使用当前版本，不影响离线记账。
 
@@ -87,6 +87,16 @@ EXPO_NO_DOTENV=1 EXPO_PUBLIC_API_BASE_URL=https://bigai.xin \
 cd apps/mobile
 npx eas-cli@latest build --platform android --profile preview
 ```
+
+官网直接分发 APK 时使用 `production-apk` profile，它保持 production 更新通道并输出 APK：
+
+```bash
+cd apps/mobile
+npx eas-cli@latest build --platform android --profile production-apk --local \
+  --non-interactive --output build-production.apk
+```
+
+Google Play 或需要 AAB 的分发仍使用 `production` profile。
 
 ## 7. 回滚
 
@@ -563,3 +573,43 @@ OTA 只负责后续兼容的 JS/TS 更新与在线更新清单。原生启动图
 真机（Redmi K60 / HyperOS）：同一微信付款详情页连续 3 次快捷键均 `save result=ok` 并生成 3 笔；随后语音 2 笔正常入账；首页 ¥8→¥61 自动刷新，搜索页 9 笔立即可见；冷启动仍为 ¥61，无 `expo-sqlite` 警告或 `Error code 10`；`NoUpdatesAvailable` 确认运行内嵌新 bundle。完整证据和上线清单见 [44号记录](./44-quick-accounting-device-verification.md)。
 
 仍待办：删除服务器测试额度覆盖（200/天、60/分钟）、部署友好 429 文案、生成 production 包、确认 runtime 0.3.3 OTA 优先级、切换官网与 GitHub Release。两个 APK 已加入 `.gitignore`，不进入 Git 仓库。
+
+## 27. 安装包更新弹窗与更新说明（2026-11-14）
+
+纯 JS/TS 的兼容更新继续走 EAS OTA：后台下载，只显示轻量“新版本已准备好”提示，不打断记账。
+
+需要覆盖安装的 Android 安装包更新改为真正的弹窗：
+
+- 标题显示目标版本，正文说明更新性质。
+- 展示服务端 `releaseNotes` 下发的主要变化，最多 6 条。
+- 明确提示“需要覆盖安装，本机账本会保留”。
+- 可选更新提供“稍后”；强制更新不能关闭，只能下载或重新检查。
+- 点“下载并退出”会先打开官网安装包地址，再在 Android 上退出应用；系统仍负责最终下载和覆盖安装确认。
+- 同一会话内“稍后”会按目标版本忽略；设置页仍可通过“安装包更新”重新打开弹窗。
+- 原生更新弹窗优先于 OTA 轻提示，避免安装包更新被小横幅遮住。
+
+`GET /v1/app/update-policy` 新增：
+
+```json
+{
+  "releaseNotes": ["微信、支付宝付款详情页可用快捷记账"],
+  "requiresReinstall": true
+}
+```
+
+更新说明通过服务端环境变量维护，使用 JSON 字符串数组：
+
+```bash
+APP_UPDATE_ANDROID_LATEST_VERSION=0.3.3
+APP_UPDATE_ANDROID_MINIMUM_VERSION=0.1.4
+APP_UPDATE_ANDROID_DOWNLOAD_URL="https://download.bigai.xin/releases/shengzhang-0.3.3-preview.apk?download=latest&version=0.3.3"
+APP_UPDATE_ANDROID_RELEASE_NOTES='["微信、支付宝付款详情页可用快捷记账","控制中心磁贴或系统快捷动作可直接触发","在原页面核对金额、时间与分类，一次确认入账","同一付款页可以连续记多笔","保存后账单自动刷新，语音记账可继续使用","修复快捷记账被系统关闭后的恢复提示"]'
+```
+
+客户端对新字段做了兼容：服务端尚未返回 `releaseNotes` / `requiresReinstall` 时，分别按空数组和“需要覆盖安装”处理，不会让旧策略接口导致检查更新失败。
+
+### 27.1 已安装 `0.2.1` 用户的覆盖范围
+
+公开稳定版 `0.2.1 (18)` 的 `UpdateProvider` 与仓库 Tag `v0.2.1-preview.1` 完全一致，当前只显示旧版小横幅，不展示更新要点。新弹窗代码进入 `0.3.3` 后，只有在用户完成一次覆盖安装后才会生效。
+
+若要让现有 `0.2.1` 用户立即看到新弹窗，必须另发一次 runtime `0.2.1` 的 preview OTA，仅更新更新提示组件与契约字段；不能把 `0.3.3` 的 bundle 发到旧 runtime。EAS 已确认 preview 分支存在 runtime `0.2.1` 历史组 `810cd59c-0666-4c9e-b4e7-c5d4402b230a`，具备该补丁通道。该 OTA 尚未发布。

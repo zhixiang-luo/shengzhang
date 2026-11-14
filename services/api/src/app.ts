@@ -93,11 +93,15 @@ export function buildApp(
           latestVersion: environment.APP_UPDATE_ANDROID_LATEST_VERSION,
           minimumSupportedVersion: environment.APP_UPDATE_ANDROID_MINIMUM_VERSION,
           downloadUrl: environment.APP_UPDATE_ANDROID_DOWNLOAD_URL,
+          releaseNotes: environment.APP_UPDATE_ANDROID_RELEASE_NOTES,
+          requiresReinstall: true,
         },
         ios: {
           latestVersion: environment.APP_UPDATE_IOS_LATEST_VERSION,
           minimumSupportedVersion: environment.APP_UPDATE_IOS_MINIMUM_VERSION,
           downloadUrl: environment.APP_UPDATE_IOS_DOWNLOAD_URL ?? null,
+          releaseNotes: environment.APP_UPDATE_IOS_RELEASE_NOTES,
+          requiresReinstall: false,
         },
       },
   });

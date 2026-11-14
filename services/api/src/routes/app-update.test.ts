@@ -8,11 +8,15 @@ const updatePolicy = {
     minimumSupportedVersion: '0.1.4',
     downloadUrl:
       'https://download.bigai.xin/releases/shengzhang-0.2.1-preview.apk?download=latest',
+    releaseNotes: ['付款页快捷记账', '账本保存后自动刷新'],
+    requiresReinstall: true,
   },
   ios: {
     latestVersion: '0.1.5',
     minimumSupportedVersion: '0.1.4',
     downloadUrl: null,
+    releaseNotes: [],
+    requiresReinstall: false,
   },
 };
 
@@ -30,6 +34,8 @@ describe('app update policy', () => {
       latestVersion: '0.1.5',
       minimumSupportedVersion: '0.1.4',
       downloadUrl: updatePolicy.android.downloadUrl,
+      releaseNotes: ['付款页快捷记账', '账本保存后自动刷新'],
+      requiresReinstall: true,
     });
     await app.close();
   });
@@ -46,6 +52,34 @@ describe('app update policy', () => {
       updateType: 'optional',
       currentVersion: '0.1.4',
       latestVersion: '0.1.5',
+    });
+    await app.close();
+  });
+
+  it('returns safe update metadata defaults for older policy configurations', async () => {
+    const app = buildApp(
+      {},
+      {
+        appUpdatePolicy: {
+          ...updatePolicy,
+          android: {
+            latestVersion: updatePolicy.android.latestVersion,
+            minimumSupportedVersion: updatePolicy.android.minimumSupportedVersion,
+            downloadUrl: updatePolicy.android.downloadUrl,
+          },
+        },
+      },
+    );
+    const response = await app.inject({
+      method: 'GET',
+      url: '/v1/app/update-policy?platform=android&currentVersion=0.1.4',
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      updateType: 'optional',
+      releaseNotes: [],
+      requiresReinstall: true,
     });
     await app.close();
   });

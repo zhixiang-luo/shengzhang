@@ -46,10 +46,15 @@
 {
   "platform": "android",
   "currentVersion": "0.1.4",
-  "latestVersion": "0.2.1",
+  "latestVersion": "0.3.3",
   "minimumSupportedVersion": "0.1.4",
   "updateType": "optional",
-  "downloadUrl": "https://download.bigai.xin/releases/shengzhang-0.2.1-preview.apk?download=latest&version=0.2.1",
+  "downloadUrl": "https://download.bigai.xin/releases/shengzhang-0.3.3-preview.apk?download=latest&version=0.3.3",
+  "releaseNotes": [
+    "微信、支付宝付款详情页可用快捷记账",
+    "保存后账单自动刷新"
+  ],
+  "requiresReinstall": true,
   "title": "有新版本可选",
   "message": "安装最新版本可使用新功能。覆盖安装会保留本地账本。"
 }
@@ -57,7 +62,9 @@
 
 - `updateType=none`：当前安装包不低于最新稳定版，不提示。
 - `updateType=optional`：支持继续使用，但存在更新的原生安装包。
-- `updateType=required`：当前版本低于最低支持版本，客户端显示不可关闭的安装包更新门禁。
+- `updateType=required`：当前版本低于最低支持版本，客户端显示不可关闭的版本更新弹窗。
+- `releaseNotes`：最多 6 条用户可见变化；缺失时客户端按空数组兼容。
+- `requiresReinstall`：为 `true` 时显示覆盖安装说明和“下载并退出”；缺失时客户端按 `true` 兼容。
 - iOS 或 Android 未配置可用的官方下载地址时，服务端不会下发强制更新，避免用户被锁在无路可走的页面。
 - 该接口只决定原生安装包策略；兼容的 JS/TS 更新仍由 EAS Update 自动下载。
 - 接口失败不能阻塞本地账本；客户端继续使用当前版本并允许稍后重试。

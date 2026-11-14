@@ -95,4 +95,5 @@ HyperOS 在覆盖安装或“强行停止”后会清掉无障碍开关；从多
 3. 用本轮代码生成 production 渠道安装包，核对 versionCode、证书、Manifest、Bundle 和 `https://bigai.xin`。
 4. 确认 runtime `0.3.3` 的 preview/production OTA 不会把新包覆盖成旧 JS；如发布 OTA，先验证内嵌包与 OTA 组的优先级。
 5. 覆盖安装保留本地账本；真机再回归一次快捷键、磁贴、语音、首页/搜索/月回顾刷新。
-6. 切换官网下载与 GitHub Release；公开主文案不展示内部 versionCode，测试额度、内部 IP 和构建路径不进入官网。
+6. 配置 `APP_UPDATE_ANDROID_RELEASE_NOTES` 与正式 APK 下载地址；先发 runtime `0.2.1` 的更新提示 OTA，再切换官网和 GitHub Release。
+7. 公开主文案不展示内部 versionCode；测试额度、内部 IP 和构建路径不进入官网。

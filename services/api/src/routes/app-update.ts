@@ -57,6 +57,9 @@ export const appUpdateRoutes: FastifyPluginAsync<{
       minimumSupportedVersion: platformPolicy.minimumSupportedVersion,
       updateType,
       downloadUrl: platformPolicy.downloadUrl,
+      releaseNotes: platformPolicy.releaseNotes ?? [],
+      requiresReinstall:
+        platformPolicy.requiresReinstall ?? Boolean(platformPolicy.downloadUrl),
       title,
       message,
     };

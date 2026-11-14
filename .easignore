@@ -42,3 +42,5 @@ android/.gradle/
 apps/mobile/android/
 apps/mobile/ios/
 .kotlin/
+apps/mobile/build-*.apk
+apps/mobile/build-*.aab

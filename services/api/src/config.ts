@@ -1,4 +1,31 @@
+import { appUpdateReleaseNoteSchema } from '@shengzhang/contracts';
 import { z } from 'zod';
+
+const appUpdateReleaseNotesSchema = z
+  .string()
+  .default('[]')
+  .transform((value, ctx) => {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(value);
+    } catch {
+      ctx.addIssue({
+        code: 'custom',
+        message: '更新说明必须是 JSON 字符串数组。',
+      });
+      return z.NEVER;
+    }
+
+    const result = z.array(appUpdateReleaseNoteSchema).max(6).safeParse(parsed);
+    if (!result.success) {
+      ctx.addIssue({
+        code: 'custom',
+        message: '更新说明必须是最多 6 条、每条不超过 120 字的字符串数组。',
+      });
+      return z.NEVER;
+    }
+    return result.data;
+  });
 
 const environmentSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -56,6 +83,7 @@ const environmentSchema = z.object({
     .default(
       'https://download.bigai.xin/releases/shengzhang-0.2.1-preview.apk?download=latest&version=0.2.1',
     ),
+  APP_UPDATE_ANDROID_RELEASE_NOTES: appUpdateReleaseNotesSchema,
   APP_UPDATE_IOS_LATEST_VERSION: z
     .string()
     .regex(/^\d+\.\d+\.\d+$/)
@@ -65,6 +93,7 @@ const environmentSchema = z.object({
     .regex(/^\d+\.\d+\.\d+$/)
     .default('0.1.4'),
   APP_UPDATE_IOS_DOWNLOAD_URL: z.url().optional(),
+  APP_UPDATE_IOS_RELEASE_NOTES: appUpdateReleaseNotesSchema,
 });
 
 export type Environment = z.infer<typeof environmentSchema>;
