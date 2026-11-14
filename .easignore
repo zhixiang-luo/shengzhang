@@ -39,4 +39,6 @@ services/api/testdata/
 .vscode/
 ios/Pods/
 android/.gradle/
+apps/mobile/android/
+apps/mobile/ios/
 .kotlin/

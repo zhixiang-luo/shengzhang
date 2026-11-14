@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./screen-bill": "./src/screen-bill.ts",
+    "./money": "./src/money.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

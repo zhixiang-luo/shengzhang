@@ -1,0 +1,31 @@
+{
+  "recordedAt": "2026-11-13T02:12:31.706078+00:00",
+  "note": "Synthetic image through the public HTTPS API and real provider. The initial attempt degraded the timestamp and was not a full-field pass; the explicit-time-evidence retest verified the page timestamp. Both attempts are preserved to show the observed variation. No real user screenshots.",
+  "endpoint": "https://bigai.xin/v1/screen-bill/parse",
+  "attempts": [
+    {
+      "version": "initial-time-prompt",
+      "statusCode": 200,
+      "amountMinor": 2658,
+      "item": null,
+      "occurredAt": null,
+      "latencyMs": 7122,
+      "amountExact": true,
+      "pageTimeVerified": false
+    },
+    {
+      "checkedAt": "2026-11-13T02:18:12.859362+00:00",
+      "version": "explicit-time-evidence-prompt",
+      "release": "20261113-quick-accounting-031-time",
+      "statusCode": 200,
+      "cacheControl": "no-store",
+      "amountMinor": 2658,
+      "item": null,
+      "occurredAt": "2026-11-12T04:31:00.000Z",
+      "latencyMs": 3557,
+      "amountExact": true,
+      "pageTimeVerified": true
+    }
+  ],
+  "stableAndroidVersion": "0.2.1"
+}

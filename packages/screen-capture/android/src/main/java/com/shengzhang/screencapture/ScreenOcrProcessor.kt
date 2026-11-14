@@ -1,6 +1,7 @@
 package com.shengzhang.screencapture
 
 import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
@@ -34,5 +35,16 @@ object ScreenOcrProcessor {
           if (continuation.isActive) continuation.resumeWithException(error)
         }
     }
+  }
+
+  /**
+   * Caller owns [bitmap] and must recycle it after [onResult] returns.
+   * The accessibility fallback uses this to avoid writing a screenshot to disk.
+   */
+  fun recognize(bitmap: Bitmap, onResult: (Result<String>) -> Unit) {
+    val image = InputImage.fromBitmap(bitmap, 0)
+    recognizer.process(image)
+      .addOnSuccessListener { result -> onResult(Result.success(result.text)) }
+      .addOnFailureListener { error -> onResult(Result.failure(error)) }
   }
 }

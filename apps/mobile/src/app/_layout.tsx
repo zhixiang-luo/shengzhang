@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BootContentReady, BootExperience } from '../components/BootExperience';
+import { ScreenOverlayConfigurationSync } from '../components/ScreenOverlayConfigurationSync';
 import { UpdateProvider } from '../components/UpdateProvider';
 import { DatabaseProvider } from '../db/DatabaseProvider';
 import { migrateDatabase } from '../db/migrations';
@@ -47,6 +48,7 @@ export default function RootLayout() {
             <Suspense fallback={null}>
               <SQLiteProvider databaseName="shengzhang.db" onInit={migrateDatabase} useSuspense>
                 <DatabaseProvider>
+                  <ScreenOverlayConfigurationSync />
                   <StatusBar style="dark" />
                   <Stack
                     screenOptions={{

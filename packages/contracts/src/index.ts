@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const transactionTypeSchema = z.enum(['expense', 'income']);
-export const transactionSourceSchema = z.enum(['voice', 'manual']);
+export const transactionSourceSchema = z.enum(['voice', 'manual', 'screen']);
 
 export const categoryPathSchema = z
   .tuple([z.string().min(1).max(12)])
@@ -114,3 +114,5 @@ export type AppUpdatePlatform = z.infer<typeof appUpdatePlatformSchema>;
 export type AppUpdateType = z.infer<typeof appUpdateTypeSchema>;
 export type AppUpdatePolicyConfig = z.infer<typeof appUpdatePolicyConfigSchema>;
 export type AppUpdatePolicyResponse = z.infer<typeof appUpdatePolicyResponseSchema>;
+
+export * from './screen-bill.ts';

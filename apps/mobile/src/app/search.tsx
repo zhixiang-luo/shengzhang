@@ -1,6 +1,7 @@
 import { formatCents } from '@shengzhang/domain';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useDatabaseRefresh } from '../db/useDatabaseRefresh';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -21,7 +22,7 @@ import {
   listCategories,
   type CategoryRow,
 } from '../db/categoryRepository';
-import { useDatabase } from '../db/DatabaseProvider';
+import { withFreshDatabase } from '../db/freshDatabase';
 import {
   listAllTransactions,
   type TransactionRow,
@@ -59,7 +60,6 @@ const EMPTY_DRAFT: LedgerSearchDraft = {
 };
 
 export default function SearchScreen() {
-  const db = useDatabase();
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [draft, setDraft] = useState<LedgerSearchDraft>(EMPTY_DRAFT);
@@ -68,23 +68,32 @@ export default function SearchScreen() {
     null,
   );
   const [loadError, setLoadError] = useState<string | null>(null);
+  const requestRef = useRef(0);
 
   const load = useCallback(() => {
-    try {
-      setTransactions(listAllTransactions(db));
-      setCategories(listCategories(db, true));
-      setLoadError(null);
-    } catch (caught) {
-      setLoadError(caught instanceof Error ? caught.message : '账单读取失败');
-    }
-  }, [db]);
+    const request = ++requestRef.current;
+    void withFreshDatabase((fresh) => ({
+      transactions: listAllTransactions(fresh),
+      categories: listCategories(fresh, true),
+    }))
+      .then((snapshot) => {
+        if (request !== requestRef.current) return;
+        setTransactions(snapshot.transactions);
+        setCategories(snapshot.categories);
+        setLoadError(null);
+      })
+      .catch((caught) => {
+        if (request !== requestRef.current) return;
+        setLoadError(caught instanceof Error ? caught.message : '账单读取失败');
+      });
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
       trackAnalyticsEvent('ledger_search_opened');
-      load();
-    }, [load]),
+    }, []),
   );
+  useDatabaseRefresh(load);
 
   const categoryMap = useMemo(
     () => new Map<string, CategoryRow>(categories.map((category) => [category.id, category])),

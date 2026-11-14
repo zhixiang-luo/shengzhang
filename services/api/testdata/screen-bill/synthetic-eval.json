@@ -1,0 +1,130 @@
+{
+  "evaluatedAt": "2026-11-13T00:46:26.758Z",
+  "note": "Synthetic sample only; not real payment layout or production accuracy evidence. No real user screenshots.",
+  "results": [
+    {
+      "case": "decimal",
+      "model": "Qwen/Qwen3-VL-8B-Instruct",
+      "expectedAmountMinor": 2658,
+      "actualAmountMinor": 2658,
+      "exact": true,
+      "inventedItem": false,
+      "time": "2026-11-12T04:31:00.000Z",
+      "latencyMs": 7601,
+      "error": null
+    },
+    {
+      "case": "decimal",
+      "model": "Qwen/Qwen3-VL-32B-Instruct",
+      "exact": false,
+      "latencyMs": 30012,
+      "error": "INVALID_OR_TIMEOUT"
+    },
+    {
+      "case": "discount",
+      "model": "Qwen/Qwen3-VL-8B-Instruct",
+      "expectedAmountMinor": 2600,
+      "actualAmountMinor": 2600,
+      "exact": true,
+      "inventedItem": false,
+      "time": null,
+      "latencyMs": 6484,
+      "error": null
+    },
+    {
+      "case": "discount",
+      "model": "Qwen/Qwen3-VL-32B-Instruct",
+      "expectedAmountMinor": 2600,
+      "actualAmountMinor": 2600,
+      "exact": true,
+      "inventedItem": false,
+      "time": null,
+      "latencyMs": 6520,
+      "error": null
+    },
+    {
+      "case": "bank-balance",
+      "model": "Qwen/Qwen3-VL-8B-Instruct",
+      "expectedAmountMinor": 2658,
+      "actualAmountMinor": 2658,
+      "exact": true,
+      "inventedItem": false,
+      "time": null,
+      "latencyMs": 3940,
+      "error": null
+    },
+    {
+      "case": "bank-balance",
+      "model": "Qwen/Qwen3-VL-32B-Instruct",
+      "expectedAmountMinor": 2658,
+      "actualAmountMinor": 2658,
+      "exact": true,
+      "inventedItem": false,
+      "time": null,
+      "latencyMs": 4857,
+      "error": null
+    },
+    {
+      "case": "missing-amount",
+      "model": "Qwen/Qwen3-VL-8B-Instruct",
+      "expectedAmountMinor": null,
+      "actualAmountMinor": null,
+      "exact": true,
+      "inventedItem": false,
+      "time": null,
+      "latencyMs": 2927,
+      "error": null
+    },
+    {
+      "case": "missing-amount",
+      "model": "Qwen/Qwen3-VL-32B-Instruct",
+      "expectedAmountMinor": null,
+      "actualAmountMinor": null,
+      "exact": true,
+      "inventedItem": false,
+      "time": null,
+      "latencyMs": 3883,
+      "error": null
+    },
+    {
+      "case": "failed",
+      "model": "Qwen/Qwen3-VL-8B-Instruct",
+      "expectedAmountMinor": null,
+      "actualAmountMinor": null,
+      "exact": true,
+      "inventedItem": false,
+      "time": null,
+      "latencyMs": 2211,
+      "error": null
+    },
+    {
+      "case": "failed",
+      "model": "Qwen/Qwen3-VL-32B-Instruct",
+      "exact": false,
+      "latencyMs": 30009,
+      "error": "INVALID_OR_TIMEOUT"
+    },
+    {
+      "case": "merchant-only",
+      "model": "Qwen/Qwen3-VL-8B-Instruct",
+      "expectedAmountMinor": 1800,
+      "actualAmountMinor": 1800,
+      "exact": true,
+      "inventedItem": false,
+      "time": null,
+      "latencyMs": 2643,
+      "error": null
+    },
+    {
+      "case": "merchant-only",
+      "model": "Qwen/Qwen3-VL-32B-Instruct",
+      "expectedAmountMinor": 1800,
+      "actualAmountMinor": 1800,
+      "exact": true,
+      "inventedItem": false,
+      "time": null,
+      "latencyMs": 5900,
+      "error": null
+    }
+  ]
+}

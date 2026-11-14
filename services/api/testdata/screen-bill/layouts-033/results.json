@@ -1,0 +1,145 @@
+{
+  "evaluatedAt": "2026-11-13T09:15:13.009Z",
+  "model": "Qwen/Qwen3-VL-8B-Instruct",
+  "note": "Fictitious template-shaped layouts only; cannot prove production accuracy. No user images. Raw output is retained ONLY for these generated fixtures.",
+  "results": [
+    {
+      "case": "alipay-signed",
+      "expectedAmountMinor": 2658,
+      "raw": {
+        "documentType": "single",
+        "paymentStatus": "success",
+        "transactionKind": "expense",
+        "currency": "CNY",
+        "amountText": "26.58",
+        "amountEvidence": "-26.58 人民币 交易成功",
+        "merchant": "示例咖啡店",
+        "item": "示例饮品",
+        "categoryId": "food",
+        "occurredAt": "2026-11-13T12:31:00+08:00",
+        "timeEvidence": "支付时间 2026-11-13 12:31:00"
+      },
+      "previousAmountMinor": 2658,
+      "actualAmountMinor": 2658,
+      "exact": true,
+      "amountIssue": null,
+      "blockingReason": null,
+      "latencyMs": 11676
+    },
+    {
+      "case": "alipay-plain",
+      "expectedAmountMinor": 1800,
+      "raw": {
+        "documentType": "single",
+        "paymentStatus": "success",
+        "transactionKind": "expense",
+        "currency": "CNY",
+        "amountText": "18.00",
+        "amountEvidence": "-18.00\n交易成功",
+        "merchant": "示例便利店",
+        "item": "示例饮品",
+        "categoryId": "food",
+        "occurredAt": "2026-11-13T05:31:00+08:00",
+        "timeEvidence": "支付时间 2026-11-13 12:31:00"
+      },
+      "previousAmountMinor": 1800,
+      "actualAmountMinor": 1800,
+      "exact": true,
+      "amountIssue": null,
+      "blockingReason": null,
+      "latencyMs": 8840
+    },
+    {
+      "case": "alipay-unsigned",
+      "expectedAmountMinor": 2658,
+      "raw": {
+        "documentType": "single",
+        "paymentStatus": "success",
+        "transactionKind": "expense",
+        "currency": "CNY",
+        "amountText": "26.58",
+        "amountEvidence": "26.58\n人民币\n交易成功",
+        "merchant": "示例午餐店",
+        "item": "示例饮品",
+        "categoryId": "food",
+        "occurredAt": "2026-11-13T05:31:00+08:00",
+        "timeEvidence": "支付时间 2026-11-13 12:31:00"
+      },
+      "previousAmountMinor": null,
+      "actualAmountMinor": 2658,
+      "exact": true,
+      "amountIssue": null,
+      "blockingReason": null,
+      "latencyMs": 8750
+    },
+    {
+      "case": "wechat-header",
+      "expectedAmountMinor": 4280,
+      "raw": {
+        "documentType": "single",
+        "paymentStatus": "success",
+        "transactionKind": "expense",
+        "currency": "CNY",
+        "amountText": "42.80",
+        "amountEvidence": "¥ 42.80\n支付成功",
+        "merchant": "示例餐厅",
+        "item": "示例饮品",
+        "categoryId": "food",
+        "occurredAt": "2026-11-13T12:31:00+08:00",
+        "timeEvidence": "支付时间 2026-11-13 12:31:00"
+      },
+      "previousAmountMinor": 4280,
+      "actualAmountMinor": 4280,
+      "exact": true,
+      "amountIssue": null,
+      "blockingReason": null,
+      "latencyMs": 6690
+    },
+    {
+      "case": "alipay-failed",
+      "expectedAmountMinor": null,
+      "raw": {
+        "documentType": "single",
+        "paymentStatus": "failed",
+        "transactionKind": "expense",
+        "currency": "CNY",
+        "amountText": "26.58",
+        "amountEvidence": "-26.58 人民币 交易关闭",
+        "merchant": "示例商店",
+        "item": "示例饮品",
+        "categoryId": "food",
+        "occurredAt": "2026-11-13T05:00:00.000Z",
+        "timeEvidence": "支付时间 2026-11-13 12:31:00"
+      },
+      "previousAmountMinor": null,
+      "actualAmountMinor": null,
+      "exact": true,
+      "amountIssue": null,
+      "blockingReason": "未确认这笔交易已成功，请手动核对",
+      "latencyMs": 8213
+    },
+    {
+      "case": "wechat-missing",
+      "expectedAmountMinor": null,
+      "raw": {
+        "documentType": "single",
+        "paymentStatus": "success",
+        "transactionKind": "expense",
+        "currency": "CNY",
+        "amountText": null,
+        "amountEvidence": null,
+        "merchant": "示例商店",
+        "item": "示例商品",
+        "categoryId": "food",
+        "occurredAt": "2026-11-13T05:31:00+08:00",
+        "timeEvidence": "支付时间 2026-11-13 12:31:00"
+      },
+      "previousAmountMinor": null,
+      "actualAmountMinor": null,
+      "exact": true,
+      "amountIssue": "not_read",
+      "blockingReason": null,
+      "latencyMs": 7737
+    }
+  ]
+}

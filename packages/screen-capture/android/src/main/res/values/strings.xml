@@ -2,6 +2,6 @@
 <resources>
   <string name="screen_capture_tile_label">声账记账</string>
   <string name="screen_capture_service_label">声账快捷记账</string>
-  <string name="screen_capture_accessibility_summary">仅在你点击声账磁贴时读取当前付款结果页</string>
-  <string name="screen_capture_accessibility_description">用于提取微信或支付宝付款成功页中的金额、时间和商户。不会后台持续读取，也不会保存截图到相册。</string>
+  <string name="screen_capture_accessibility_summary">主动触发后截图识别，在原页面确认记账</string>
+  <string name="screen_capture_accessibility_description">点击声账磁贴、快捷动作、无障碍按钮或可选边缘按钮后，截取当前微信或支付宝页面并发送到已授权的云端识别，在原页面显示可编辑记账卡。只观察窗口来源，不在后台读取付款文字，也不自动截图或保存到相册。</string>
 </resources>

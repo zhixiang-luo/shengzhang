@@ -162,7 +162,11 @@ export async function migrateToVersion3(db: Pick<SQLiteDatabase, 'execAsync'>) {
 }
 
 export async function migrateDatabase(db: SQLiteDatabase) {
-  await db.execAsync('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
+  // The accessibility overlay writes through Android's framework SQLite while
+  // the app reads through expo-sqlite. WAL checkpoints across those two SQLite
+  // builds can fail with SQLITE_IOERR, so keep the ledger on the portable
+  // rollback journal instead of WAL.
+  await db.execAsync('PRAGMA journal_mode = DELETE; PRAGMA foreign_keys = ON;');
   const row = await db.getFirstAsync<{ user_version: number }>('PRAGMA user_version');
   const currentVersion = row?.user_version ?? 0;
 

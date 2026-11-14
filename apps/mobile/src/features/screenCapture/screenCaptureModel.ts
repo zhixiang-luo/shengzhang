@@ -1,4 +1,4 @@
-import { extractScreenBill, type ScreenBillExtraction } from '@shengzhang/domain';
+import type { ScreenBillExtraction } from '@shengzhang/domain';
 import type {
   PendingScreenCapture,
   ScreenCaptureStatus,
@@ -13,21 +13,19 @@ export type ScreenCaptureViewState =
       status: ScreenCaptureStatus;
       capture: PendingScreenCapture;
       extraction: ScreenBillExtraction;
-      needsOcr: boolean;
+      needsCloud: boolean;
     };
 
-export function mergeScreenCaptureText(accessibilityText: string, ocrText: string): string {
-  const lines: string[] = [];
-  const seen = new Set<string>();
+export function createCloudCaptureDraft(capturedAt: string): ScreenBillExtraction {
+  return {
+    type: 'expense', amountMinor: null, occurredAt: capturedAt,
+    timeSource: 'capture', note: '', confidence: 'low', warnings: [], blockingReason: null,
+  };
+}
 
-  for (const rawLine of `${accessibilityText}\n${ocrText}`.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line || seen.has(line)) continue;
-    seen.add(line);
-    lines.push(line);
-  }
-
-  return lines.join('\n');
+export function captureExpiresAt(pending: PendingScreenCapture): number {
+  const createdAt = Date.parse(pending.createdAt);
+  return Number.isFinite(createdAt) ? createdAt + 5 * 60_000 : 0;
 }
 
 export function buildScreenCaptureViewState(
@@ -36,23 +34,16 @@ export function buildScreenCaptureViewState(
   now: string,
 ): ScreenCaptureViewState {
   if (!status.supported) return { kind: 'unsupported', status };
-  if (!status.accessibilityEnabled) return { kind: 'setup_required', status };
+  if (!status.accessibilityEnabled && pending?.captureMethod !== 'shared_image') return { kind: 'setup_required', status };
   if (!pending) return { kind: 'empty', status };
 
-  const extraction = extractScreenBill({
-    text: pending.rawText,
-    now,
-    sourceApp: pending.sourceApp,
-  });
+  const extraction = createCloudCaptureDraft(pending.createdAt || now);
 
   return {
     kind: 'ready',
     status,
     capture: pending,
     extraction,
-    needsOcr:
-      extraction.amountMinor === null &&
-      Boolean(pending.screenshotUri) &&
-      pending.captureMethod === 'screenshot',
+    needsCloud: Boolean(pending.screenshotUri),
   };
 }

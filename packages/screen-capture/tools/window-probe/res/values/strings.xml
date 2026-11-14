@@ -1,0 +1,3 @@
+<resources>
+  <string name="probe_description">临时只读排查声账快捷记账：只在电脑主动请求后的六秒内输出窗口编号、类型、来源标签和规则结果。不读取文字，不截图，不联网，不记账。测试后可关闭并卸载此工具。</string>
+</resources>

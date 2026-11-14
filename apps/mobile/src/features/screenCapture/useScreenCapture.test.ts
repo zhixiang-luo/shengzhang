@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { ScreenCaptureStatus } from '@shengzhang/screen-capture';
 
-import { buildScreenCaptureViewState, mergeScreenCaptureText } from './screenCaptureModel';
+import { buildScreenCaptureViewState, captureExpiresAt } from './screenCaptureModel';
 
 const readyStatus: ScreenCaptureStatus = {
   supported: true,
@@ -54,7 +54,7 @@ describe('screen capture view state', () => {
     expect(state.kind).toBe('empty');
   });
 
-  it('uses accessibility text without waiting for OCR when the paid amount is visible', () => {
+  it('starts with an empty cloud draft even when legacy accessibility text contains an amount', () => {
     const state = buildScreenCaptureViewState(
       readyStatus,
       pendingCapture,
@@ -63,16 +63,18 @@ describe('screen capture view state', () => {
 
     expect(state).toMatchObject({
       kind: 'ready',
-      needsOcr: false,
+      needsCloud: true,
       extraction: {
-        amountMinor: 2600,
-        note: '滴滴出行',
-        confidence: 'high',
+        amountMinor: null,
+        note: '',
+        confidence: 'low',
+        occurredAt: pendingCapture.createdAt,
+        timeSource: 'capture',
       },
     });
   });
 
-  it('falls back to OCR only when text is insufficient and a screenshot exists', () => {
+  it('requests cloud recognition directly when a screenshot has no accessible text', () => {
     const state = buildScreenCaptureViewState(
       readyStatus,
       {
@@ -82,15 +84,27 @@ describe('screen capture view state', () => {
       '2026-11-12T10:35:00.000Z',
     );
 
-    expect(state).toMatchObject({ kind: 'ready', needsOcr: true });
+    expect(state).toMatchObject({ kind: 'ready', needsCloud: true });
   });
 
-  it('merges OCR text without repeating lines already provided by accessibility', () => {
-    expect(
-      mergeScreenCaptureText(
-        '微信支付\n支付成功\n收款方：便利店',
-        '支付成功\n实付 ¥8.50\n收款方：便利店',
-      ),
-    ).toBe('微信支付\n支付成功\n收款方：便利店\n实付 ¥8.50');
+  it('accepts a deliberately shared screenshot without accessibility permission', () => {
+    const state = buildScreenCaptureViewState(
+      { ...readyStatus, accessibilityEnabled: false },
+      { ...pendingCapture, captureMethod: 'shared_image', rawText: '' },
+      '2026-11-12T10:35:00.000Z',
+    );
+    expect(state).toMatchObject({ kind: 'ready', needsCloud: true });
+  });
+
+  it('does not accept locally guessed money when there is no image to send', () => {
+    const state = buildScreenCaptureViewState(readyStatus, {
+      ...pendingCapture, screenshotUri: null,
+    }, '2026-11-12T10:35:00.000Z');
+    expect(state).toMatchObject({ kind: 'ready', needsCloud: false, extraction: { amountMinor: null } });
+  });
+
+  it('expires a capture five minutes after the original capture time', () => {
+    expect(captureExpiresAt(pendingCapture)).toBe(Date.parse('2026-11-12T10:35:00.000Z'));
+    expect(captureExpiresAt({ ...pendingCapture, createdAt: 'invalid' })).toBe(0);
   });
 });

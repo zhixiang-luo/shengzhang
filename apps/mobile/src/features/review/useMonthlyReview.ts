@@ -3,11 +3,11 @@ import {
   type MonthlyReview,
   type MonthlyReviewTransaction,
 } from '@shengzhang/domain';
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { listCategories, type CategoryRow } from '../../db/categoryRepository';
-import { useDatabase } from '../../db/DatabaseProvider';
+import { withFreshDatabase } from '../../db/freshDatabase';
+import { useDatabaseRefresh } from '../../db/useDatabaseRefresh';
 import {
   listTransactionsBetween,
   type TransactionRow,
@@ -51,36 +51,46 @@ function reviewTransactions(
 }
 
 export function useMonthlyReview(monthKey: string) {
-  const db = useDatabase();
   const month = useMemo(() => monthDateFromKey(monthKey), [monthKey]);
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [previousTransactions, setPreviousTransactions] = useState<TransactionRow[]>([]);
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const requestRef = useRef(0);
 
   const load = useCallback(() => {
-    try {
+    const request = ++requestRef.current;
+    void withFreshDatabase((fresh) => {
       const range = monthRange(month);
       const previousRange = monthRange(shiftMonth(month, -1));
-      setTransactions(listTransactionsBetween(db, range.startIso, range.endIso));
-      setPreviousTransactions(
-        listTransactionsBetween(db, previousRange.startIso, previousRange.endIso),
-      );
-      setCategories(listCategories(db, true));
-      setError(null);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : '月度回顾读取失败');
-    } finally {
-      setLoading(false);
-    }
-  }, [db, month]);
+      return {
+        transactions: listTransactionsBetween(fresh, range.startIso, range.endIso),
+        previousTransactions: listTransactionsBetween(
+          fresh,
+          previousRange.startIso,
+          previousRange.endIso,
+        ),
+        categories: listCategories(fresh, true),
+      };
+    })
+      .then((snapshot) => {
+        if (request !== requestRef.current) return;
+        setTransactions(snapshot.transactions);
+        setPreviousTransactions(snapshot.previousTransactions);
+        setCategories(snapshot.categories);
+        setError(null);
+      })
+      .catch((caught) => {
+        if (request !== requestRef.current) return;
+        setError(caught instanceof Error ? caught.message : '月度回顾读取失败');
+      })
+      .finally(() => {
+        if (request === requestRef.current) setLoading(false);
+      });
+  }, [month]);
 
-  useFocusEffect(
-    useCallback(() => {
-      load();
-    }, [load]),
-  );
+  useDatabaseRefresh(load);
 
   const categoryMap = useMemo(
     () => new Map(categories.map((category) => [category.id, category])),

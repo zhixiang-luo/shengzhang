@@ -2,6 +2,7 @@ package com.shengzhang.screencapture
 
 import android.content.Context
 import android.net.Uri
+import android.util.AtomicFile
 import org.json.JSONObject
 import java.io.File
 
@@ -27,21 +28,47 @@ object PendingCaptureStore {
     return File(directory(context), "$captureId.png")
   }
 
+  fun stagingScreenshotFile(context: Context, captureId: String): File {
+    return File(context.cacheDir, "screen-capture-$captureId.png")
+  }
+
   @Synchronized
   fun write(context: Context, capture: PendingCapture): Boolean {
-    purgeExpired(context)
-    removeFilesExcept(context, capture.captureId)
-    val json = JSONObject()
-      .put("captureId", capture.captureId)
-      .put("createdAt", capture.createdAt)
-      .put("sourceApp", capture.sourceApp)
-      .put("rawText", capture.rawText.take(12_000))
-      .put("screenshotPath", capture.screenshotPath ?: JSONObject.NULL)
-      .put("captureMethod", capture.captureMethod)
-    return runCatching {
-      metadataFile(context).writeText(json.toString())
+    val staged = capture.screenshotPath?.let { File(it) }
+    val destination = staged?.let { screenshotFile(context, capture.captureId) }
+    return try {
+      // Image generation happens in cacheDir. Publish it and its metadata while
+      // holding the same lock used by read/clear/purge; they never see a partial image.
+      if (staged != null && destination != null) {
+        require(staged.isFile) { "截图已失效" }
+        if (staged.absolutePath != destination.absolutePath && !staged.renameTo(destination)) {
+          staged.copyTo(destination, overwrite = true)
+        }
+      }
+      val json = JSONObject()
+        .put("captureId", capture.captureId)
+        .put("createdAt", capture.createdAt)
+        .put("sourceApp", capture.sourceApp)
+        .put("rawText", capture.rawText.take(12_000))
+        .put("screenshotPath", destination?.absolutePath ?: JSONObject.NULL)
+        .put("captureMethod", capture.captureMethod)
+      val atomic = AtomicFile(metadataFile(context))
+      val stream = atomic.startWrite()
+      try {
+        stream.write(json.toString().toByteArray(Charsets.UTF_8))
+        atomic.finishWrite(stream)
+      } catch (error: Exception) {
+        atomic.failWrite(stream)
+        throw error
+      }
+      removeFilesExcept(context, capture.captureId)
       true
-    }.getOrDefault(false)
+    } catch (_: Exception) {
+      destination?.delete()
+      false
+    } finally {
+      if (staged?.absolutePath != destination?.absolutePath) staged?.delete()
+    }
   }
 
   @Synchronized
@@ -82,13 +109,13 @@ object PendingCaptureStore {
 
   @Synchronized
   fun clear(context: Context, captureId: String? = null) {
-    val capture = read(context)
-    if (captureId == null || capture?.captureId == captureId) {
-      metadataFile(context).delete()
-    }
     if (captureId == null) {
       directory(context).listFiles()?.forEach { it.delete() }
       return
+    }
+    val capture = read(context)
+    if (capture?.captureId == captureId) {
+      metadataFile(context).delete()
     }
     screenshotFile(context, captureId).delete()
   }
@@ -97,6 +124,10 @@ object PendingCaptureStore {
   fun purgeExpired(context: Context) {
     val file = metadataFile(context)
     val now = System.currentTimeMillis()
+    context.cacheDir.listFiles()
+      ?.filter { it.name.startsWith("screen-capture-") || it.name.startsWith("bill-import-") }
+      ?.filter { now - it.lastModified() > MAX_AGE_MS }
+      ?.forEach { it.delete() }
     if (file.isFile) {
       val createdAt = runCatching { JSONObject(file.readText()).getLong("createdAt") }.getOrDefault(0L)
       if (createdAt <= 0L || now - createdAt > MAX_AGE_MS) {
@@ -115,7 +146,7 @@ object PendingCaptureStore {
   private fun removeFilesExcept(context: Context, captureId: String) {
     val keepScreenshot = screenshotFile(context, captureId).name
     directory(context).listFiles()?.forEach { file ->
-      if (file.name != keepScreenshot) file.delete()
+      if (file.name != keepScreenshot && file.name != "capture.json") file.delete()
     }
   }
 }

@@ -3,12 +3,12 @@ import {
   summarizeExpenseCategories,
   type AmountSummary,
 } from '@shengzhang/domain';
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { listCategories, type CategoryRow } from '../../db/categoryRepository';
-import { useDatabase } from '../../db/DatabaseProvider';
+import { withFreshDatabase } from '../../db/freshDatabase';
 import { listTransactionsBetween, type TransactionRow } from '../../db/transactionRepository';
+import { useDatabaseRefresh } from '../../db/useDatabaseRefresh';
 import { localDateKey, monthRange, shiftMonth, startOfMonth } from '../../utils/date';
 
 export interface LedgerEntryView extends TransactionRow {
@@ -25,7 +25,6 @@ export interface LedgerDayGroup {
 }
 
 export function useLedgerMonth() {
-  const db = useDatabase();
   const [month, setMonthState] = useState(() => startOfMonth(new Date()));
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [categories, setCategories] = useState<CategoryRow[]>([]);
@@ -36,29 +35,38 @@ export function useLedgerMonth() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const requestRef = useRef(0);
 
   const load = useCallback(() => {
-    try {
+    const request = ++requestRef.current;
+    void withFreshDatabase((fresh) => {
       const range = monthRange(month);
       const previousRange = monthRange(shiftMonth(month, -1));
-      setTransactions(listTransactionsBetween(db, range.startIso, range.endIso));
-      setPreviousSummary(
-        summarizeAmounts(listTransactionsBetween(db, previousRange.startIso, previousRange.endIso)),
-      );
-      setCategories(listCategories(db));
-      setError(null);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : '账本读取失败');
-    } finally {
-      setLoading(false);
-    }
-  }, [db, month]);
+      return {
+        transactions: listTransactionsBetween(fresh, range.startIso, range.endIso),
+        previousSummary: summarizeAmounts(
+          listTransactionsBetween(fresh, previousRange.startIso, previousRange.endIso),
+        ),
+        categories: listCategories(fresh),
+      };
+    })
+      .then((snapshot) => {
+        if (request !== requestRef.current) return;
+        setTransactions(snapshot.transactions);
+        setPreviousSummary(snapshot.previousSummary);
+        setCategories(snapshot.categories);
+        setError(null);
+      })
+      .catch((caught) => {
+        if (request !== requestRef.current) return;
+        setError(caught instanceof Error ? caught.message : '账本读取失败');
+      })
+      .finally(() => {
+        if (request === requestRef.current) setLoading(false);
+      });
+  }, [month]);
 
-  useFocusEffect(
-    useCallback(() => {
-      load();
-    }, [load]),
-  );
+  useDatabaseRefresh(load);
 
   const categoryMap = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
 

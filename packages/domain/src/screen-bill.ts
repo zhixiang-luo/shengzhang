@@ -1,4 +1,4 @@
-import { parseYuanToCents } from './money';
+import { parseYuanToCents } from './money.ts';
 
 export type ScreenBillSourceApp = 'wechat' | 'alipay' | 'unknown';
 export type ScreenBillConfidence = 'high' | 'medium' | 'low';
@@ -20,175 +20,136 @@ export interface ScreenBillExtraction {
   type: 'expense' | 'income';
   amountMinor: number | null;
   occurredAt: string;
+  timeSource: 'page' | 'capture';
   note: string;
   confidence: ScreenBillConfidence;
   warnings: string[];
+  blockingReason: string | null;
 }
 
-const NEGATIVE_AMOUNT_CONTEXT =
-  /订单号|订单编号|交易号|流水号|余额|手机号|电话|尾号|卡号|原价|优惠|折扣|积分|券码|验证码|账号/;
-const ACTUAL_PAYMENT_CONTEXT = /实付|实际支付|支付金额|付款金额|交易金额|消费金额/;
-const PAYMENT_CONTEXT = /支付成功|付款成功|交易成功|付款详情|支付详情|合计|总计/;
-const MONEY_PATTERN = /(?:[¥￥]\s*)?(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,2}))?\s*(?:元)?/g;
+const EXCLUDED = /订单|交易号|流水号|余额|手机号|电话|尾号|卡号|原价|优惠|折扣|积分|券码|验证码|账号|手续费|时间|日期/;
+const PAID = /实付|实际支付|已支付|支付金额|付款金额|交易金额|消费金额|支出金额|收入金额|到账金额/;
+const PAYMENT = /支付成功|付款成功|交易成功|消费成功|付款详情|支付详情|账单详情|交易详情|合计|总计/;
+const SUCCESS = /支付成功|付款成功|交易成功|消费成功|扣款成功|收款成功|收款到账|交易已完成|(?:交易状态|付款状态|支付状态|当前状态)\s*:?\s*(?:成功|已完成|已支付)|(?:^|\n)(?:已支付|已付款|已完成)(?=\s|$)/;
+const FIELD_LABEL = /^(?:实付|实际支付|已支付|支付金额|付款金额|交易金额|消费金额|支出金额|收入金额|到账金额|订单金额|原价|优惠|余额|订单号|订单编号|交易号|流水号|手机号|卡号|手续费)\s*:?$/;
+const AMOUNT_TOKEN = /[¥￥]?\s*[+−-]?\d[\d.,:/-]*\s*元?/g;
+const TRANSFER_OR_REFUND = /(?:^|\n)(?:(?:交易类型|收支类型|交易状态|当前状态)\s*:?\s*)?(?:转账(?:成功|详情|记录|金额)?|转账给[^\n]*|微信转账|支付宝转账|退款(?:成功|中|处理中|金额|到账|详情)?|已退款|已退回|撤销交易)(?:\s|[:¥]|$)/;
+const FOREIGN_CURRENCY = /\b(?:USD|HKD|EUR|GBP|JPY|AUD|CAD|SGD)\s*[+−-]?\d|[$€£]\s*\d|\d[\d.,]*\s*(?:美元|港元|港币|欧元|英镑|日元)|币种\s*:?\s*(?:USD|HKD|EUR|GBP|JPY|美元|港元|港币|欧元|英镑|日元)/i;
 
-function normalizeWidth(value: string): string {
+export function normalizeScreenText(value: string): string {
   return value
     .replace(/[０-９]/g, (digit) => String(digit.charCodeAt(0) - 0xff10))
     .replace(/[，]/g, ',')
-    .replace(/[。]/g, '.')
+    .replace(/[．。]/g, '.')
     .replace(/[：]/g, ':')
     .replace(/[￥]/g, '¥');
 }
 
-function amountFromMatch(amount: string, fraction: string | undefined): number | null {
-  const normalized = `${amount.replaceAll(',', '')}${fraction ? `.${fraction}` : ''}`;
-  return parseYuanToCents(normalized);
+function fieldLines(text: string): string[] {
+  const lines = normalizeScreenText(text).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const result: string[] = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    let line = lines[index]!;
+    // Accessibility labels, currency marks and values can be separate nodes.
+    if (FIELD_LABEL.test(line) || (EXCLUDED.test(line) && !/\d/.test(line) && line.length <= 40) || line === '¥') {
+      for (let count = 0; count < 2; count += 1) {
+        const next = lines[index + 1];
+        if (!next || !/^[¥+−\d.,\s-]+(?:元)?$/.test(next)) break;
+        line += ` ${next}`;
+        index += 1;
+      }
+    }
+    result.push(line);
+  }
+  return result;
+}
+
+function candidatesFromLine(line: string): AmountCandidate[] {
+  if (EXCLUDED.test(line)) return [];
+  const matches = [...line.matchAll(AMOUNT_TOKEN)];
+  // Multiple numbers on one line have ambiguous roles; never choose the largest.
+  if (matches.length !== 1) return [];
+  const raw = matches[0]![0].trim();
+  const value = raw.replace(/^[¥\s+−-]+/, '').replace(/元$/, '').trim();
+  if (!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/.test(value)) return [];
+  const explicit = PAID.test(line);
+  const payment = PAYMENT.test(line);
+  if (!explicit && !payment && !/[¥元]/.test(raw) && !/^[+−-]/.test(raw)) return [];
+  const amountMinor = parseYuanToCents(value);
+  if (!amountMinor || amountMinor > 99_999_999) return [];
+  return [{
+    amountMinor, raw, line,
+    score: explicit ? 100 : payment ? 50 : /[¥元]/.test(raw) ? 20 : 10,
+  }];
 }
 
 export function normalizeScreenAmount(text: string): number | null {
-  const line = normalizeWidth(text).trim();
-  if (!line || NEGATIVE_AMOUNT_CONTEXT.test(line)) return null;
-
-  MONEY_PATTERN.lastIndex = 0;
-  const matches = [...line.matchAll(MONEY_PATTERN)];
-  if (matches.length !== 1) return null;
-  const match = matches[0];
-  if (!match?.[1]) return null;
-  const raw = match[0];
-  const hasMoneyMarker = /[¥元]/.test(raw) || raw.includes('.');
-  const hasPositiveContext = ACTUAL_PAYMENT_CONTEXT.test(line) || PAYMENT_CONTEXT.test(line);
-  if (!hasMoneyMarker && !hasPositiveContext) return null;
-  return amountFromMatch(match[1], match[2]);
+  const candidates = candidatesFromLine(normalizeScreenText(text).trim());
+  return candidates[0]?.amountMinor ?? null;
 }
 
 export function selectBestAmountCandidate(candidates: AmountCandidate[]): AmountCandidate | null {
-  return (
-    [...candidates]
-      .filter((candidate) => Number.isSafeInteger(candidate.amountMinor) && candidate.amountMinor > 0)
-      .sort((left, right) => right.score - left.score || right.amountMinor - left.amountMinor)[0] ??
-    null
-  );
+  const valid = candidates
+    .filter((candidate) => Number.isSafeInteger(candidate.amountMinor) && candidate.amountMinor > 0 && candidate.score > 0)
+    .sort((left, right) => right.score - left.score);
+  const best = valid[0];
+  if (!best || valid.some((candidate) => candidate.score === best.score && candidate.amountMinor !== best.amountMinor)) return null;
+  return best;
 }
 
-function scoreAmountLine(line: string): number {
-  let score = 0;
-  if (ACTUAL_PAYMENT_CONTEXT.test(line)) score += 40;
-  else if (/订单金额|付款总额|消费合计/.test(line)) score += 30;
-  else if (PAYMENT_CONTEXT.test(line)) score += 18;
-  if (/[¥￥]|元/.test(line)) score += 10;
-  if (/\.\d{1,2}/.test(line)) score += 4;
-  if (NEGATIVE_AMOUNT_CONTEXT.test(line)) score -= 100;
-  return score;
+function extractContent(text: string): string {
+  const product = text.match(/(?:商品名称|商品说明|商品|付款说明)\s*:?\s*([^\n]+)/)?.[1];
+  const merchant = text.match(/(?:收款方|收款人|商户全称|商户名称|商户|付款给|交易对方)\s*:?\s*([^\n]+)/)?.[1];
+  return (product ?? merchant ?? '').replace(/(?:支付时间|付款时间|交易时间|订单号).*$/, '').trim().slice(0, 40);
 }
 
-function collectAmountCandidates(text: string): AmountCandidate[] {
-  const candidates: AmountCandidate[] = [];
-  for (const rawLine of text.split(/\r?\n/)) {
-    const line = normalizeWidth(rawLine).trim();
-    if (!line) continue;
-    MONEY_PATTERN.lastIndex = 0;
-    for (const match of line.matchAll(MONEY_PATTERN)) {
-      if (!match[1]) continue;
-      const raw = match[0].trim();
-      const hasMoneyMarker = /[¥元]/.test(raw) || raw.includes('.');
-      const hasPositiveContext = ACTUAL_PAYMENT_CONTEXT.test(line) || PAYMENT_CONTEXT.test(line);
-      if (!hasMoneyMarker && !hasPositiveContext) continue;
-      const amountMinor = amountFromMatch(match[1], match[2]);
-      if (!amountMinor || amountMinor > 99_999_999) continue;
-      candidates.push({ amountMinor, raw, line, score: scoreAmountLine(line) });
-    }
-  }
-  return candidates;
-}
-
-function extractMerchant(text: string): string {
-  const normalized = normalizeWidth(text);
-  const match = normalized.match(
-    /(?:收款方|收款人|商户全称|商户名称|商户|付款给|商品名称|付款说明)\s*:?\s*([^\n]+)/,
-  );
-  if (!match?.[1]) return '';
-  return match[1]
-    .replace(/(?:支付时间|付款时间|交易时间|订单号).*$/, '')
-    .trim()
-    .slice(0, 40);
-}
-
-function localDateWithTime(now: Date, hours: number, minutes: number): string | null {
-  if (hours > 23 || minutes > 59) return null;
-  const result = new Date(now);
-  result.setHours(hours, minutes, 0, 0);
-  return result.toISOString();
-}
-
-function extractOccurredAt(text: string, nowIso: string): string {
-  const normalized = normalizeWidth(text);
-  const now = new Date(nowIso);
-  if (Number.isNaN(now.getTime())) return new Date().toISOString();
-
-  const relative = normalized.match(/(今天|昨天|前天)\s*(\d{1,2}):(\d{2})/);
-  if (relative) {
-    const hours = Number(relative[2]);
-    const minutes = Number(relative[3]);
-    const relativeDate = new Date(now);
-    const dayOffset = relative[1] === '昨天' ? -1 : relative[1] === '前天' ? -2 : 0;
-    relativeDate.setDate(relativeDate.getDate() + dayOffset);
-    const value = localDateWithTime(relativeDate, hours, minutes);
-    if (value) return value;
-  }
-
-  const absolute = normalized.match(
-    /(\d{4})[-/.年](\d{1,2})[-/.月](\d{1,2})日?\s*(\d{1,2}):(\d{2})/,
-  );
+function extractTime(text: string, now: string): { occurredAt: string; timeSource: 'page' | 'capture' } {
+  const fallback = { occurredAt: now, timeSource: 'capture' as const };
+  const current = new Date(now);
+  if (Number.isNaN(current.getTime())) return fallback;
+  const labeled = text.match(/(?:支付时间|付款时间|交易时间|完成时间|到账时间)\s*:?\s*([^\n]+)/)?.[1];
+  // Prefer a labeled transaction time. Unlabeled dates may be order creation dates.
+  const source = labeled ?? text.match(/(?:今天|昨天|前天)\s*\d{1,2}:\d{2}/)?.[0];
+  if (!source) return fallback;
+  const absolute = source.match(/(\d{4})[-/.年](\d{1,2})[-/.月](\d{1,2})日?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  const relative = source.match(/(?:(今天|昨天|前天)\s*)?(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  let result: Date;
   if (absolute) {
-    const value = new Date(
-      Number(absolute[1]),
-      Number(absolute[2]) - 1,
-      Number(absolute[3]),
-      Number(absolute[4]),
-      Number(absolute[5]),
-      0,
-      0,
-    );
-    if (!Number.isNaN(value.getTime())) return value.toISOString();
-  }
-
-  const clockOnly = normalized.match(/(?:支付时间|付款时间|交易时间)\s*:?\s*(\d{1,2}):(\d{2})/);
-  if (clockOnly) {
-    const value = localDateWithTime(now, Number(clockOnly[1]), Number(clockOnly[2]));
-    if (value) return value;
-  }
-
-  return now.toISOString();
+    const [, y, m, d, h, min, sec] = absolute;
+    const parts = [Number(y), Number(m), Number(d), Number(h), Number(min), Number(sec ?? 0)];
+    result = new Date(parts[0]!, parts[1]! - 1, parts[2], parts[3], parts[4], parts[5]);
+    if (result.getFullYear() !== parts[0] || result.getMonth() + 1 !== parts[1] || result.getDate() !== parts[2] || result.getHours() !== parts[3] || result.getMinutes() !== parts[4] || result.getSeconds() !== parts[5]) return fallback;
+  } else if (relative) {
+    const [, day, h, min, sec] = relative;
+    if (Number(h) > 23 || Number(min) > 59 || Number(sec ?? 0) > 59) return fallback;
+    result = new Date(current);
+    result.setDate(result.getDate() - (day === '昨天' ? 1 : day === '前天' ? 2 : 0));
+    result.setHours(Number(h), Number(min), Number(sec ?? 0), 0);
+  } else return fallback;
+  return { occurredAt: result.toISOString(), timeSource: 'page' };
 }
 
 export function extractScreenBill(input: ScreenBillTextInput): ScreenBillExtraction {
-  const text = normalizeWidth(input.text).trim();
-  const candidates = collectAmountCandidates(text);
-  const best = selectBestAmountCandidate(candidates);
-  const positiveCandidates = candidates.filter((candidate) => candidate.score > 0);
-  const hasPaymentCue = PAYMENT_CONTEXT.test(text) || ACTUAL_PAYMENT_CONTEXT.test(text);
-  const note = extractMerchant(text);
-  const occurredAt = extractOccurredAt(text, input.now);
+  const text = normalizeScreenText(input.text).trim();
+  const blockingReason = /支付失败|付款失败|交易失败|交易关闭|订单关闭|待付款|待支付|等待(?:买家)?付款|等待支付|未支付|未付款|支付中/.test(text)
+    ? '这笔交易尚未支付成功，请确认后再记账'
+    : TRANSFER_OR_REFUND.test(text)
+      ? '这是转账或退款，请通过手动记账确认收支'
+      : FOREIGN_CURRENCY.test(text) ? '当前仅支持人民币账单' : null;
+  const candidates = fieldLines(text).flatMap(candidatesFromLine);
+  const confirmed = SUCCESS.test(text);
+  const best = !blockingReason && confirmed ? selectBestAmountCandidate(candidates) : null;
   const warnings: string[] = [];
-
-  if (!best) warnings.push('没有识别到明确的实付金额，请手动填写');
-  if (positiveCandidates.length > 1) warnings.push('识别到多个金额，请核对实付金额');
-
-  const confidence: ScreenBillConfidence =
-    !best
-      ? 'low'
-      : hasPaymentCue && (ACTUAL_PAYMENT_CONTEXT.test(text) || /支付成功|付款成功/.test(text))
-        ? positiveCandidates.length > 1
-          ? 'medium'
-          : 'high'
-        : 'medium';
-
+  if (blockingReason) warnings.push(blockingReason);
+  else if (!confirmed && candidates.length > 0) warnings.push('未确认这笔交易已成功，请手动核对或尝试云端识别');
+  else if (!best) warnings.push(candidates.length > 1 ? '识别到多个金额，请手动核对实付金额' : '没有识别到明确的实付金额，请手动填写');
   return {
-    type: 'expense',
+    type: /收入金额|到账金额|收款成功|收款到账|(?:收支类型|收支|交易类型)\s*:?\s*收入/.test(text) || /^[¥\s]*\+/.test(best?.raw ?? '') ? 'income' : 'expense',
     amountMinor: best?.amountMinor ?? null,
-    occurredAt,
-    note,
-    confidence,
+    ...extractTime(text, input.now),
+    note: extractContent(text),
+    confidence: !best ? 'low' : best.score >= 100 ? 'high' : 'medium',
     warnings,
+    blockingReason,
   };
 }

@@ -3,7 +3,7 @@
     "name": "声账",
     "slug": "shengzhang",
     "scheme": "shengzhang",
-    "version": "0.3.0",
+    "version": "0.3.3",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -37,7 +37,8 @@
         "android.permission.FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ],
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": ["android.permission.SYSTEM_ALERT_WINDOW"]
     },
     "plugins": [
       "expo-router",

@@ -1,7 +1,7 @@
 import { formatCents, summarizeAmounts } from '@shengzhang/domain';
 import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -21,6 +21,7 @@ import { Icon } from '../components/Icon';
 import { UndoDeleteBanner } from '../components/UndoDeleteBanner';
 import { SwipeableDeleteRow } from '../components/SwipeableDeleteRow';
 import { MissingAmountSheet } from '../components/MissingAmountSheet';
+import { QuickCaptureReminder } from '../components/QuickCaptureReminder';
 import { VoiceCaptureOverlay } from '../components/VoiceCaptureOverlay';
 import { VoiceResultSheet } from '../components/VoiceResultSheet';
 import { useDatabase } from '../db/DatabaseProvider';
@@ -57,6 +58,19 @@ export default function LedgerScreen() {
   } = useLedgerMonth();
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
   const [transactionCount] = useState(() => countTransactions(db));
+  const [pullRefreshing, setPullRefreshing] = useState(false);
+  const pullRefreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const pullToRefresh = useCallback(() => {
+    setPullRefreshing(true);
+    refresh();
+    if (pullRefreshTimer.current) clearTimeout(pullRefreshTimer.current);
+    pullRefreshTimer.current = setTimeout(() => setPullRefreshing(false), 350);
+  }, [refresh]);
+
+  useEffect(() => () => {
+    if (pullRefreshTimer.current) clearTimeout(pullRefreshTimer.current);
+  }, []);
 
   const openManualEntry = () => router.push('/entry');
 
@@ -141,7 +155,7 @@ export default function LedgerScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         directionalLockEnabled
-        refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} tintColor={colors.blushDeep} />}
+        refreshControl={<RefreshControl refreshing={pullRefreshing} onRefresh={pullToRefresh} tintColor={colors.blushDeep} />}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.summary}>
@@ -164,6 +178,8 @@ export default function LedgerScreen() {
             </View>
           </View>
         </View>
+
+        {!guideVisible ? <QuickCaptureReminder /> : null}
 
         {error ? (
           <View style={styles.errorCard}>

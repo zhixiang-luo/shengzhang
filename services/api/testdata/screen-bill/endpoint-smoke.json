@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-13T01:24:46.748Z",
+  "note": "Synthetic image through compiled API route and real cloud provider; not a mobile or production endpoint test.",
+  "statusCode": 200,
+  "captureId": "synthetic-endpoint-smoke",
+  "bill": {
+    "amountMinor": 2658,
+    "type": "expense",
+    "merchant": "示例餐厅",
+    "item": null,
+    "occurredAt": "2026-11-12T04:31:00.000Z",
+    "categoryId": "expense-food",
+    "amountEvidence": "实付 ￥26.58",
+    "blockingReason": null
+  },
+  "latencyMs": 3150
+}

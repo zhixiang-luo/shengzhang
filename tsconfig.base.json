@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
+    "rewriteRelativeImportExtensions": true,
     "noEmit": true
   }
 }

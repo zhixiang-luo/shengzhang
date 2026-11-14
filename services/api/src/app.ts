@@ -7,6 +7,9 @@ import { AnalyticsEventStore } from './analytics/event-store.js';
 import { loadEnvironment } from './config.js';
 import { FeedbackStore } from './feedback/feedback-store.js';
 import { createVoiceProvider } from './providers/factory.js';
+import { OpenAiScreenVisionProvider } from './providers/screen-vision.js';
+import { resolveScreenVisionCredentials } from './providers/screen-vision-config.js';
+import { screenBillRoutes } from './routes/screen-bill.js';
 import { analyticsRoutes } from './routes/analytics.js';
 import { appUpdateRoutes } from './routes/app-update.js';
 import { feedbackRoutes } from './routes/feedback.js';
@@ -28,6 +31,7 @@ export function buildApp(
   dependencies: AppDependencies = {},
 ) {
   const environment = loadEnvironment();
+  const screenVision = resolveScreenVisionCredentials(environment);
   const voiceAccessGuard =
     dependencies.voiceAccessGuard ??
     new VoiceAccessGuard(new InMemoryFixedWindowRateLimiter(), {
@@ -48,6 +52,10 @@ export function buildApp(
           '*.note',
           '*.token',
           '*.refreshToken',
+          '*.image',
+          '*.base64',
+          '*.bill',
+          '*.amountEvidence',
         ],
         censor: '[REDACTED]',
       },
@@ -65,6 +73,19 @@ export function buildApp(
   });
 
   app.register(healthRoutes);
+  app.register(screenBillRoutes, {
+    provider: environment.SCREEN_VISION_ENABLED && screenVision.apiKey
+      ? new OpenAiScreenVisionProvider({
+          apiKey: screenVision.apiKey,
+          baseUrl: environment.SCREEN_VISION_BASE_URL,
+          model: environment.SCREEN_VISION_MODEL,
+          thinking: screenVision.thinking,
+        })
+      : null,
+    dailyLimit: environment.SCREEN_VISION_DAILY_LIMIT,
+    globalDailyLimit: environment.SCREEN_VISION_GLOBAL_DAILY_LIMIT,
+    minuteLimit: environment.SCREEN_VISION_IP_MINUTE_LIMIT,
+  });
   app.register(appUpdateRoutes, {
     policy:
       dependencies.appUpdatePolicy ?? {

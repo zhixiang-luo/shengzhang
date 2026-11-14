@@ -8,9 +8,25 @@ export interface ScreenCaptureStatus {
   platform: 'android' | 'ios' | 'web';
   androidApi: number;
   accessibilityEnabled: boolean;
+  accessibilityConnected?: boolean;
   tileSupported: boolean;
+  /** null/absent means this installation has not received a system confirmation yet. */
+  tileAdded?: boolean | null;
   autoAddTileSupported: boolean;
   reason: string | null;
+  imageExportSupported?: boolean;
+  overlaySupported?: boolean;
+  floatingButtonEnabled?: boolean;
+  overlayCloudEnabled?: boolean;
+  lastCaptureMessage?: string | null;
+  lastCaptureCode?: string | null;
+}
+
+export interface ScreenOverlayConfiguration {
+  apiBaseUrl: string;
+  databasePath: string;
+  installationId: string;
+  cloudEnabled: boolean;
 }
 
 export interface PendingScreenCapture {
@@ -19,8 +35,19 @@ export interface PendingScreenCapture {
   sourceApp: ScreenCaptureSourceApp;
   rawText: string;
   screenshotUri: string | null;
-  captureMethod: 'accessibility' | 'screenshot';
+  captureMethod: 'accessibility' | 'screenshot' | 'shared_image';
 }
+
+export interface CaptureImage {
+  mimeType: 'image/jpeg';
+  base64: string;
+}
+
+export interface ScreenCaptureEventSubscription {
+  remove(): void;
+}
+
+export const SCREEN_BILL_SAVED_EVENT = 'onScreenBillSaved';
 
 interface ScreenCaptureNativeModule {
   getScreenCaptureStatus(): Promise<ScreenCaptureStatus>;
@@ -28,8 +55,14 @@ interface ScreenCaptureNativeModule {
   requestQuickSettingsTile(): Promise<boolean>;
   getPendingCapture(): Promise<PendingScreenCapture | null>;
   recognizeCaptureImage(captureId: string): Promise<string>;
+  prepareCaptureImage?(captureId: string): Promise<CaptureImage>;
   clearCapture(captureId: string): Promise<void>;
   openConfirmation(captureId: string): Promise<void>;
+  configureScreenOverlay?(configuration: ScreenOverlayConfiguration): Promise<void>;
+  setScreenOverlayCloudEnabled?(enabled: boolean): Promise<void>;
+  setScreenFloatingButtonEnabled?(enabled: boolean): Promise<void>;
+  requestCaptureShortcut?(): Promise<boolean>;
+  addListener?(eventName: string, listener: () => void): ScreenCaptureEventSubscription;
 }
 
 const nativeModule =
@@ -65,6 +98,11 @@ export async function recognizeCaptureImage(captureId: string): Promise<string> 
   return nativeModule?.recognizeCaptureImage(captureId) ?? '';
 }
 
+export async function prepareCaptureImage(captureId: string): Promise<CaptureImage> {
+  if (!nativeModule?.prepareCaptureImage) throw new Error('请安装新版声账以启用截图云端识别');
+  return nativeModule.prepareCaptureImage(captureId);
+}
+
 export async function clearCapture(captureId: string): Promise<void> {
   await nativeModule?.clearCapture(captureId);
 }
@@ -75,4 +113,27 @@ export async function openScreenCaptureConfirmation(captureId: string): Promise<
 
 export function isScreenCaptureNativeAvailable(): boolean {
   return nativeModule !== null;
+}
+
+export async function configureScreenOverlay(configuration: ScreenOverlayConfiguration): Promise<boolean> {
+  if (!nativeModule?.configureScreenOverlay) return false;
+  await nativeModule.configureScreenOverlay(configuration);
+  return true;
+}
+
+export async function setScreenOverlayCloudEnabled(enabled: boolean): Promise<void> {
+  await nativeModule?.setScreenOverlayCloudEnabled?.(enabled);
+}
+
+export async function setScreenFloatingButtonEnabled(enabled: boolean): Promise<void> {
+  if (!nativeModule?.setScreenFloatingButtonEnabled) throw new Error('请安装新版声账以启用原页面悬浮记账');
+  await nativeModule.setScreenFloatingButtonEnabled(enabled);
+}
+
+export async function requestCaptureShortcut(): Promise<boolean> {
+  return nativeModule?.requestCaptureShortcut?.() ?? false;
+}
+
+export function addScreenBillSavedListener(listener: () => void): ScreenCaptureEventSubscription {
+  return nativeModule?.addListener?.(SCREEN_BILL_SAVED_EVENT, listener) ?? { remove() {} };
 }

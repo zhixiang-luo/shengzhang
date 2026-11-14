@@ -12,6 +12,7 @@ export type IconName =
   | 'close'
   | 'clock'
   | 'drag'
+  | 'edit'
   | 'ledger'
   | 'mic'
   | 'plus'
@@ -61,6 +62,7 @@ export function Icon({ name, size = 22, color = colors.ink, strokeWidth = 1.8 }:
         </>
       )}
       {name === 'drag' && <Path d="M8 9h8M8 15h8" {...common} strokeWidth={2.4} />}
+      {name === 'edit' && <Path d="m15 4 5 5M4 20l5-1L20 8a2 2 0 0 0-5-5L4 14l-1 7Z" {...common} />}
       {name === 'calendar' && (
         <>
           <Rect x="3.5" y="5" width="17" height="15.5" rx="3" {...common} />
