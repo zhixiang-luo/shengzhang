@@ -34,6 +34,8 @@ Android 可提供动态/固定快捷方式与独立显式动作 Activity。[快�
 
 Redmi K60 / HyperOS 的背部轻敲只能在系统“设置 → 更多设置 → 快捷手势 → 背部轻敲”里绑定，第三方 App 不能监听原始敲击事件。声账已发布动态快捷方式 `screen-bill-capture`；若该系统的动作列表能选到“快捷记账”，可直接绑定。若只有“打开应用”，选择声账只会进入首页，不能采集下面的付款页；这种情况需要额外提供一个专用启动入口（会以第二个应用图标出现在系统选择器中），不能靠现有主入口伪装成截图动作。
 
+2026-11-14 在用户的 Redmi K60 / HyperOS 上实测：背部轻敲的双击/三击列表只有微信扫一扫、支付宝扫一扫、支付宝收款码、超级小爱、控制中心、通知中心、截屏、相机、计算器、静音、语音控制、实时字幕、录音机等系统动作，没有第三方 App、动态快捷方式或“打开应用”。因此该机型无法把背部轻敲直接绑到声账，增加专用启动入口也不会出现在这个列表里。可用的折中是“双击 → 控制中心 → 声账小猪磁贴”，磁贴点击后会收起面板并采集当前付款页。
+
 ## iOS 的区别
 
 App 可通过 [App Intents](https://developer.apple.com/documentation/appintents) 暴露动作给快捷指令，执行是否切 App 取决于能力与 [supportedModes](https://developer.apple.com/documentation/appintents/appintent/supportedmodes)。普通 iOS App 没有 Android 式无障碍跨 App 浮层；[扩展模型](https://developer.apple.com/library/archive/documentation/General/Conceptual/ExtensibilityPG/ExtensionOverview.html) 的界面受宿主及扩展点约束。
