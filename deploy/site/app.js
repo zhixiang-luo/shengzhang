@@ -155,6 +155,7 @@ const screenLabels = {
   "voice-result": "声账语音记账结果页面",
   stats: "声账月度统计页面",
   "manual-entry": "声账手动记账页面",
+  "quick-capture": "声账付款页快捷记账确认卡",
 };
 
 function preloadScreens() {

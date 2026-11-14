@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="声账是一款语音优先的个人记账应用。按住说一句，自动识别金额、分类和时间，把记账缩短成一句话。"
+      content="声账是一款语音优先的个人记账应用。按住说一句，自动识别金额、分类和时间；在微信、支付宝付款详情页也能一键快捷记账。"
     />
     <meta name="theme-color" content="#faf7f0" />
     <meta name="color-scheme" content="light" />
@@ -14,7 +14,7 @@
     <meta property="og:title" content="声账 · 说一句，就记好。" />
     <meta
       property="og:description"
-      content="语音优先的个人记账应用。付款之后，不用再经历选择分类、输入金额的一长串步骤。"
+      content="语音优先的个人记账应用。说一句就记好，也能在微信、支付宝付款详情页核对一次直接入账。"
     />
     <meta property="og:image" content="https://bigai.xin/shengzhang/assets/brand-lockup.png" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -30,7 +30,7 @@
         "name": "声账",
         "applicationCategory": "FinanceApplication",
         "operatingSystem": "Android",
-        "description": "语音优先的个人记账应用。按住说一句，自动识别并入账。",
+        "description": "语音优先的个人记账应用。按住说一句，自动识别并入账；Android 内测版支持微信、支付宝付款详情页快捷记账。",
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -224,6 +224,7 @@
         <div class="signal-track">
           <span>一句话多笔</span><i></i>
           <span>自动分类</span><i></i>
+          <span>付款页快捷</span><i></i>
           <span>本地优先</span><i></i>
           <span>实时转写</span><i></i>
           <span>8 秒撤销</span><i></i>
@@ -283,7 +284,7 @@
           <div class="section-lead section-lead-centered" data-reveal>
             <span class="section-index">02 / 怎么记</span>
             <h2>一句话之后，<br /><em>账单自己长出来。</em></h2>
-            <p>语音是主路径，手动记账是稳定兜底。网络、登录和云备份，都不会阻塞你记下眼前这笔钱。</p>
+            <p>语音是主路径，付款页快捷记账把“看到账单再打开 App”的那一步也省掉，手动记账仍是最稳的兜底。网络、登录和云备份，都不会阻塞你记下眼前这笔钱。</p>
           </div>
 
           <div class="experience-stage" data-reveal>
@@ -336,6 +337,22 @@
                 >
                   <span>03</span>
                   手动兜底
+                </button>
+                <button
+                  class="feature-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="feature-panel"
+                  data-screen="quick-capture"
+                  data-kicker="付款之后，不用离开原页面"
+                  data-title="留在付款详情页，核对一下就记好"
+                  data-description="在微信或支付宝的单笔付款详情页，用控制中心磁贴或系统快捷动作触发。金额、商户、时间和分类生成一张可编辑卡，确认一次就写入本地账本，不跳转、不重复输入。"
+                  data-stat-value="1 次确认"
+                  data-stat-label="不离开付款详情页"
+                >
+                  <span>04</span>
+                  付款页快捷
                 </button>
               </div>
 
@@ -425,7 +442,7 @@
             <span class="section-index section-index-light">03 / 隐私边界</span>
             <h2>你的账本，<br /><em>不需要向世界广播。</em></h2>
             <p>
-              最小化收集不是一句口号，而是数据流动方式本身。录音只用于本次识别，历史账单不会被发送给语音模型。
+              最小化收集不是一句口号，而是数据流动方式本身。录音只用于本次识别，历史账单不会被发送给语音模型。付款页快捷记账也只在你主动触发时读取当前页面，首次云端识别前会单独征得同意，不后台监听，也不读取相册。
             </p>
           </div>
 
@@ -555,7 +572,7 @@
             <img src="./assets/piggy-mark.svg" alt="" width="72" height="72" />
             <span class="section-index section-index-light">现在就能试试</span>
             <h2>下一次付款之后，<br /><em>试着只说一句。</em></h2>
-            <p>Android 内测版已开放。本版加入匿名改进与反馈，并修复反馈提交的网络提示，以及“昨天午饭 25”落入当天的问题；反馈会直接进入开发者的私有收件箱。日常界面与逻辑更新会通过应用内 OTA 推送，只有原生能力变化时才需要重新下载安装包。iOS 版本正在准备中，代码与开发进度可以在 GitHub 持续查看。</p>
+            <p>Android 内测版已开放。付款页快捷记账已随 0.3.3 内测包完成微信、支付宝真机验证：同一页面可连续记多笔，保存后账本自动刷新；公开下载仍为稳定版，正式版切换后开放。本版也包含匿名改进与反馈，反馈会直接进入开发者的私有收件箱。日常界面与逻辑更新会通过应用内 OTA 推送，只有原生能力变化时才需要重新下载安装包。iOS 版本正在准备中，代码与开发进度可以在 GitHub 持续查看。</p>
             <div class="download-actions">
               <a
                 class="button button-light button-large"
