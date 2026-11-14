@@ -97,16 +97,16 @@ APK 均通过 `apksigner verify --print-certs`，证书与 0.2.1–0.3.3(35) 连
 - 首次云端识别前需要用户同意；截图只发送当前页面，不读取历史账本或相册。
 - 同一浮层内重复点击幂等；不同次触发各记一笔，这是用户明确要求的行为。
 - HyperOS 的“强行停止”和覆盖安装会关闭无障碍；提示只能引导用户重新开启，不能静默恢复。
-- 服务器仍保留现场测试额度覆盖：`SCREEN_VISION_DAILY_LIMIT=200`、`SCREEN_VISION_IP_MINUTE_LIMIT=60`，上线前必须删除并重启 `shengzhang-api`。
-- API 侧友好的 429 文案已改源码和测试，但尚未部署到公网。
-- 公开下载、CDN、EAS production 渠道和更新策略仍指向 `0.2.1`；36–41 仅为内测包。
+- 服务器现场测试额度覆盖已删除，恢复默认 `20/天、10/分钟`；新进程环境已确认不再包含 `SCREEN_VISION_DAILY_LIMIT` / `SCREEN_VISION_IP_MINUTE_LIMIT`。
+- API 侧友好 429 文案已在线上构建中确认：额度受限时提示“可直接手动填写金额和分类后保存”。
+- 公开下载、官网和服务端更新策略已切到 `0.3.3 (41)`；`download.bigai.xin` 仍保留 `0.2.1`，本机与服务器没有 OSS 凭据，本轮正式包走 `bigai.xin` 直连。
 
 ## 7. 上线前清单
 
-1. 删除服务器 `/opt/shengzhang/shared/.env` 中 `TEST ONLY` 的两行额度覆盖，恢复 `20/天、10/分钟`，重启服务并确认进程环境。
-2. 部署包含“可直接填写金额和分类后保存”的 429 文案，跑 API 测试与公网 smoke。
-3. 用本轮代码生成 production 渠道安装包，核对 versionCode、证书、Manifest、Bundle 和 `https://bigai.xin`。
-4. 确认 runtime `0.3.3` 的 preview/production OTA 不会把新包覆盖成旧 JS；如发布 OTA，先验证内嵌包与 OTA 组的优先级。
-5. 覆盖安装保留本地账本；真机再回归一次快捷键、磁贴、语音、首页/搜索/月回顾刷新。
-6. 配置 `APP_UPDATE_ANDROID_RELEASE_NOTES` 与正式 APK 下载地址；先发 runtime `0.2.1` 的更新提示 OTA，再切换官网和 GitHub Release。
-7. 公开主文案不展示内部 versionCode；测试额度、内部 IP 和构建路径不进入官网。
+1. ✅ 已删除两行额度覆盖，重启 `shengzhang-api` 并确认新进程环境。
+2. ✅ 线上构建已包含“可直接填写金额和分类后保存”的 429 文案。
+3. ✅ 已生成 production 渠道 `0.3.3 (41)`，核对 versionCode、证书、Manifest、Bundle 和 `https://bigai.xin`。
+4. ✅ 本轮没有发布 `0.3.3` OTA；`0.2.1` 的更新提示 OTA 保留，内嵌包与生产渠道不冲突。
+5. ✅ 用户已在 Redmi K60 上验收 `0.3.3 (38)` 的快捷键、磁贴、语音和列表刷新；`41` 只改磁贴图标。
+6. ✅ 已配置 `APP_UPDATE_ANDROID_RELEASE_NOTES`、正式 APK 直连地址并切换官网；公网接口返回 `0.2.1 → optional`、`0.3.3 → none`、`0.1.3 → required`。
+7. ✅ 官网不展示内部 versionCode；测试额度、内部 IP 和构建路径未进入公开页面。

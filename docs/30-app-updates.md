@@ -613,3 +613,32 @@ APP_UPDATE_ANDROID_RELEASE_NOTES='["微信、支付宝付款详情页可用快�
 公开稳定版 `0.2.1 (18)` 的 `UpdateProvider` 与仓库 Tag `v0.2.1-preview.1` 完全一致，当前只显示旧版小横幅，不展示更新要点。新弹窗代码进入 `0.3.3` 后，只有在用户完成一次覆盖安装后才会生效。
 
 若要让现有 `0.2.1` 用户立即看到新弹窗，必须另发一次 runtime `0.2.1` 的 preview OTA，仅更新更新提示组件与契约字段；不能把 `0.3.3` 的 bundle 发到旧 runtime。EAS 已确认 preview 分支存在 runtime `0.2.1` 历史组 `810cd59c-0666-4c9e-b4e7-c5d4402b230a`，具备该补丁通道。该 OTA 尚未发布。
+
+## 28. Android `0.3.3 (41)` 正式发布（2026-11-14）
+
+0.3.3(41) 已从内测包切换为公开 Android 正式版。本版包含微信/支付宝付款详情页快捷记账、控制中心无耳圆脸小猪磁贴、同一页面连续记账、保存后账单刷新、语音接续和无障碍被系统关闭后的恢复提示。
+
+| 项目 | 值 |
+| --- | --- |
+| App Version / Version Code | `0.3.3` / `41` |
+| Runtime Version | `0.3.3` |
+| Channel | `production` |
+| 包名 | `com.shengzhang.ledger` |
+| 文件大小 | 155,851,496 字节 |
+| SHA-256 | `4c84fd68003048b12c634a43f8b47eec13dc0087c76c4ab8db320657eb495c3b` |
+| 签名证书 SHA-256 | `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955` |
+| Embedded update | `77cf919e-d0cf-4e46-805b-378b0b5dc3e3` |
+| 正式下载 | `https://bigai.xin/shengzhang/downloads/shengzhang-0.3.3-preview.apk?download=latest&version=0.3.3` |
+
+服务端 `APP_UPDATE_ANDROID_LATEST_VERSION=0.3.3`，minimum 保持 `0.1.4`，`releaseNotes` 为 6 条，`requiresReinstall=true`。公网验收：
+
+- `0.2.1 → optional`；
+- `0.3.3 → none`；
+- `0.1.3 → required`；
+- 所有返回的 `downloadUrl` 均指向上述正式直连地址。
+
+`SCREEN_VISION_DAILY_LIMIT=200` 与 `SCREEN_VISION_IP_MINUTE_LIMIT=60` 两行测试覆盖已从 `/opt/shengzhang/shared/.env` 删除，API 新进程环境已确认不再包含这两项，恢复默认 `20/天、10/分钟`。
+
+本轮没有发布 0.3.3 OTA。runtime `0.2.1` 的更新提示 OTA 已于此前发布（update group `6b933730-412d-4e9a-9c99-4760c3fdd30d`，Android update ID `01a1da1f-7c46-7747-af2a-267cd9768f54`），老用户会看到 0.3.3 的覆盖安装弹窗。
+
+`download.bigai.xin` 仍是 OSS + CDN 上的 0.2.1 旧包；本轮本机和服务器均没有 OSS 凭据，因此正式下载改用 `bigai.xin` 服务器直连。恢复 OSS 凭据后，把同一 APK 上传为 `releases/shengzhang-0.3.3-preview.apk`，再把官网和服务端 URL 切回 CDN。

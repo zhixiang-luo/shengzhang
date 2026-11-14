@@ -77,7 +77,7 @@ Android 11+ 在微信、支付宝单笔付款详情页，通过控制中心磁�
 | 两级自定义分类、拖拽排序、归档 | ✅ 已完成 |
 | 月度统计、分类下钻、每日明细 | ✅ 已完成 |
 | 本地 SQLite 与删除撤销 | ✅ 已完成 |
-| Android 内测 APK | ✅ 已通过 EAS Build |
+| Android 正式 APK | ✅ `0.3.3 (41)` 已发布 |
 | OTA 增量更新 | ✅ 已接入 EAS Update，需安装含更新客户端的版本 |
 | 官网与移动端下载入口 | ✅ 已部署到 `https://bigai.xin/shengzhang/` |
 | 匿名产品统计与用户开关 | ✅ 已完成 |
@@ -85,14 +85,14 @@ Android 11+ 在微信、支付宝单笔付款详情页，通过控制中心磁�
 | 本地 JSON 备份/恢复与 CSV 导出 | ✅ 已完成 |
 | 离线账单搜索与组合筛选 | ✅ 已完成 |
 | 确定性月度回顾与隐私分享卡 | ✅ 代码与双端导出完成，待真机验收 |
-| Android 11+ 付款页快捷记账 | ✅ `0.3.3 (37)` 微信、支付宝真机通过；连续多笔、语音接续、列表自动刷新与冷启动已验证 |
+| Android 11+ 付款页快捷记账 | ✅ `0.3.3 (41)` 已发布；微信、支付宝真机通过，连续多笔、语音接续、列表自动刷新与冷启动已验证 |
 | 30–50 条真人语音与双端真机矩阵 | 🚧 进行中 |
 | 隐私中心 | 🚧 进行中 |
 | 微信登录、云备份、会员与支付 | 🧭 外部依赖就绪后再启动 |
 
-项目当前处于 **M5/M6 内测与正式发布准备阶段**。快捷记账由主动截图直接走云端，在当前微信/支付宝页面显示可编辑卡，点一次“确定收好了”写现有本地账本并收起。保留单图分享；不先 OCR，不把未知金额伪装 0 元，不增加快捷记账二次确认或撤销页。410 项测试、类型检查、Lint、API build 及双端 bundle 通过；原生规则 51 项通过，0.3.3(37) 完整 Gradle 构建通过。公开稳定仍为 0.2.1，详见 [真机闭环记录](docs/44-quick-accounting-device-verification.md)。
+项目当前处于 **M5/M6 正式发布阶段**。快捷记账由主动截图直接走云端，在当前微信/支付宝页面显示可编辑卡，点一次“确定收好了”写现有本地账本并收起。保留单图分享；不先 OCR，不把未知金额伪装 0 元，不增加快捷记账二次确认或撤销页。410 项测试、类型检查、Lint、API build 及双端 bundle 通过；原生规则 51 项通过，`0.3.3(41)` 完整 Gradle 构建通过。公开稳定已切到 `0.3.3`，详见 [真机闭环记录](docs/44-quick-accounting-device-verification.md)。
 
-线上视觉模型已切到 DeepSeek Flash。0.3.3(36) 真机完成同一微信详情页连续 3 次快捷键、随后 2 笔语音、首页/搜索自动刷新和冷启动验证；0.3.3(37) 增加“快捷记账被系统关闭”的低调恢复提示。HyperOS 在强行停止或覆盖安装后会关闭无障碍，App 只能引导用户重新开启，不能静默恢复。当前剩余工作是撤掉服务器测试额度、部署友好 429 文案、生成 production 包并切换官网下载。
+线上视觉模型已切到 DeepSeek Flash。0.3.3(36) 真机完成同一微信详情页连续 3 次快捷键、随后 2 笔语音、首页/搜索自动刷新和冷启动验证；0.3.3(37) 增加“快捷记账被系统关闭”的低调恢复提示；0.3.3(41) 将控制中心磁贴改为无耳圆脸小猪并正式发布。HyperOS 在强行停止或覆盖安装后会关闭无障碍，App 只能引导用户重新开启，不能静默恢复。
 
 ## 技术亮点
 
@@ -140,10 +140,10 @@ flowchart LR
 | Expo Doctor | 18 / 20；2 项在线检查受当前网络环境限制 |
 | 中文 TTS 语音评测 | 200 / 200 通过 |
 | 松手到结构化完成 | P50 1.68s / P95 2.20s |
-| Android EAS 内测构建 | `0.3.3 (37)` 完整 Gradle 构建、v2 签名及旧证书连续性通过 |
+| Android 正式构建 | `0.3.3 (41)` 完整 Gradle 构建、v2 签名及旧证书连续性通过 |
 | iOS / Android Bundle 导出 | `0.3.3` 通过 |
 
-`0.3.3 (37)` 为 preview 本地构建，`versionCode=37`，签名 SHA-256 `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955`，与 0.2.1–0.3.3(35) 连续；本机文件不进入 Git，构建记录、真机证据和上线清单见 [44号记录](docs/44-quick-accounting-device-verification.md)。上一版0.3.2(23)保留在 [41号记录](docs/41-cloud-overlay-validation.md)，0.3.1(22)及合成模型评测保留在 [38号记录](docs/38-quick-accounting-validation.md)。
+`0.3.3 (41)` 为 production 渠道本地构建，`versionCode=41`，签名 SHA-256 `d0249dc6bbe850212eccad3d16ef28eb9b245edcba1aba8bf9f572a767230955`，与 0.2.1–0.3.3(35) 连续；本机文件不进入 Git，构建记录、真机证据和上线记录见 [44号记录](docs/44-quick-accounting-device-verification.md)。上一版0.3.2(23)保留在 [41号记录](docs/41-cloud-overlay-validation.md)，0.3.1(22)及合成模型评测保留在 [38号记录](docs/38-quick-accounting-validation.md)。
 
 200 条语音结果来自合成的中文 TTS 基线，不等同于真人噪声、口音和弱网环境。项目仍在补充真人语料与双端真机矩阵。
 
@@ -256,9 +256,9 @@ python3 -m http.server 4173
 
 ## 下载与发布
 
-最新公开 Android 内测版仍为 `0.2.1`，可从[声账官网稳定入口下载](https://bigai.xin/shengzhang/#download)。安装包由 `download.bigai.xin` 的 OSS + CDN 链路分发，无需 Expo 或 GitHub 账户。`0.3.3` 内测线包含原生无障碍浮层、TileService、独立动作、同库写入与单图分享，`minSdkVersion=30`，必须新原生 APK/runtime；不申请 SYSTEM_ALERT_WINDOW。Android 11+ 可做覆盖安装测试，先导出 JSON 备份便于核对升级前后账本。不能通过 Expo Go 或 `0.2.1/0.3.0/0.3.1` 的同 runtime OTA 获得新原生能力；`0.3.3(37)` 已完成真机回归，待完成 production 构建与[上线清单](docs/44-quick-accounting-device-verification.md)后切换稳定下载。
+最新公开 Android 版为 `0.3.3 (41)`，可从[声账官网下载入口](https://bigai.xin/shengzhang/#download)获取。当前正式包大小 155,851,496 字节，SHA-256 为 `4c84fd68003048b12c634a43f8b47eec13dc0087c76c4ab8db320657eb495c3b`。由于本机与服务器均未配置 OSS 凭据，本轮正式下载改用 `https://bigai.xin/shengzhang/downloads/shengzhang-0.3.3-preview.apk` 直连；`download.bigai.xin` 仍保留 0.2.1 旧包，恢复凭据后再迁回 CDN。`0.3.3` 包含原生无障碍浮层、TileService、独立动作、同库写入与单图分享，`minSdkVersion=30`，必须新原生 APK/runtime；不申请 SYSTEM_ALERT_WINDOW。Android 11+ 可覆盖安装并保留本地账本。
 
-GitHub Releases 仍保留每个版本的 Tag 和更新说明作为可追溯记录。需要重新安装的原生版本会附 APK；仅 OTA 的更新不需要重复上传 APK。官网当前提供 `0.2.1 (18)`，GitHub Pre-release `v0.2.1-preview.1` 附带同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
+GitHub Releases 保留每个版本的 Tag 和更新说明作为可追溯记录。官网当前提供 `0.3.3 (41)`；GitHub Release 附带同一构建。文件大小、SHA-256 和完整构建记录见 [App 更新与发布文档](docs/30-app-updates.md)。APK 不直接提交到 Git 仓库，避免仓库体积膨胀。
 
 当前尚未在 App Store 或国内 Android 应用商店正式上架。
 

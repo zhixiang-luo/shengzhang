@@ -1,7 +1,7 @@
 # 声账官网
 
 日期：2026-11-14
-状态：首版已上线；2026-11-14 增加付款页快捷记账特性并部署，公开下载仍为稳定版 0.2.1
+状态：首版已上线；2026-11-14 增加付款页快捷记账特性并发布 0.3.3 (41)，公开下载已切到 0.3.3
 
 ## 1. 目标
 
@@ -68,7 +68,7 @@
 当前下载入口：
 
 - 正式官网：`https://bigai.xin/shengzhang/`；
-- Android 内测：`https://download.bigai.xin/releases/shengzhang-0.2.1-preview.apk?download=latest&version=0.2.1`；
+- Android 正式版：`https://bigai.xin/shengzhang/downloads/shengzhang-0.3.3-preview.apk?download=latest&version=0.3.3`；
 - 全量版本索引：GitHub Releases；
 - 源码：`https://github.com/zhixiang-luo/shengzhang`。
 
@@ -90,12 +90,13 @@ python3 -m http.server 4174 -d deploy/site
 
 HTTPS 使用 Let’s Encrypt 证书，SAN 覆盖 `bigai.xin`、`www.bigai.xin`，有效期至 2027-01-26。`certbot.timer` 自动续期已通过 dry-run；阿里云安全组与 Ubuntu UFW 均已放行 443/TCP。官网 footer 展示 `京ICP备2026073107号` 并链接工信部备案系统。
 
-Android 内测包保存在阿里云 OSS Bucket `shengzhang-releases` 的
-`releases/shengzhang-0.2.1-preview.apk`，通过 `download.bigai.xin` CDN 分发，官网直接提供下载，不依赖 Expo 登录。当前稳定安装包为 `0.2.1 (18)`，大小 107,723,132 字节，SHA-256 为 `dbbf5f3f8657895ea2fa2ef9c686b959023a0a6bd56ed57056e17dac1b5fe084`。旧版可直接覆盖安装并保留本地账本。服务器 `/downloads/` 旧路径只保留作短时兼容，不再作为稳定入口。
+0.3.3(41) 已完成微信、支付宝真机回归并发布。当前正式安装包为 `0.3.3 (41)`，大小 155,851,496 字节，SHA-256 为 `4c84fd68003048b12c634a43f8b47eec13dc0087c76c4ab8db320657eb495c3b`。本机与服务器均没有 OSS/CDN 凭据，因此本轮官网和更新接口使用服务器直连：
 
-0.3.3(37) 已完成微信、支付宝真机回归，但仍是 preview 内测包，不进入官网稳定下载。正式切换前需完成 [44 号记录](./44-quick-accounting-device-verification.md) 的额度恢复、API 文案部署、production 构建与 OTA 校验。
+`https://bigai.xin/shengzhang/downloads/shengzhang-0.3.3-preview.apk?download=latest&version=0.3.3`
 
-首页主文案不展示版本号，下载链接使用版本化对象路径并附加 `?download=latest&version=0.2.1`，便于统计下载来源并避免浏览器把旧 APK 当作同一资源继续使用。CDN 对象只存公开安装包和发行文件，禁止存放录音、账本、密钥或用户备份。
+`download.bigai.xin` 的 OSS 对象仍保留 `0.2.1` 旧包，待 OSS 凭据恢复后再迁回 CDN。旧版可直接覆盖安装并保留本地账本；服务器 `/downloads/shengzhang-android-preview.apk` 只保留作过渡兼容。
+
+首页主文案不展示内部 versionCode，下载链接使用版本化路径并附加 `?download=latest&version=0.3.3`，便于统计下载来源并避免浏览器把旧 APK 当作同一资源继续使用。公开目录只存安装包和发行文件，禁止存放录音、账本、密钥或用户备份。
 
 2026-11-05 已完成 CDN HTTPS 切换：`download.bigai.xin` 使用云盾证书
 `cert-95qrl`，启用 HTTP/2、OCSP Stapling 和 HTTP → HTTPS 跳转。公网验收确认
