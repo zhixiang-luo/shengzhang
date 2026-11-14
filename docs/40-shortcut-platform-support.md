@@ -32,6 +32,8 @@ Android 可提供动态/固定快捷方式与独立显式动作 Activity。[快�
 
 不再提供边缘按钮或手动“添加快捷动作”入口。系统磁贴添加状态通过生命周期与添加确认保存，设置返回前台或控制中心收起时刷新。所有保留入口复用单次任务，截图前隐藏自身窗口；关闭/过期/新任务丢弃旧结果，连点一次任务不重复入账。
 
+Redmi K60 / HyperOS 的背部轻敲只能在系统“设置 → 更多设置 → 快捷手势 → 背部轻敲”里绑定，第三方 App 不能监听原始敲击事件。声账已发布动态快捷方式 `screen-bill-capture`；若该系统的动作列表能选到“快捷记账”，可直接绑定。若只有“打开应用”，选择声账只会进入首页，不能采集下面的付款页；这种情况需要额外提供一个专用启动入口（会以第二个应用图标出现在系统选择器中），不能靠现有主入口伪装成截图动作。
+
 ## iOS 的区别
 
 App 可通过 [App Intents](https://developer.apple.com/documentation/appintents) 暴露动作给快捷指令，执行是否切 App 取决于能力与 [supportedModes](https://developer.apple.com/documentation/appintents/appintent/supportedmodes)。普通 iOS App 没有 Android 式无障碍跨 App 浮层；[扩展模型](https://developer.apple.com/library/archive/documentation/General/Conceptual/ExtensibilityPG/ExtensionOverview.html) 的界面受宿主及扩展点约束。
